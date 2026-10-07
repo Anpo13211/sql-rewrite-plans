@@ -1,0 +1,25 @@
+-- PostgreSQL 18, tpch-q10, rewrite; execution 3857.024 ms, planning 0.377 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=20.0 loops=1 est_rows=20 buffers hit=26986421 read=0)
+  -> Sort  (rows=20.0 loops=1 est_rows=428822 buffers hit=26986421 read=0)
+       Sort Key: ['r.revenue DESC']
+    -> Nested Loop [Inner]  (rows=381105.0 loops=1 est_rows=428822 buffers hit=26986421 read=0)
+      -> Hash Join [Inner]  (rows=381105.0 loops=1 est_rows=428822 buffers hit=26986371 read=0)
+           Hash Cond: (c.c_custkey = r.o_custkey)
+        -> Seq Scan on customer c  (rows=1500000.0 loops=1 est_rows=1500196 buffers hit=36560 read=0)
+        -> Hash  (rows=381105.0 loops=1 est_rows=428822 buffers hit=26949811 read=0)
+          -> Subquery Scan  (rows=381105.0 loops=1 est_rows=428822 buffers hit=26949811 read=0)
+            -> Aggregate [Hashed]  (rows=381105.0 loops=1 est_rows=428822 buffers hit=26949811 read=0)
+                 Group Key: ['o.o_custkey']
+              -> Gather  (rows=1147084.0 loops=1 est_rows=560994 workers=7 buffers hit=26949811 read=0)
+                -> Nested Loop [Inner]  (rows=143385.5 loops=8 est_rows=80142 buffers hit=26949811 read=0)
+                  -> Seq Scan on lineitem l  (rows=1851022.88 loops=8 est_rows=2103583 buffers hit=1105296 read=0)
+                       Filter: ((l_returnflag)::text = 'R'::text)
+                       Rows Removed by Filter: 5647234
+                  -> Memoize  (rows=0.08 loops=14808183 est_rows=1 buffers hit=25844515 read=0)
+                    -> Index Scan on orders o using scaleup_tpch_06  (rows=0.08 loops=6461127 est_rows=1 buffers hit=25844515 read=0)
+                         Index Cond: (o_orderkey = l.l_orderkey)
+                         Filter: ((o_orderdate >= '1993-10-01'::date) AND (o_orderdate < '1994-01-01'::date))
+                         Rows Removed by Filter: 1
+      -> Memoize  (rows=1.0 loops=381105 est_rows=1 buffers hit=50 read=0)
+        -> Index Scan on nation n using scaleup_tpch_01  (rows=1.0 loops=25 est_rows=1 buffers hit=50 read=0)
+             Index Cond: (n_nationkey = c.c_nationkey)

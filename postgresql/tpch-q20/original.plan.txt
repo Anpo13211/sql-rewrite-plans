@@ -1,0 +1,26 @@
+-- PostgreSQL 18, tpch-q20, original; execution 3082.113 ms, planning 0.406 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Nested Loop [Semi]  (rows=1804.0 loops=1 est_rows=1077 buffers hit=3777150 read=0)
+  -> Gather Merge  (rows=4054.0 loops=1 est_rows=4000 workers=1 buffers hit=2210 read=0)
+    -> Sort  (rows=2027.0 loops=2 est_rows=2353 buffers hit=2210 read=0)
+         Sort Key: ['supplier.s_name']
+      -> Hash Join [Inner]  (rows=2027.0 loops=2 est_rows=2353 buffers hit=2202 read=0)
+           Hash Cond: (supplier.s_nationkey = nation.n_nationkey)
+        -> Seq Scan on supplier  (rows=50000.0 loops=2 est_rows=58824 buffers hit=2200 read=0)
+        -> Hash  (rows=1.0 loops=2 est_rows=1 buffers hit=2 read=0)
+          -> Seq Scan on nation  (rows=1.0 loops=2 est_rows=1 buffers hit=2 read=0)
+               Filter: ((n_name)::text = 'CANADA'::text)
+               Rows Removed by Filter: 24
+  -> Nested Loop [Inner]  (rows=0.44 loops=4054 est_rows=1 buffers hit=3774940 read=0)
+    -> Index Scan on partsupp using scaleup_tpch_11  (rows=41.48 loops=4054 est_rows=27 buffers hit=3102256 read=0)
+         Index Cond: (ps_suppkey = supplier.s_suppkey)
+         Filter: ((ps_availqty)::numeric > (SubPlan 1))
+         Rows Removed by Filter: 20
+      -> Aggregate <SubPlan 1>  (rows=1.0 loops=247287 est_rows=1 buffers hit=2842807 read=0)
+        -> Index Scan on lineitem using scaleup_tpch_13  (rows=1.14 loops=247287 est_rows=1 buffers hit=2842807 read=0)
+             Index Cond: ((l_partkey = partsupp.ps_partkey) AND (l_suppkey = partsupp.ps_suppkey))
+             Filter: ((l_shipdate >= '1994-01-01'::date) AND (l_shipdate < '1995-01-01'::date))
+             Rows Removed by Filter: 6
+    -> Index Scan on part using scaleup_tpch_04  (rows=0.01 loops=168171 est_rows=1 buffers hit=672684 read=0)
+         Index Cond: (p_partkey = partsupp.ps_partkey)
+         Filter: ((p_name)::text ~~ 'forest%'::text)
+         Rows Removed by Filter: 1

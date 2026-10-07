@@ -1,0 +1,49 @@
+-- PostgreSQL 18, tpcds-q70, rewrite; execution 2370.414 ms, planning 0.514 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=7.0 loops=1 est_rows=13 buffers hit=1359528 read=0)
+  -> Aggregate [Sorted] [Finalize] <CTE main_store_profit>  (rows=52.0 loops=1 est_rows=51 buffers hit=679744 read=0)
+       Group Key: ['ss.ss_store_sk']
+    -> Gather Merge  (rows=364.0 loops=1 est_rows=306 workers=6 buffers hit=679744 read=0)
+      -> Aggregate [Sorted] [Partial]  (rows=52.0 loops=7 est_rows=51 buffers hit=679744 read=0)
+           Group Key: ['ss.ss_store_sk']
+        -> Sort  (rows=788476.71 loops=7 est_rows=23280 buffers hit=679744 read=0)
+             Sort Key: ['ss.ss_store_sk']
+          -> Hash Join [Inner]  (rows=788476.71 loops=7 est_rows=23280 buffers hit=679696 read=0)
+               Hash Cond: (ss.ss_sold_date_sk = d.d_date_sk)
+            -> Seq Scan on store_sales ss  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+            -> Hash  (rows=52.29 loops=7 est_rows=218 buffers hit=2032 read=0)
+              -> Seq Scan on date_dim d  (rows=366.0 loops=1 est_rows=218 buffers hit=2032 read=0)
+                   Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+                   Rows Removed by Filter: 72683
+  -> Unique <CTE eligible_states>  (rows=3.0 loops=1 est_rows=3 buffers hit=679779 read=0)
+    -> Gather Merge  (rows=21.0 loops=1 est_rows=18 workers=6 buffers hit=679779 read=0)
+      -> Unique  (rows=3.0 loops=7 est_rows=3 buffers hit=679779 read=0)
+        -> Sort  (rows=754767.0 loops=7 est_rows=21997 buffers hit=679779 read=0)
+             Sort Key: ['s_1.s_state']
+          -> Hash Join [Inner]  (rows=754767.0 loops=7 est_rows=21997 buffers hit=679731 read=0)
+               Hash Cond: (ss_1.ss_store_sk = s_1.s_store_sk)
+            -> Hash Join [Inner]  (rows=788476.71 loops=7 est_rows=23280 buffers hit=679696 read=0)
+                 Hash Cond: (ss_1.ss_sold_date_sk = d_1.d_date_sk)
+              -> Seq Scan on store_sales ss_1  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+              -> Hash  (rows=52.29 loops=7 est_rows=218 buffers hit=2032 read=0)
+                -> Seq Scan on date_dim d_1  (rows=366.0 loops=1 est_rows=218 buffers hit=2032 read=0)
+                     Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+                     Rows Removed by Filter: 72683
+            -> Hash  (rows=101.0 loops=7 est_rows=101 buffers hit=35 read=0)
+              -> Seq Scan on store s_1  (rows=101.0 loops=7 est_rows=101 buffers hit=35 read=0)
+                   Filter: (s_state IS NOT NULL)
+                   Rows Removed by Filter: 1
+  -> Sort  (rows=7.0 loops=1 est_rows=13 buffers hit=349456 read=0)
+       Sort Key: ['((GROUPING(s.s_state) + GROUPING(s.s_county))) DESC', '(CASE WHEN (((GROUPING(s.s_state) + GROUPING(s.s_county))) = 0) THEN s.s_state ELSE NULL::character varying END)', '(rank() OVER w1)']
+    -> WindowAgg  (rows=7.0 loops=1 est_rows=13 buffers hit=349456 read=0)
+      -> Sort  (rows=7.0 loops=1 est_rows=13 buffers hit=349456 read=0)
+           Sort Key: ['((GROUPING(s.s_state) + GROUPING(s.s_county)))', '(CASE WHEN (GROUPING(s.s_county) = 0) THEN s.s_state ELSE NULL::character varying END)', '(sum(msp.profit)) DESC']
+        -> Aggregate [Mixed]  (rows=7.0 loops=1 est_rows=13 buffers hit=349456 read=0)
+          -> Hash Join [Semi]  (rows=50.0 loops=1 est_rows=50 buffers hit=349456 read=0)
+               Hash Cond: ((s.s_state)::text = (e.s_state)::text)
+            -> Hash Join [Inner]  (rows=51.0 loops=1 est_rows=51 buffers hit=161759 read=0)
+                 Hash Cond: (msp.ss_store_sk = s.s_store_sk)
+              -> CTE Scan (CTE main_store_profit)  (rows=52.0 loops=1 est_rows=51 buffers hit=161754 read=0)
+              -> Hash  (rows=102.0 loops=1 est_rows=102 buffers hit=5 read=0)
+                -> Seq Scan on store s  (rows=102.0 loops=1 est_rows=102 buffers hit=5 read=0)
+            -> Hash  (rows=3.0 loops=1 est_rows=3 buffers hit=187697 read=0)
+              -> CTE Scan (CTE eligible_states)  (rows=3.0 loops=1 est_rows=3 buffers hit=187697 read=0)

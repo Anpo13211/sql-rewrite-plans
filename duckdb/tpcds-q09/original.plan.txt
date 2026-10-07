@@ -1,0 +1,290 @@
+-- DuckDB 1.5.5, tpcds-q09, original; latency 0.39544646 s, cpu 2.873873744 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> PROJECTION  (rows=1 time_s=0.0)
+       Projections: ['bucket1', 'bucket2', 'bucket3', 'bucket4', 'bucket5']
+       Estimated Cardinality: 1
+    -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+      -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+        -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+          -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+            -> TABLE_SCAN  (rows=1 time_s=0.0)
+                 Table: tpcds.main.reason
+                 Type: Index Scan
+                 Filters: r_reason_sk=1
+                 Estimated Cardinality: 1
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0012)
+                       Aggregates: count_star()
+                    -> TABLE_SCAN  (rows=5498216 time_s=0.1329)
+                         Table: tpcds.main.store_sales
+                         Type: Sequential Scan
+                         Filters: ss_quantity>=1 AND ss_quantity<=20
+                         Estimated Cardinality: 5760198
+          -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0167)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5498216 time_s=0.0018)
+                         Projections: ss_ext_discount_amt
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5498216 time_s=0.2477)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_ext_discount_amt
+                           Filters: ss_quantity>=1 AND ss_quantity<=20
+                           Estimated Cardinality: 5760198
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0168)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5498216 time_s=0.0019)
+                         Projections: ss_net_paid
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5498216 time_s=0.1643)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_net_paid
+                           Filters: ss_quantity>=1 AND ss_quantity<=20
+                           Estimated Cardinality: 5760198
+        -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+          -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0012)
+                       Aggregates: count_star()
+                    -> TABLE_SCAN  (rows=5498175 time_s=0.1268)
+                         Table: tpcds.main.store_sales
+                         Type: Sequential Scan
+                         Filters: ss_quantity>=21 AND ss_quantity<=40
+                         Estimated Cardinality: 5760198
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.017)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5498175 time_s=0.0018)
+                         Projections: ss_ext_discount_amt
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5498175 time_s=0.2417)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_ext_discount_amt
+                           Filters: ss_quantity>=21 AND ss_quantity<=40
+                           Estimated Cardinality: 5760198
+          -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0177)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5498175 time_s=0.0019)
+                         Projections: ss_net_paid
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5498175 time_s=0.1623)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_net_paid
+                           Filters: ss_quantity>=21 AND ss_quantity<=40
+                           Estimated Cardinality: 5760198
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0014)
+                       Aggregates: count_star()
+                    -> TABLE_SCAN  (rows=5503144 time_s=0.1259)
+                         Table: tpcds.main.store_sales
+                         Type: Sequential Scan
+                         Filters: ss_quantity>=41 AND ss_quantity<=60
+                         Estimated Cardinality: 5760198
+      -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+        -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+          -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0193)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5503144 time_s=0.002)
+                         Projections: ss_ext_discount_amt
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5503144 time_s=0.2568)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_ext_discount_amt
+                           Filters: ss_quantity>=41 AND ss_quantity<=60
+                           Estimated Cardinality: 5760198
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0192)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5503144 time_s=0.002)
+                         Projections: ss_net_paid
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5503144 time_s=0.167)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_net_paid
+                           Filters: ss_quantity>=41 AND ss_quantity<=60
+                           Estimated Cardinality: 5760198
+          -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0014)
+                       Aggregates: count_star()
+                    -> TABLE_SCAN  (rows=5505755 time_s=0.1233)
+                         Table: tpcds.main.store_sales
+                         Type: Sequential Scan
+                         Filters: ss_quantity>=61 AND ss_quantity<=80
+                         Estimated Cardinality: 5760198
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0187)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5505755 time_s=0.002)
+                         Projections: ss_ext_discount_amt
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5505755 time_s=0.25)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_ext_discount_amt
+                           Filters: ss_quantity>=61 AND ss_quantity<=80
+                           Estimated Cardinality: 5760198
+        -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+          -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0188)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5505755 time_s=0.002)
+                         Projections: ss_net_paid
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5505755 time_s=0.1595)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_net_paid
+                           Filters: ss_quantity>=61 AND ss_quantity<=80
+                           Estimated Cardinality: 5760198
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0014)
+                       Aggregates: count_star()
+                    -> TABLE_SCAN  (rows=5499519 time_s=0.1172)
+                         Table: tpcds.main.store_sales
+                         Type: Sequential Scan
+                         Filters: ss_quantity>=81 AND ss_quantity<=100
+                         Estimated Cardinality: 5760198
+          -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0179)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5499519 time_s=0.0019)
+                         Projections: ss_ext_discount_amt
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5499519 time_s=0.2414)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_ext_discount_amt
+                           Filters: ss_quantity>=81 AND ss_quantity<=100
+                           Estimated Cardinality: 5760198
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                 Estimated Cardinality: 1
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                   Aggregates: ['"first"(#0)', 'count_star()']
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: #0
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0183)
+                       Aggregates: avg(#0)
+                    -> PROJECTION  (rows=5499519 time_s=0.002)
+                         Projections: ss_net_paid
+                         Estimated Cardinality: 5760198
+                      -> TABLE_SCAN  (rows=5499519 time_s=0.1502)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ss_net_paid
+                           Filters: ss_quantity>=81 AND ss_quantity<=100
+                           Estimated Cardinality: 5760198

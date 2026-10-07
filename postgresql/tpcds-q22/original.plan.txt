@@ -1,0 +1,17 @@
+-- PostgreSQL 18, tpcds-q22, original; execution 13234.316 ms, planning 0.337 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=981448 read=0)
+  -> Sort  (rows=100.0 loops=1 est_rows=406953 buffers hit=981448 read=0)
+       Sort Key: ['(avg(inventory.inv_quantity_on_hand)) NULLS FIRST', 'item.i_product_name NULLS FIRST', 'item.i_brand NULLS FIRST', 'item.i_class NULLS FIRST', 'item.i_category NULLS FIRST']
+    -> Aggregate [Mixed]  (rows=203751.0 loops=1 est_rows=406953 buffers hit=981448 read=0)
+      -> Gather  (rows=26520000.0 loops=1 est_rows=676012 workers=7 buffers hit=981448 read=0)
+        -> Hash Join [Inner]  (rows=3315000.0 loops=8 est_rows=96573 buffers hit=981448 read=0)
+             Hash Cond: (inventory.inv_item_sk = item.i_item_sk)
+          -> Hash Join [Inner]  (rows=3315000.0 loops=8 est_rows=96573 buffers hit=976944 read=0)
+               Hash Cond: (inventory.inv_date_sk = date_dim.d_date_sk)
+            -> Seq Scan on inventory  (rows=16638750.0 loops=8 est_rows=19015014 buffers hit=974912 read=0)
+            -> Hash  (rows=45.75 loops=8 est_rows=218 buffers hit=2032 read=0)
+              -> Seq Scan on date_dim  (rows=45.75 loops=8 est_rows=218 buffers hit=2032 read=0)
+                   Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+                   Rows Removed by Filter: 9085
+          -> Hash  (rows=12750.0 loops=8 est_rows=42500 buffers hit=4504 read=0)
+            -> Seq Scan on item  (rows=12750.0 loops=8 est_rows=42500 buffers hit=4504 read=0)

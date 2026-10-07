@@ -1,0 +1,90 @@
+-- PostgreSQL 18, tpcds-q56, original; execution 2655.07 ms, planning 1.512 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=1854145 read=0)
+  -> Sort  (rows=100.0 loops=1 est_rows=200 buffers hit=1854145 read=0)
+       Sort Key: ['(sum((sum(store_sales.ss_ext_sales_price)))) NULLS FIRST', 'item.i_item_id NULLS FIRST']
+    -> Aggregate [Sorted]  (rows=2618.0 loops=1 est_rows=200 buffers hit=1854145 read=0)
+         Group Key: ['item.i_item_id']
+      -> Sort  (rows=4842.0 loops=1 est_rows=416 buffers hit=1854145 read=0)
+           Sort Key: ['item.i_item_id NULLS FIRST']
+        -> Append  (rows=4842.0 loops=1 est_rows=416 buffers hit=1854145 read=0)
+          -> Aggregate [Sorted]  (rows=2238.0 loops=1 est_rows=229 buffers hit=1041446 read=0)
+               Group Key: ['item.i_item_id']
+            -> Gather Merge  (rows=4737.0 loops=1 est_rows=229 workers=1 buffers hit=1041446 read=0)
+              -> Nested Loop [Inner]  (rows=2368.5 loops=2 est_rows=135 buffers hit=1041446 read=0)
+                -> Merge Join [Semi]  (rows=6680.0 loops=2 est_rows=386 buffers hit=989242 read=0)
+                     Merge Cond: ((item.i_item_id)::text = (item_1.i_item_id)::text)
+                  -> Sort  (rows=123134.0 loops=2 est_rows=6201 buffers hit=984738 read=0)
+                       Sort Key: ['item.i_item_id']
+                    -> Nested Loop [Inner]  (rows=123155.5 loops=2 est_rows=6201 buffers hit=984733 read=0)
+                      -> Nested Loop [Inner]  (rows=123155.5 loops=2 est_rows=6201 buffers hit=245800 read=0)
+                        -> Seq Scan on date_dim  (rows=14.0 loops=2 est_rows=16 buffers hit=2032 read=0)
+                             Filter: ((d_year = 2001) AND (d_moy = 2))
+                             Rows Removed by Filter: 36510
+                        -> Bitmap Heap Scan on store_sales  (rows=8796.82 loops=28 est_rows=15095 buffers hit=243768 read=0)
+                          -> Bitmap Index Scan using scaleup_tpcds_53  (rows=8796.82 loops=28 est_rows=15095 buffers hit=290 read=0)
+                               Index Cond: (ss_sold_date_sk = date_dim.d_date_sk)
+                      -> Index Scan on item using scaleup_tpcds_40  (rows=1.0 loops=246311 est_rows=1 buffers hit=738933 read=0)
+                           Index Cond: (i_item_sk = store_sales.ss_item_sk)
+                  -> Sort  (rows=2803.0 loops=1 est_rows=2825 buffers hit=4504 read=0)
+                       Sort Key: ['item_1.i_item_id']
+                    -> Seq Scan on item item_1  (rows=2803.0 loops=1 est_rows=2825 buffers hit=4504 read=0)
+                         Filter: ((i_color)::text = ANY ('{slate,blanched,burnished}'::text[]))
+                         Rows Removed by Filter: 99197
+                -> Index Scan on customer_address using scaleup_tpcds_34  (rows=0.35 loops=13360 est_rows=1 buffers hit=52204 read=0)
+                     Index Cond: (ca_address_sk = store_sales.ss_addr_sk)
+                     Filter: (ca_gmt_offset = '-5'::numeric)
+                     Rows Removed by Filter: 1
+          -> Aggregate [Sorted]  (rows=1605.0 loops=1 est_rows=124 buffers hit=539069 read=0)
+               Group Key: ['item_2.i_item_id']
+            -> Gather Merge  (rows=2411.0 loops=1 est_rows=124 workers=1 buffers hit=539069 read=0)
+              -> Nested Loop [Inner]  (rows=1205.5 loops=2 est_rows=73 buffers hit=539069 read=0)
+                -> Merge Join [Semi]  (rows=3453.5 loops=2 est_rows=201 buffers hit=511513 read=0)
+                     Merge Cond: ((item_2.i_item_id)::text = (item_3.i_item_id)::text)
+                  -> Sort  (rows=63700.5 loops=2 est_rows=3231 buffers hit=507009 read=0)
+                       Sort Key: ['item_2.i_item_id']
+                    -> Nested Loop [Inner]  (rows=63714.0 loops=2 est_rows=3231 buffers hit=507004 read=0)
+                      -> Nested Loop [Inner]  (rows=63714.0 loops=2 est_rows=3231 buffers hit=124720 read=0)
+                        -> Seq Scan on date_dim date_dim_1  (rows=14.0 loops=2 est_rows=16 buffers hit=2032 read=0)
+                             Filter: ((d_year = 2001) AND (d_moy = 2))
+                             Rows Removed by Filter: 36510
+                        -> Bitmap Heap Scan on catalog_sales  (rows=4551.0 loops=28 est_rows=7810 buffers hit=122688 read=0)
+                          -> Bitmap Index Scan using scaleup_tpcds_17  (rows=4551.0 loops=28 est_rows=7810 buffers hit=188 read=0)
+                               Index Cond: (cs_sold_date_sk = date_dim_1.d_date_sk)
+                      -> Index Scan on item item_2 using scaleup_tpcds_40  (rows=1.0 loops=127428 est_rows=1 buffers hit=382284 read=0)
+                           Index Cond: (i_item_sk = catalog_sales.cs_item_sk)
+                  -> Sort  (rows=2803.0 loops=1 est_rows=2825 buffers hit=4504 read=0)
+                       Sort Key: ['item_3.i_item_id']
+                    -> Seq Scan on item item_3  (rows=2803.0 loops=1 est_rows=2825 buffers hit=4504 read=0)
+                         Filter: ((i_color)::text = ANY ('{slate,blanched,burnished}'::text[]))
+                         Rows Removed by Filter: 99197
+                -> Index Scan on customer_address customer_address_1 using scaleup_tpcds_34  (rows=0.35 loops=6907 est_rows=1 buffers hit=27556 read=0)
+                     Index Cond: (ca_address_sk = catalog_sales.cs_bill_addr_sk)
+                     Filter: (ca_gmt_offset = '-5'::numeric)
+                     Rows Removed by Filter: 1
+          -> Aggregate [Sorted]  (rows=999.0 loops=1 est_rows=63 buffers hit=273630 read=0)
+               Group Key: ['item_4.i_item_id']
+            -> Gather Merge  (rows=1236.0 loops=1 est_rows=63 workers=1 buffers hit=273630 read=0)
+              -> Nested Loop [Inner]  (rows=618.0 loops=2 est_rows=37 buffers hit=273630 read=0)
+                -> Merge Join [Semi]  (rows=1721.5 loops=2 est_rows=101 buffers hit=259862 read=0)
+                     Merge Cond: ((item_4.i_item_id)::text = (item_5.i_item_id)::text)
+                  -> Sort  (rows=31700.5 loops=2 est_rows=1622 buffers hit=255358 read=0)
+                       Sort Key: ['item_4.i_item_id']
+                    -> Nested Loop [Inner]  (rows=31706.5 loops=2 est_rows=1622 buffers hit=255353 read=0)
+                      -> Nested Loop [Inner]  (rows=31706.5 loops=2 est_rows=1622 buffers hit=65114 read=0)
+                        -> Seq Scan on date_dim date_dim_2  (rows=14.0 loops=2 est_rows=16 buffers hit=2032 read=0)
+                             Filter: ((d_year = 2001) AND (d_moy = 2))
+                             Rows Removed by Filter: 36510
+                        -> Bitmap Heap Scan on web_sales  (rows=2264.75 loops=28 est_rows=3947 buffers hit=63082 read=0)
+                          -> Bitmap Index Scan using scaleup_tpcds_76  (rows=2264.75 loops=28 est_rows=3947 buffers hit=137 read=0)
+                               Index Cond: (ws_sold_date_sk = date_dim_2.d_date_sk)
+                      -> Index Scan on item item_4 using scaleup_tpcds_40  (rows=1.0 loops=63413 est_rows=1 buffers hit=190239 read=0)
+                           Index Cond: (i_item_sk = web_sales.ws_item_sk)
+                  -> Sort  (rows=2803.0 loops=1 est_rows=2825 buffers hit=4504 read=0)
+                       Sort Key: ['item_5.i_item_id']
+                    -> Seq Scan on item item_5  (rows=2803.0 loops=1 est_rows=2825 buffers hit=4504 read=0)
+                         Filter: ((i_color)::text = ANY ('{slate,blanched,burnished}'::text[]))
+                         Rows Removed by Filter: 99197
+                -> Index Scan on customer_address customer_address_2 using scaleup_tpcds_34  (rows=0.36 loops=3443 est_rows=1 buffers hit=13768 read=0)
+                     Index Cond: (ca_address_sk = web_sales.ws_bill_addr_sk)
+                     Filter: (ca_gmt_offset = '-5'::numeric)
+                     Rows Removed by Filter: 1

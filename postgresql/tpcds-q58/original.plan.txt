@@ -1,0 +1,77 @@
+-- PostgreSQL 18, tpcds-q58, original; execution 1402.604 ms, planning 0.887 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=31.0 loops=1 est_rows=1 buffers hit=1302249 read=0)
+  -> Sort  (rows=31.0 loops=1 est_rows=1 buffers hit=1302249 read=0)
+       Sort Key: ['item_1.i_item_id NULLS FIRST', '(sum(store_sales.ss_ext_sales_price)) NULLS FIRST']
+    -> Merge Join [Inner]  (rows=31.0 loops=1 est_rows=1 buffers hit=1302249 read=0)
+         Merge Cond: ((item.i_item_id)::text = (item_1.i_item_id)::text)
+         Join Filter: (((sum(store_sales.ss_ext_sales_price)) >= (0.9 * (sum(catalog_sales.cs_ext_sales_price)))) AND ((sum(store_sales.ss_ext_sales_price)) <= (1.1 * (sum(catalog_sales.cs_ext_sales_price)))) AND ((sum(catalog_sales.cs_ext_sales_price)) >= (0.9 * (sum(store_sales.ss_ext_sales_price)))) AND ((sum(catalog_sales.cs_ext_sales_price)) <= (1.1 * (sum(store_sales.ss_ext_sales_price)))) AND ((sum(catalog_sales.cs_ext_sales_price)) >= (0.9 * (sum(web_sales.ws_ext_sales_price)))) AND ((sum(catalog_sales.cs_ext_sales_price)) <= (1.1 * (sum(web_sales.ws_ext_sales_price)))) AND ((sum(web_sales.ws_ext_sales_price)) >= (0.9 * (sum(catalog_sales.cs_ext_sales_price)))) AND ((sum(web_sales.ws_ext_sales_price)) <= (1.1 * (sum(catalog_sales.cs_ext_sales_price)))))
+         Rows Removed by Join Filter: 1064
+      -> Aggregate [Sorted]  (rows=39562.0 loops=1 est_rows=1373 buffers hit=301093 read=0)
+           Group Key: ['item.i_item_id']
+        -> Seq Scan on date_dim date_dim_7 <InitPlan 2>  (rows=1.0 loops=1 est_rows=1 buffers hit=2032 read=0)
+             Filter: (d_date = '2000-01-03'::date)
+             Rows Removed by Filter: 73048
+        -> Gather Merge  (rows=75933.0 loops=1 est_rows=1373 workers=1 buffers hit=301093 read=0)
+          -> Sort  (rows=37966.5 loops=2 est_rows=808 buffers hit=299061 read=0)
+               Sort Key: ['item.i_item_id']
+            -> Nested Loop [Inner]  (rows=37966.5 loops=2 est_rows=808 buffers hit=299053 read=0)
+              -> Nested Loop [Inner]  (rows=37966.5 loops=2 est_rows=808 buffers hit=71254 read=0)
+                -> Hash Join [Semi]  (rows=3.5 loops=2 est_rows=4 buffers hit=4064 read=0)
+                     Hash Cond: (date_dim.d_date = date_dim_1.d_date)
+                  -> Seq Scan on date_dim  (rows=36524.5 loops=2 est_rows=42970 buffers hit=2032 read=0)
+                  -> Hash  (rows=3.5 loops=2 est_rows=4 buffers hit=2032 read=0)
+                    -> Seq Scan on date_dim date_dim_1  (rows=7.0 loops=1 est_rows=4 buffers hit=2032 read=0)
+                         Filter: (d_week_seq = (InitPlan 2).col1)
+                         Rows Removed by Filter: 73042
+                -> Index Scan on catalog_sales using scaleup_tpcds_17  (rows=10847.57 loops=7 est_rows=7810 buffers hit=67190 read=0)
+                     Index Cond: (cs_sold_date_sk = date_dim.d_date_sk)
+              -> Index Scan on item using scaleup_tpcds_40  (rows=1.0 loops=75933 est_rows=1 buffers hit=227799 read=0)
+                   Index Cond: (i_item_sk = catalog_sales.cs_item_sk)
+      -> Materialize  (rows=1413.0 loops=1 est_rows=9 buffers hit=1001156 read=0)
+        -> Merge Join [Inner]  (rows=1413.0 loops=1 est_rows=9 buffers hit=1001156 read=0)
+             Merge Cond: ((item_1.i_item_id)::text = (item_2.i_item_id)::text)
+             Join Filter: (((sum(store_sales.ss_ext_sales_price)) >= (0.9 * (sum(web_sales.ws_ext_sales_price)))) AND ((sum(store_sales.ss_ext_sales_price)) <= (1.1 * (sum(web_sales.ws_ext_sales_price)))) AND ((sum(web_sales.ws_ext_sales_price)) >= (0.9 * (sum(store_sales.ss_ext_sales_price)))) AND ((sum(web_sales.ws_ext_sales_price)) <= (1.1 * (sum(store_sales.ss_ext_sales_price)))))
+             Rows Removed by Join Filter: 30227
+          -> Aggregate [Sorted]  (rows=49916.0 loops=1 est_rows=2636 buffers hit=787729 read=0)
+               Group Key: ['item_1.i_item_id']
+            -> Seq Scan on date_dim date_dim_6 <InitPlan 1>  (rows=1.0 loops=1 est_rows=1 buffers hit=2032 read=0)
+                 Filter: (d_date = '2000-01-03'::date)
+                 Rows Removed by Filter: 73048
+            -> Gather Merge  (rows=197074.0 loops=1 est_rows=2636 workers=1 buffers hit=787729 read=0)
+              -> Sort  (rows=98537.0 loops=2 est_rows=1551 buffers hit=785697 read=0)
+                   Sort Key: ['item_1.i_item_id']
+                -> Nested Loop [Inner]  (rows=98537.0 loops=2 est_rows=1551 buffers hit=785689 read=0)
+                  -> Nested Loop [Inner]  (rows=98537.0 loops=2 est_rows=1551 buffers hit=194467 read=0)
+                    -> Hash Join [Semi]  (rows=3.5 loops=2 est_rows=4 buffers hit=4064 read=0)
+                         Hash Cond: (date_dim_2.d_date = date_dim_3.d_date)
+                      -> Seq Scan on date_dim date_dim_2  (rows=36524.5 loops=2 est_rows=42970 buffers hit=2032 read=0)
+                      -> Hash  (rows=3.5 loops=2 est_rows=4 buffers hit=2032 read=0)
+                        -> Seq Scan on date_dim date_dim_3  (rows=7.0 loops=1 est_rows=4 buffers hit=2032 read=0)
+                             Filter: (d_week_seq = (InitPlan 1).col1)
+                             Rows Removed by Filter: 73042
+                    -> Index Scan on store_sales using scaleup_tpcds_53  (rows=28153.43 loops=7 est_rows=15095 buffers hit=190403 read=0)
+                         Index Cond: (ss_sold_date_sk = date_dim_2.d_date_sk)
+                  -> Index Scan on item item_1 using scaleup_tpcds_40  (rows=1.0 loops=197074 est_rows=1 buffers hit=591222 read=0)
+                       Index Cond: (i_item_sk = store_sales.ss_item_sk)
+          -> Materialize  (rows=32314.0 loops=1 est_rows=690 buffers hit=213427 read=0)
+            -> Aggregate [Sorted]  (rows=32314.0 loops=1 est_rows=690 buffers hit=213427 read=0)
+                 Group Key: ['item_2.i_item_id']
+              -> Seq Scan on date_dim date_dim_8 <InitPlan 3>  (rows=1.0 loops=1 est_rows=1 buffers hit=2032 read=0)
+                   Filter: (d_date = '2000-01-03'::date)
+                   Rows Removed by Filter: 73048
+              -> Gather Merge  (rows=52128.0 loops=1 est_rows=690 workers=1 buffers hit=213427 read=0)
+                -> Sort  (rows=26064.0 loops=2 est_rows=406 buffers hit=211395 read=0)
+                     Sort Key: ['item_2.i_item_id']
+                  -> Nested Loop [Inner]  (rows=26064.0 loops=2 est_rows=406 buffers hit=211387 read=0)
+                    -> Nested Loop [Inner]  (rows=26064.0 loops=2 est_rows=406 buffers hit=55003 read=0)
+                      -> Hash Join [Semi]  (rows=3.5 loops=2 est_rows=4 buffers hit=4064 read=0)
+                           Hash Cond: (date_dim_4.d_date = date_dim_5.d_date)
+                        -> Seq Scan on date_dim date_dim_4  (rows=36524.5 loops=2 est_rows=42970 buffers hit=2032 read=0)
+                        -> Hash  (rows=3.5 loops=2 est_rows=4 buffers hit=2032 read=0)
+                          -> Seq Scan on date_dim date_dim_5  (rows=7.0 loops=1 est_rows=4 buffers hit=2032 read=0)
+                               Filter: (d_week_seq = (InitPlan 3).col1)
+                               Rows Removed by Filter: 73042
+                      -> Index Scan on web_sales using scaleup_tpcds_76  (rows=7446.86 loops=7 est_rows=3947 buffers hit=50939 read=0)
+                           Index Cond: (ws_sold_date_sk = date_dim_4.d_date_sk)
+                    -> Index Scan on item item_2 using scaleup_tpcds_40  (rows=1.0 loops=52128 est_rows=1 buffers hit=156384 read=0)
+                         Index Cond: (i_item_sk = web_sales.ws_item_sk)

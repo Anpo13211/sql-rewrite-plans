@@ -1,0 +1,48 @@
+-- PostgreSQL 18, tpcds-q70, original; execution 3939.216 ms, planning 1.029 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=7.0 loops=1 est_rows=13 buffers hit=1359558 read=0)
+  -> Sort  (rows=7.0 loops=1 est_rows=13 buffers hit=1359558 read=0)
+       Sort Key: ['((GROUPING(store.s_state) + GROUPING(store.s_county))) DESC', '(CASE WHEN (((GROUPING(store.s_state) + GROUPING(store.s_county))) = 0) THEN store.s_state ELSE NULL::character varying END)', '(rank() OVER w1)']
+    -> WindowAgg  (rows=7.0 loops=1 est_rows=13 buffers hit=1359558 read=0)
+      -> Sort  (rows=7.0 loops=1 est_rows=13 buffers hit=1359558 read=0)
+           Sort Key: ['((GROUPING(store.s_state) + GROUPING(store.s_county)))', '(CASE WHEN (GROUPING(store.s_county) = 0) THEN store.s_state ELSE NULL::character varying END)', '(sum(store_sales.ss_net_profit)) DESC']
+        -> Aggregate [Sorted]  (rows=7.0 loops=1 est_rows=13 buffers hit=1359558 read=0)
+          -> Nested Loop [Semi]  (rows=5283369.0 loops=1 est_rows=131982 buffers hit=1359558 read=0)
+               Join Filter: ((store.s_state)::text = (tmp1.s_state)::text)
+               Rows Removed by Join Filter: 5618891
+            -> Gather Merge  (rows=5389655.0 loops=1 est_rows=133289 workers=6 buffers hit=679779 read=0)
+              -> Sort  (rows=769950.71 loops=7 est_rows=22215 buffers hit=679779 read=0)
+                   Sort Key: ['store.s_state', 'store.s_county']
+                -> Hash Join [Inner]  (rows=769950.71 loops=7 est_rows=22215 buffers hit=679731 read=0)
+                     Hash Cond: (store_sales.ss_store_sk = store.s_store_sk)
+                  -> Hash Join [Inner]  (rows=788476.71 loops=7 est_rows=23280 buffers hit=679696 read=0)
+                       Hash Cond: (store_sales.ss_sold_date_sk = d1.d_date_sk)
+                    -> Seq Scan on store_sales  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+                    -> Hash  (rows=52.29 loops=7 est_rows=218 buffers hit=2032 read=0)
+                      -> Seq Scan on date_dim d1  (rows=366.0 loops=1 est_rows=218 buffers hit=2032 read=0)
+                           Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+                           Rows Removed by Filter: 72683
+                  -> Hash  (rows=102.0 loops=7 est_rows=102 buffers hit=35 read=0)
+                    -> Seq Scan on store  (rows=102.0 loops=7 est_rows=102 buffers hit=35 read=0)
+            -> Materialize  (rows=2.02 loops=5389655 est_rows=3 buffers hit=679779 read=0)
+              -> Subquery Scan  (rows=4.0 loops=1 est_rows=3 buffers hit=679779 read=0)
+                -> WindowAgg  (rows=4.0 loops=1 est_rows=3 buffers hit=679779 read=0)
+                  -> Incremental Sort  (rows=4.0 loops=1 est_rows=3 buffers hit=679779 read=0)
+                       Sort Key: ['store_1.s_state', '(sum(store_sales_1.ss_net_profit)) DESC']
+                    -> Aggregate [Sorted] [Finalize]  (rows=4.0 loops=1 est_rows=3 buffers hit=679779 read=0)
+                         Group Key: ['store_1.s_state']
+                      -> Gather Merge  (rows=28.0 loops=1 est_rows=18 workers=6 buffers hit=679779 read=0)
+                        -> Aggregate [Sorted] [Partial]  (rows=4.0 loops=7 est_rows=3 buffers hit=679779 read=0)
+                             Group Key: ['store_1.s_state']
+                          -> Sort  (rows=769950.71 loops=7 est_rows=22215 buffers hit=679779 read=0)
+                               Sort Key: ['store_1.s_state']
+                            -> Hash Join [Inner]  (rows=769950.71 loops=7 est_rows=22215 buffers hit=679731 read=0)
+                                 Hash Cond: (store_sales_1.ss_store_sk = store_1.s_store_sk)
+                              -> Hash Join [Inner]  (rows=788476.71 loops=7 est_rows=23280 buffers hit=679696 read=0)
+                                   Hash Cond: (store_sales_1.ss_sold_date_sk = date_dim.d_date_sk)
+                                -> Seq Scan on store_sales store_sales_1  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+                                -> Hash  (rows=52.29 loops=7 est_rows=218 buffers hit=2032 read=0)
+                                  -> Seq Scan on date_dim  (rows=366.0 loops=1 est_rows=218 buffers hit=2032 read=0)
+                                       Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+                                       Rows Removed by Filter: 72683
+                              -> Hash  (rows=102.0 loops=7 est_rows=102 buffers hit=35 read=0)
+                                -> Seq Scan on store store_1  (rows=102.0 loops=7 est_rows=102 buffers hit=35 read=0)

@@ -1,0 +1,14 @@
+-- PostgreSQL 18, tpch-q13, rewrite; execution 4752.304 ms, planning 0.327 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Sort  (rows=45.0 loops=1 est_rows=200 buffers hit=19503646 read=0)
+     Sort Key: ['(count(*)) DESC', "(count(o.o_orderkey) FILTER (WHERE ((o.o_comment)::text !~~ '%special%requests%'::text))) DESC"]
+  -> Aggregate [Hashed]  (rows=45.0 loops=1 est_rows=200 buffers hit=19503646 read=0)
+       Group Key: ["count(o.o_orderkey) FILTER (WHERE ((o.o_comment)::text !~~ '%special%requests%'::text))"]
+    -> Aggregate [Hashed] [Finalize]  (rows=1500000.0 loops=1 est_rows=1500196 buffers hit=19503646 read=0)
+         Group Key: ['c.c_custkey']
+      -> Gather  (rows=1500000.0 loops=1 est_rows=6000784 workers=4 buffers hit=19503646 read=0)
+        -> Aggregate [Sorted] [Partial]  (rows=300000.0 loops=5 est_rows=1500196 buffers hit=19503646 read=0)
+             Group Key: ['c.c_custkey']
+          -> Nested Loop [Left]  (rows=3100003.6 loops=5 est_rows=3749847 buffers hit=19503646 read=0)
+            -> Index Only Scan on customer c using scaleup_tpch_03  (rows=300000.0 loops=5 est_rows=375049 buffers hit=4111 read=0)
+            -> Index Scan on orders o using scaleup_tpch_12  (rows=10.0 loops=1500000 est_rows=17 buffers hit=19499535 read=0)
+                 Index Cond: (o_custkey = c.c_custkey)

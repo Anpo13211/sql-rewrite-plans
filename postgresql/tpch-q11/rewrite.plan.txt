@@ -1,0 +1,20 @@
+-- PostgreSQL 18, tpch-q11, rewrite; execution 488.385 ms, planning 0.305 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Sort  (rows=0.0 loops=1 est_rows=106670 buffers hit=189208 read=0)
+     Sort Key: ['ranked.value DESC']
+  -> Subquery Scan  (rows=0.0 loops=1 est_rows=106670 buffers hit=189208 read=0)
+       Filter: (ranked.value > (ranked.total_value * 0.0001000000))
+       Rows Removed by Filter: 304774
+    -> WindowAgg  (rows=304774.0 loops=1 est_rows=320010 buffers hit=189208 read=0)
+      -> Aggregate [Hashed]  (rows=304774.0 loops=1 est_rows=320010 buffers hit=189208 read=0)
+           Group Key: ['ps.ps_partkey']
+        -> Seq Scan on nation n <InitPlan 1>  (rows=1.0 loops=1 est_rows=1 buffers hit=1 read=0)
+             Filter: ((n_name)::text = 'GERMANY'::text)
+             Rows Removed by Filter: 24
+        -> Gather  (rows=323920.0 loops=1 est_rows=320010 workers=5 buffers hit=189208 read=0)
+          -> Hash Join [Inner]  (rows=53986.67 loops=6 est_rows=64002 buffers hit=189207 read=0)
+               Hash Cond: (ps.ps_suppkey = s.s_suppkey)
+            -> Seq Scan on partsupp ps  (rows=1333333.33 loops=6 est_rows=1600051 buffers hit=187352 read=0)
+            -> Hash  (rows=674.83 loops=6 est_rows=2353 buffers hit=1855 read=0)
+              -> Bitmap Heap Scan on supplier s  (rows=4049.0 loops=1 est_rows=2353 buffers hit=1855 read=0)
+                -> Bitmap Index Scan using scaleup_tpch_09  (rows=4049.0 loops=1 est_rows=4000 buffers hit=6 read=0)
+                     Index Cond: (s_nationkey = (InitPlan 1).col1)

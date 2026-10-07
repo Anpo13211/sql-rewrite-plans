@@ -1,0 +1,475 @@
+{
+ "total_bytes_written": 0,
+ "total_bytes_read": 0,
+ "system_peak_temp_dir_size": 0,
+ "system_peak_buffer_memory": 546535424,
+ "rows_returned": 0,
+ "wal_replay_entry_count": 0,
+ "result_set_size": 0,
+ "query_name": "EXPLAIN (ANALYZE, FORMAT JSON) WITH quantity_stats AS\n  (SELECT ss_quantity AS qty,\n          count(*) AS ROW_COUNT,\n          sum(ss_ext_discount_amt) AS discount_sum,\n          count(ss_ext_discount_amt) AS discount_count,\n          sum(ss_net_paid) AS net_sum,\n          count(ss_net_paid) AS net_count\n   FROM store_sales\n   GROUP BY ss_quantity),\n     metrics AS\n  (SELECT coalesce(sum(ROW_COUNT) FILTER (\n                                          WHERE qty BETWEEN 1 AND 20), 0) AS c1,\n          sum(discount_sum) FILTER (\n                                    WHERE qty BETWEEN 1 AND 20)/nullif(sum(discount_count) FILTER (\n                                                                                                   WHERE qty BETWEEN 1 AND 20), 0) AS d1,\n          sum(net_sum) FILTER (\n                               WHERE qty BETWEEN 1 AND 20)/nullif(sum(net_count) FILTER (\n                                                                                            WHERE qty BETWEEN 21 AND 40), 0) AS n1,\n          coalesce(sum(ROW_COUNT) FILTER (\n                                          WHERE qty BETWEEN 21 AND 40), 0) AS c2,\n          sum(discount_sum) FILTER (\n                                    WHERE qty BETWEEN 21 AND 40)/nullif(sum(discount_count) FILTER (\n                                                                                                    WHERE qty BETWEEN 21 AND 40), 0) AS d2,\n          sum(net_sum) FILTER (\n                               WHERE qty BETWEEN 41 AND 60)/nullif(sum(net_count) FILTER (\n                                                                                            WHERE qty BETWEEN 41 AND 60), 0) AS n2,\n          coalesce(sum(ROW_COUNT) FILTER (\n                                          WHERE qty BETWEEN 61 AND 80), 0) AS c3,\n          sum(discount_sum) FILTER (\n                                    WHERE qty BETWEEN 41 AND 60)/nullif(sum(discount_count) FILTER (\n                                                                                                    WHERE qty BETWEEN 41 AND 60), 0) AS d3,\n          sum(net_sum) FILTER (\n                               WHERE qty BETWEEN 61 AND 80)/nullif(sum(net_count) FILTER (\n                                                                                            WHERE qty BETWEEN 81 AND 100), 0) AS n3,\n          coalesce(sum(ROW_COUNT) FILTER (\n                                          WHERE qty BETWEEN 81 AND 100), 0) AS c4,\n          sum(discount_sum) FILTER (\n                                    WHERE qty BETWEEN 61 AND 80)/nullif(sum(discount_count) FILTER (\n                                                                                                    WHERE qty BETWEEN 61 AND 80), 0) AS d4,\n          sum(net_sum) FILTER (\n                               WHERE qty BETWEEN 81 AND 100)/nullif(sum(net_count) FILTER (\n                                                                                            WHERE qty BETWEEN 81 AND 100), 0) AS n4,\n          coalesce(sum(ROW_COUNT) FILTER (\n                                          WHERE qty BETWEEN 81 AND 100), 0) AS c5,\n          sum(discount_sum) FILTER (\n                                    WHERE qty BETWEEN 81 AND 100)/nullif(sum(discount_count) FILTER (\n                                                                                                     WHERE qty BETWEEN 81 AND 100), 0) AS d5,\n          sum(net_sum) FILTER (\n                               WHERE qty BETWEEN 81 AND 100)/nullif(sum(net_count) FILTER (\n                                                                                            WHERE qty BETWEEN 81 AND 100), 0) AS n5\n   FROM quantity_stats)\nSELECT CASE\n           WHEN c1 > 165306 THEN d1\n           ELSE n1\n       END AS bucket1,\n       CASE\n           WHEN c2 > 10097 THEN d2\n           ELSE n2\n       END AS bucket2,\n       CASE\n           WHEN c3 > 56580 THEN d3\n           ELSE n3\n       END AS bucket3,\n       CASE\n           WHEN c4 > 122840 THEN d4\n           ELSE n4\n       END AS bucket4,\n       CASE\n           WHEN c5 > 74129 THEN d5\n           ELSE n5\n       END AS bucket5\nFROM metrics\nJOIN reason ON r_reason_sk = 1",
+ "waiting_to_attach_latency": 0.0,
+ "attach_load_storage_latency": 0.0,
+ "blocked_thread_time": 0.0,
+ "cpu_time": 0.556753001,
+ "extra_info": {},
+ "total_memory_allocated": 262144,
+ "cumulative_cardinality": 86403384,
+ "checkpoint_latency": 0.0,
+ "cumulative_rows_scanned": 28800992,
+ "write_to_wal_latency": 0.0,
+ "latency": 0.076957384,
+ "attach_replay_wal_latency": 0.0,
+ "commit_local_storage_latency": 0.0,
+ "children": [
+  {
+   "system_peak_temp_dir_size": 0,
+   "system_peak_buffer_memory": 0,
+   "result_set_size": 0,
+   "operator_timing": 1.38e-07,
+   "operator_type": "EXPLAIN_ANALYZE",
+   "cpu_time": 0.556753001,
+   "extra_info": {},
+   "cumulative_cardinality": 86403384,
+   "cumulative_rows_scanned": 28800992,
+   "operator_cardinality": 0,
+   "operator_name": "EXPLAIN_ANALYZE",
+   "operator_rows_scanned": 0,
+   "children": [
+    {
+     "system_peak_temp_dir_size": 0,
+     "system_peak_buffer_memory": 0,
+     "result_set_size": 40,
+     "operator_timing": 1.1344e-05,
+     "operator_type": "PROJECTION",
+     "cpu_time": 0.556752863,
+     "extra_info": {
+      "Projections": [
+       "bucket1",
+       "bucket2",
+       "bucket3",
+       "bucket4",
+       "bucket5"
+      ],
+      "Estimated Cardinality": "1"
+     },
+     "cumulative_cardinality": 86403384,
+     "cumulative_rows_scanned": 28800992,
+     "operator_cardinality": 1,
+     "operator_name": "PROJECTION",
+     "operator_rows_scanned": 0,
+     "children": [
+      {
+       "system_peak_temp_dir_size": 0,
+       "system_peak_buffer_memory": 0,
+       "result_set_size": 168,
+       "operator_timing": 3.7077e-05,
+       "operator_type": "CROSS_PRODUCT",
+       "cpu_time": 0.556741519,
+       "extra_info": {},
+       "cumulative_cardinality": 86403383,
+       "cumulative_rows_scanned": 28800992,
+       "operator_cardinality": 1,
+       "operator_name": "CROSS_PRODUCT",
+       "operator_rows_scanned": 0,
+       "children": [
+        {
+         "system_peak_temp_dir_size": 0,
+         "system_peak_buffer_memory": 0,
+         "result_set_size": 160,
+         "operator_timing": 3.2923e-05,
+         "operator_type": "PROJECTION",
+         "cpu_time": 0.556697536,
+         "extra_info": {
+          "Projections": [
+           "c1",
+           "d1",
+           "n1",
+           "c2",
+           "d2",
+           "n2",
+           "c3",
+           "d3",
+           "n3",
+           "c4",
+           "d4",
+           "n4",
+           "c5",
+           "d5",
+           "n5"
+          ],
+          "Estimated Cardinality": "1"
+         },
+         "cumulative_cardinality": 86403381,
+         "cumulative_rows_scanned": 28800991,
+         "operator_cardinality": 1,
+         "operator_name": "PROJECTION",
+         "operator_rows_scanned": 0,
+         "children": [
+          {
+           "system_peak_temp_dir_size": 0,
+           "system_peak_buffer_memory": 0,
+           "result_set_size": 320,
+           "operator_timing": 8.326e-06,
+           "operator_type": "PROJECTION",
+           "cpu_time": 0.556664613,
+           "extra_info": {
+            "Projections": [
+             "sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))",
+             "sum(discount_sum) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))",
+             "sum(discount_count) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))",
+             "sum(net_sum) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))",
+             "sum(net_count) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))",
+             "sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))",
+             "sum(discount_sum) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))",
+             "sum(discount_count) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))",
+             "sum(net_sum) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))",
+             "sum(net_count) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))",
+             "sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))",
+             "sum(discount_sum) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))",
+             "sum(discount_count) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))",
+             "sum(net_sum) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))",
+             "#14",
+             "c4",
+             "sum(discount_sum) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))",
+             "sum(discount_count) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))",
+             "n4",
+             "sum(discount_sum) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))",
+             "sum(discount_count) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))"
+            ],
+            "Estimated Cardinality": "1"
+           },
+           "cumulative_cardinality": 86403380,
+           "cumulative_rows_scanned": 28800991,
+           "operator_cardinality": 1,
+           "operator_name": "PROJECTION",
+           "operator_rows_scanned": 0,
+           "children": [
+            {
+             "system_peak_temp_dir_size": 0,
+             "system_peak_buffer_memory": 0,
+             "result_set_size": 328,
+             "operator_timing": 3.17e-06,
+             "operator_type": "PROJECTION",
+             "cpu_time": 0.556656287,
+             "extra_info": {
+              "Projections": [
+               "sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))",
+               "sum(discount_sum) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))",
+               "sum(discount_count) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))",
+               "sum(net_sum) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))",
+               "sum(net_count) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))",
+               "sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))",
+               "sum(discount_sum) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))",
+               "sum(discount_count) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))",
+               "sum(net_sum) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))",
+               "sum(net_count) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))",
+               "sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))",
+               "sum(discount_sum) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))",
+               "sum(discount_count) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))",
+               "sum(net_sum) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))",
+               "CAST(CASE  WHEN ((sum(net_count) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT)))) = 0)) THEN (NULL) ELSE sum(net_count) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT)))) END AS DOUBLE)",
+               "sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))",
+               "sum(discount_sum) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))",
+               "sum(discount_count) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))",
+               "sum(net_sum) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))",
+               "sum(discount_sum) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))",
+               "sum(discount_count) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))"
+              ],
+              "Estimated Cardinality": "1"
+             },
+             "cumulative_cardinality": 86403379,
+             "cumulative_rows_scanned": 28800991,
+             "operator_cardinality": 1,
+             "operator_name": "PROJECTION",
+             "operator_rows_scanned": 0,
+             "children": [
+              {
+               "system_peak_temp_dir_size": 0,
+               "system_peak_buffer_memory": 0,
+               "result_set_size": 336,
+               "operator_timing": 0.000224104,
+               "operator_type": "UNGROUPED_AGGREGATE",
+               "cpu_time": 0.556653117,
+               "extra_info": {
+                "Aggregates": [
+                 "sum(#0) FILTER (WHERE #1) Filter: #1",
+                 "sum(#2) FILTER (WHERE #3) Filter: #3",
+                 "sum(#4) FILTER (WHERE #5) Filter: #5",
+                 "sum(#6) FILTER (WHERE #7) Filter: #7",
+                 "sum(#8) FILTER (WHERE #9) Filter: #9",
+                 "sum(#10) FILTER (WHERE #11) Filter: #11",
+                 "sum(#12) FILTER (WHERE #13) Filter: #13",
+                 "sum(#14) FILTER (WHERE #15) Filter: #15",
+                 "sum(#16) FILTER (WHERE #17) Filter: #17",
+                 "sum(#18) FILTER (WHERE #19) Filter: #19",
+                 "sum(#20) FILTER (WHERE #21) Filter: #21",
+                 "sum(#22) FILTER (WHERE #23) Filter: #23",
+                 "sum(#24) FILTER (WHERE #25) Filter: #25",
+                 "sum(#26) FILTER (WHERE #27) Filter: #27",
+                 "sum(#28) FILTER (WHERE #29) Filter: #29",
+                 "sum(#30) FILTER (WHERE #31) Filter: #31",
+                 "sum(#32) FILTER (WHERE #33) Filter: #33",
+                 "sum(#34) FILTER (WHERE #35) Filter: #35",
+                 "sum(#36) FILTER (WHERE #37) Filter: #37",
+                 "sum(#38) FILTER (WHERE #39) Filter: #39",
+                 "sum(#40) FILTER (WHERE #41) Filter: #41"
+                ]
+               },
+               "cumulative_cardinality": 86403378,
+               "cumulative_rows_scanned": 28800991,
+               "operator_cardinality": 1,
+               "operator_name": "UNGROUPED_AGGREGATE",
+               "operator_rows_scanned": 0,
+               "children": [
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 26361,
+                 "operator_timing": 1.086e-06,
+                 "operator_type": "PROJECTION",
+                 "cpu_time": 0.556429013,
+                 "extra_info": {
+                  "Projections": [
+                   "ROW_COUNT",
+                   "#1",
+                   "discount_sum",
+                   "#1",
+                   "discount_count",
+                   "#1",
+                   "net_sum",
+                   "#1",
+                   "net_count",
+                   "#6",
+                   "ROW_COUNT",
+                   "#6",
+                   "discount_sum",
+                   "#6",
+                   "discount_count",
+                   "#6",
+                   "net_sum",
+                   "#7",
+                   "net_count",
+                   "#7",
+                   "ROW_COUNT",
+                   "#8",
+                   "discount_sum",
+                   "#7",
+                   "discount_count",
+                   "#7",
+                   "net_sum",
+                   "#8",
+                   "net_count",
+                   "#9",
+                   "ROW_COUNT",
+                   "#9",
+                   "discount_sum",
+                   "#8",
+                   "discount_count",
+                   "#8",
+                   "net_sum",
+                   "#9",
+                   "discount_sum",
+                   "#9",
+                   "discount_count",
+                   "#9"
+                  ],
+                  "Estimated Cardinality": "96"
+                 },
+                 "cumulative_cardinality": 86403377,
+                 "cumulative_rows_scanned": 28800991,
+                 "operator_cardinality": 101,
+                 "operator_name": "PROJECTION",
+                 "operator_rows_scanned": 0,
+                 "children": [
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 6161,
+                   "operator_timing": 2.9368e-05,
+                   "operator_type": "PROJECTION",
+                   "cpu_time": 0.556427927,
+                   "extra_info": {
+                    "Projections": [
+                     "ROW_COUNT",
+                     "((qty <= 20) AND constant_or_null(true, qty, 1))",
+                     "discount_sum",
+                     "discount_count",
+                     "net_sum",
+                     "net_count",
+                     "((qty >= 21) AND (qty <= 40))",
+                     "((qty >= 41) AND (qty <= 60))",
+                     "((qty >= 61) AND (qty <= 80))",
+                     "((qty >= 81) AND constant_or_null(true, qty, 100))"
+                    ],
+                    "Estimated Cardinality": "96"
+                   },
+                   "cumulative_cardinality": 86403276,
+                   "cumulative_rows_scanned": 28800991,
+                   "operator_cardinality": 101,
+                   "operator_name": "PROJECTION",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 6464,
+                     "operator_timing": 2.318e-06,
+                     "operator_type": "PROJECTION",
+                     "cpu_time": 0.556398559,
+                     "extra_info": {
+                      "Projections": [
+                       "__internal_decompress_integral_bigint(#0, 1)",
+                       "#1",
+                       "#2",
+                       "#3",
+                       "#4",
+                       "#5"
+                      ],
+                      "Estimated Cardinality": "96"
+                     },
+                     "cumulative_cardinality": 86403175,
+                     "cumulative_rows_scanned": 28800991,
+                     "operator_cardinality": 101,
+                     "operator_name": "PROJECTION",
+                     "operator_rows_scanned": 0,
+                     "children": [
+                      {
+                       "system_peak_temp_dir_size": 0,
+                       "system_peak_buffer_memory": 0,
+                       "result_set_size": 5757,
+                       "operator_timing": 0.33536575700000015,
+                       "operator_type": "PERFECT_HASH_GROUP_BY",
+                       "cpu_time": 0.5563962410000001,
+                       "extra_info": {
+                        "Groups": "#0",
+                        "Aggregates": [
+                         "count_star()",
+                         "sum_no_overflow(#1)",
+                         "count(#2)",
+                         "sum_no_overflow(#3)",
+                         "count(#4)"
+                        ]
+                       },
+                       "cumulative_cardinality": 86403074,
+                       "cumulative_rows_scanned": 28800991,
+                       "operator_cardinality": 101,
+                       "operator_name": "PERFECT_HASH_GROUP_BY",
+                       "operator_rows_scanned": 0,
+                       "children": [
+                        {
+                         "system_peak_temp_dir_size": 0,
+                         "system_peak_buffer_memory": 0,
+                         "result_set_size": 489616847,
+                         "operator_timing": 0.00368988800000001,
+                         "operator_type": "PROJECTION",
+                         "cpu_time": 0.22103048399999994,
+                         "extra_info": {
+                          "Projections": [
+                           "ss_quantity",
+                           "ss_ext_discount_amt",
+                           "ss_ext_discount_amt",
+                           "ss_net_paid",
+                           "ss_net_paid"
+                          ],
+                          "Estimated Cardinality": "28800991"
+                         },
+                         "cumulative_cardinality": 86402973,
+                         "cumulative_rows_scanned": 28800991,
+                         "operator_cardinality": 28800991,
+                         "operator_name": "PROJECTION",
+                         "operator_rows_scanned": 0,
+                         "children": [
+                          {
+                           "system_peak_temp_dir_size": 0,
+                           "system_peak_buffer_memory": 0,
+                           "result_set_size": 259208919,
+                           "operator_timing": 0.051556733,
+                           "operator_type": "PROJECTION",
+                           "cpu_time": 0.21734059599999994,
+                           "extra_info": {
+                            "Projections": [
+                             "__internal_compress_integral_utinyint(#0, 1)",
+                             "#1",
+                             "#2"
+                            ],
+                            "Estimated Cardinality": "28800991"
+                           },
+                           "cumulative_cardinality": 57601982,
+                           "cumulative_rows_scanned": 28800991,
+                           "operator_cardinality": 28800991,
+                           "operator_name": "PROJECTION",
+                           "operator_rows_scanned": 0,
+                           "children": [
+                            {
+                             "system_peak_temp_dir_size": 0,
+                             "system_peak_buffer_memory": 0,
+                             "result_set_size": 460815856,
+                             "operator_timing": 0.16578386299999995,
+                             "operator_type": "TABLE_SCAN",
+                             "cpu_time": 0.16578386299999995,
+                             "extra_info": {
+                              "Table": "tpcds.main.store_sales",
+                              "Type": "Sequential Scan",
+                              "Projections": [
+                               "ss_quantity",
+                               "ss_ext_discount_amt",
+                               "ss_net_paid"
+                              ],
+                              "Estimated Cardinality": "28800991"
+                             },
+                             "cumulative_cardinality": 28800991,
+                             "cumulative_rows_scanned": 28800991,
+                             "operator_cardinality": 28800991,
+                             "operator_name": "SEQ_SCAN",
+                             "operator_rows_scanned": 28800991,
+                             "children": []
+                            }
+                           ]
+                          }
+                         ]
+                        }
+                       ]
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "system_peak_temp_dir_size": 0,
+         "system_peak_buffer_memory": 0,
+         "result_set_size": 8,
+         "operator_timing": 6.9060000000000005e-06,
+         "operator_type": "TABLE_SCAN",
+         "cpu_time": 6.9060000000000005e-06,
+         "extra_info": {
+          "Table": "tpcds.main.reason",
+          "Type": "Index Scan",
+          "Projections": "",
+          "Filters": "r_reason_sk=1",
+          "Estimated Cardinality": "1"
+         },
+         "cumulative_cardinality": 1,
+         "cumulative_rows_scanned": 1,
+         "operator_cardinality": 1,
+         "operator_name": "SEQ_SCAN",
+         "operator_rows_scanned": 1,
+         "children": []
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

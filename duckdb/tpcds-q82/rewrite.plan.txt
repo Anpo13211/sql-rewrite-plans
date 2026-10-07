@@ -1,0 +1,64 @@
+-- DuckDB 1.5.5, tpcds-q82, rewrite; latency 0.037881762 s, cpu 0.08943795600000001 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0)
+       CTE Name: eligible_dates
+       Table Index: 0
+       Estimated Cardinality: 100
+    -> TABLE_SCAN  (rows=61 time_s=0.0001)
+         Table: tpcds.main.date_dim
+         Type: Sequential Scan
+         Projections: d_date_sk
+         Filters: d_date>='2000-05-25'::DATE AND d_date<='2000-07-24'::DATE
+         Estimated Cardinality: 14609
+    -> CTE  (rows=0 time_s=0.0)
+         CTE Name: eligible_items
+         Table Index: 1
+         Estimated Cardinality: 100
+      -> PROJECTION  (rows=15 time_s=0.0)
+           Projections: ['i_item_sk', 'i_item_id', 'i_item_desc', 'i_current_price']
+           Estimated Cardinality: 4080
+        -> PROJECTION  (rows=15 time_s=0.0)
+             Projections: ['#0', '#2', '#3', '#4']
+             Estimated Cardinality: 4080
+          -> FILTER  (rows=15 time_s=0.0006)
+               Expression: ((i_manufact_id = 129) OR (i_manufact_id = 270) OR (i_manufact_id = 821) OR (i_manufact_id = 423))
+               Estimated Cardinality: 4080
+            -> TABLE_SCAN  (rows=3418 time_s=0.0211)
+                 Table: tpcds.main.item
+                 Type: Sequential Scan
+                 Projections: ['i_current_price', 'i_manufact_id', 'i_item_sk', 'i_item_id', 'i_item_desc']
+                 Filters: ['i_current_price>=62.00 AND i_current_price<=92.00', 'optional: i_manufact_id IN (129, 270, 423, 821)']
+                 Estimated Cardinality: 20400
+      -> TOP_N  (rows=6 time_s=0.0001)
+           Top: 100
+           Order By: i.i_item_id ASC
+        -> HASH_GROUP_BY  (rows=6 time_s=0.0023)
+             Groups: ['#0', '#1', '#2']
+             Estimated Cardinality: 226213
+          -> PROJECTION  (rows=230 time_s=0.0)
+               Projections: ['i_item_id', 'i_item_desc', 'i_current_price']
+               Estimated Cardinality: 226213
+            -> PROJECTION  (rows=230 time_s=0.0)
+                 Projections: ['i_item_id', 'i_item_desc', 'i_current_price']
+                 Estimated Cardinality: 226213
+              -> HASH_JOIN  (rows=230 time_s=0.0004)
+                   Join Type: INNER
+                   Conditions: inv_date_sk = d_date_sk
+                   Estimated Cardinality: 226213
+                -> HASH_JOIN  (rows=230 time_s=0.0083)
+                     Join Type: INNER
+                     Conditions: inv_item_sk = i_item_sk
+                     Estimated Cardinality: 1131128
+                  -> TABLE_SCAN  (rows=1718629 time_s=0.0566)
+                       Table: tpcds.main.inventory
+                       Type: Sequential Scan
+                       Projections: ['inv_date_sk', 'inv_item_sk']
+                       Filters: inv_quantity_on_hand>=100 AND inv_quantity_on_hand<=500
+                       Estimated Cardinality: 26622000
+                       Dynamic Filters: ['optional: inv_date_sk>=2451690 AND optional: inv_date_sk<=2451750', 'optional: inv_item_sk IN (8514, 10123, 11300, 13677, 19893, 27238, 35052, 35397, 56460, 68207, 81543, 82412, 87139, 91182, 97075) AND optional: inv_item_sk>=8514 AND optional: inv_item_sk<=97075']
+                  -> CTE_SCAN  (rows=15 time_s=0.0)
+                       CTE Index: 1
+                       Estimated Cardinality: 4080
+                -> CTE_SCAN  (rows=61 time_s=0.0)
+                     CTE Index: 0
+                     Estimated Cardinality: 14609

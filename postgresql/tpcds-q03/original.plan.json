@@ -1,0 +1,438 @@
+{
+ "Plan": {
+  "Node Type": "Limit",
+  "Parallel Aware": false,
+  "Async Capable": false,
+  "Startup Cost": 57304.52,
+  "Total Cost": 173253.02,
+  "Plan Rows": 100,
+  "Plan Width": 65,
+  "Actual Rows": 100.0,
+  "Actual Loops": 1,
+  "Disabled": false,
+  "Shared Hit Blocks": 2771563,
+  "Shared Read Blocks": 0,
+  "Shared Dirtied Blocks": 0,
+  "Shared Written Blocks": 0,
+  "Local Hit Blocks": 0,
+  "Local Read Blocks": 0,
+  "Local Dirtied Blocks": 0,
+  "Local Written Blocks": 0,
+  "Temp Read Blocks": 0,
+  "Temp Written Blocks": 0,
+  "Plans": [
+   {
+    "Node Type": "Incremental Sort",
+    "Parent Relationship": "Outer",
+    "Parallel Aware": false,
+    "Async Capable": false,
+    "Startup Cost": 57304.52,
+    "Total Cost": 5370064.55,
+    "Plan Rows": 4582,
+    "Plan Width": 65,
+    "Actual Rows": 100.0,
+    "Actual Loops": 1,
+    "Disabled": false,
+    "Sort Key": [
+     "dt.d_year",
+     "(sum(store_sales.ss_ext_sales_price)) DESC",
+     "item.i_brand_id"
+    ],
+    "Presorted Key": [
+     "dt.d_year"
+    ],
+    "Full-sort Groups": {
+     "Group Count": 2,
+     "Sort Methods Used": [
+      "top-N heapsort",
+      "quicksort"
+     ],
+     "Sort Space Memory": {
+      "Average Sort Space Used": 29,
+      "Peak Sort Space Used": 29
+     }
+    },
+    "Pre-sorted Groups": {
+     "Group Count": 2,
+     "Sort Methods Used": [
+      "quicksort"
+     ],
+     "Sort Space Memory": {
+      "Average Sort Space Used": 29,
+      "Peak Sort Space Used": 29
+     }
+    },
+    "Shared Hit Blocks": 2771563,
+    "Shared Read Blocks": 0,
+    "Shared Dirtied Blocks": 0,
+    "Shared Written Blocks": 0,
+    "Local Hit Blocks": 0,
+    "Local Read Blocks": 0,
+    "Local Dirtied Blocks": 0,
+    "Local Written Blocks": 0,
+    "Temp Read Blocks": 0,
+    "Temp Written Blocks": 0,
+    "Plans": [
+     {
+      "Node Type": "Aggregate",
+      "Strategy": "Sorted",
+      "Partial Mode": "Simple",
+      "Parent Relationship": "Outer",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 30607.54,
+      "Total Cost": 5369899.77,
+      "Plan Rows": 4582,
+      "Plan Width": 65,
+      "Actual Rows": 141.0,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Group Key": [
+       "dt.d_year",
+       "item.i_brand",
+       "item.i_brand_id"
+      ],
+      "Shared Hit Blocks": 2771563,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0,
+      "Plans": [
+       {
+        "Node Type": "Incremental Sort",
+        "Parent Relationship": "Outer",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 30607.54,
+        "Total Cost": 5369796.68,
+        "Plan Rows": 4582,
+        "Plan Width": 39,
+        "Actual Rows": 3387.0,
+        "Actual Loops": 1,
+        "Disabled": false,
+        "Sort Key": [
+         "dt.d_year",
+         "item.i_brand",
+         "item.i_brand_id"
+        ],
+        "Presorted Key": [
+         "dt.d_year"
+        ],
+        "Full-sort Groups": {
+         "Group Count": 3,
+         "Sort Methods Used": [
+          "quicksort"
+         ],
+         "Sort Space Memory": {
+          "Average Sort Space Used": 28,
+          "Peak Sort Space Used": 28
+         }
+        },
+        "Pre-sorted Groups": {
+         "Group Count": 3,
+         "Sort Methods Used": [
+          "quicksort"
+         ],
+         "Sort Space Memory": {
+          "Average Sort Space Used": 147,
+          "Peak Sort Space Used": 148
+         }
+        },
+        "Shared Hit Blocks": 2771563,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+         {
+          "Node Type": "Nested Loop",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Join Type": "Inner",
+          "Startup Cost": 3777.76,
+          "Total Cost": 5369631.9,
+          "Plan Rows": 4582,
+          "Plan Width": 39,
+          "Actual Rows": 4885.0,
+          "Actual Loops": 1,
+          "Disabled": false,
+          "Inner Unique": true,
+          "Shared Hit Blocks": 2771563,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0,
+          "Plans": [
+           {
+            "Node Type": "Nested Loop",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Join Type": "Inner",
+            "Startup Cost": 3777.45,
+            "Total Cost": 5305041.85,
+            "Plan Rows": 2257887,
+            "Plan Width": 22,
+            "Actual Rows": 2644535.0,
+            "Actual Loops": 1,
+            "Disabled": false,
+            "Inner Unique": false,
+            "Shared Hit Blocks": 2567353,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+             {
+              "Node Type": "Gather Merge",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 3777.02,
+              "Total Cost": 4460.5,
+              "Plan Rows": 5997,
+              "Plan Width": 16,
+              "Actual Rows": 3031.0,
+              "Actual Loops": 1,
+              "Disabled": false,
+              "Workers Planned": 1,
+              "Workers Launched": 1,
+              "Shared Hit Blocks": 2071,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "Plans": [
+               {
+                "Node Type": "Sort",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 2777.01,
+                "Total Cost": 2785.83,
+                "Plan Rows": 3528,
+                "Plan Width": 16,
+                "Actual Rows": 1515.5,
+                "Actual Loops": 2,
+                "Disabled": false,
+                "Sort Key": [
+                 "dt.d_year"
+                ],
+                "Sort Method": "quicksort",
+                "Sort Space Used": 380,
+                "Sort Space Type": "Memory",
+                "Shared Hit Blocks": 2071,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Workers": [
+                 {
+                  "Worker Number": 0,
+                  "Sort Method": "quicksort",
+                  "Sort Space Used": 25,
+                  "Sort Space Type": "Memory"
+                 }
+                ],
+                "Plans": [
+                 {
+                  "Node Type": "Seq Scan",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": true,
+                  "Async Capable": false,
+                  "Relation Name": "date_dim",
+                  "Alias": "dt",
+                  "Startup Cost": 0.0,
+                  "Total Cost": 2569.12,
+                  "Plan Rows": 3528,
+                  "Plan Width": 16,
+                  "Actual Rows": 3000.0,
+                  "Actual Loops": 2,
+                  "Disabled": false,
+                  "Filter": "(d_moy = 11)",
+                  "Rows Removed by Filter": 33524,
+                  "Shared Hit Blocks": 2032,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "Workers": []
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "Node Type": "Index Scan",
+              "Parent Relationship": "Inner",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Scan Direction": "Forward",
+              "Index Name": "scaleup_tpcds_53",
+              "Relation Name": "store_sales",
+              "Alias": "store_sales",
+              "Startup Cost": 0.44,
+              "Total Cost": 732.92,
+              "Plan Rows": 15095,
+              "Plan Width": 22,
+              "Actual Rows": 872.5,
+              "Actual Loops": 3031,
+              "Disabled": false,
+              "Index Cond": "(ss_sold_date_sk = dt.d_date_sk)",
+              "Rows Removed by Index Recheck": 0,
+              "Index Searches": 3031,
+              "Shared Hit Blocks": 2565282,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0
+             }
+            ]
+           },
+           {
+            "Node Type": "Memoize",
+            "Parent Relationship": "Inner",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0.3,
+            "Total Cost": 0.32,
+            "Plan Rows": 1,
+            "Plan Width": 33,
+            "Actual Rows": 0.0,
+            "Actual Loops": 2644535,
+            "Disabled": false,
+            "Cache Key": "store_sales.ss_item_sk",
+            "Cache Mode": "logical",
+            "Cache Hits": 2576465,
+            "Cache Misses": 68070,
+            "Cache Evictions": 0,
+            "Cache Overflows": 0,
+            "Peak Memory Usage": 4795,
+            "Shared Hit Blocks": 204210,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+             {
+              "Node Type": "Index Scan",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Scan Direction": "Forward",
+              "Index Name": "scaleup_tpcds_40",
+              "Relation Name": "item",
+              "Alias": "item",
+              "Startup Cost": 0.29,
+              "Total Cost": 0.31,
+              "Plan Rows": 1,
+              "Plan Width": 33,
+              "Actual Rows": 0.0,
+              "Actual Loops": 68070,
+              "Disabled": false,
+              "Index Cond": "(i_item_sk = store_sales.ss_item_sk)",
+              "Rows Removed by Index Recheck": 0,
+              "Filter": "(i_manufact_id = 128)",
+              "Rows Removed by Filter": 1,
+              "Index Searches": 68070,
+              "Shared Hit Blocks": 204210,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "Settings": {
+  "effective_cache_size": "96GB",
+  "work_mem": "64MB",
+  "max_parallel_workers": "32",
+  "max_parallel_workers_per_gather": "31",
+  "search_path": "tpcds_sf10,pg_catalog"
+ },
+ "Planning": {
+  "Shared Hit Blocks": 14,
+  "Shared Read Blocks": 0,
+  "Shared Dirtied Blocks": 0,
+  "Shared Written Blocks": 0,
+  "Local Hit Blocks": 0,
+  "Local Read Blocks": 0,
+  "Local Dirtied Blocks": 0,
+  "Local Written Blocks": 0,
+  "Temp Read Blocks": 0,
+  "Temp Written Blocks": 0
+ },
+ "Planning Time": 0.292,
+ "Triggers": [],
+ "JIT": {
+  "Functions": 31,
+  "Options": {
+   "Inlining": false,
+   "Optimization": false,
+   "Expressions": true,
+   "Deforming": true
+  }
+ },
+ "Execution Time": 2803.151
+}

@@ -1,0 +1,50 @@
+-- DuckDB 1.5.5, tpcds-q43, original; latency 0.086532443 s, cpu 0.6122482899999999 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=18 time_s=0.0001)
+       Top: 100
+       Order By: ['tpcds.main.store.s_store_name ASC', 'tpcds.main.store.s_store_id ASC', "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Sunday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC", "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Monday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC", "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Tuesday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC", "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Wednesday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC", "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Thursday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC", "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Friday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC", "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Saturday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC"]
+    -> PROJECTION  (rows=18 time_s=0.0)
+         Projections: ['__internal_decompress_string(#0)', '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8']
+         Estimated Cardinality: 13231
+      -> HASH_GROUP_BY  (rows=18 time_s=0.1253)
+           Groups: ['#0', '#1']
+           Aggregates: ['sum(#2)', 'sum(#3)', 'sum(#4)', 'sum(#5)', 'sum(#6)', 'sum(#7)', 'sum(#8)']
+           Estimated Cardinality: 13231
+        -> PROJECTION  (rows=1908802 time_s=0.1646)
+             Projections: ['s_store_name', 's_store_id', "CASE  WHEN ((d_day_name = 'Sunday')) THEN (ss_sales_price) ELSE NULL END", "CASE  WHEN ((d_day_name = 'Monday')) THEN (ss_sales_price) ELSE NULL END", "CASE  WHEN ((d_day_name = 'Tuesday')) THEN (ss_sales_price) ELSE NULL END", "CASE  WHEN ((d_day_name = 'Wednesday')) THEN (ss_sales_price) ELSE NULL END", "CASE  WHEN ((d_day_name = 'Thursday')) THEN (ss_sales_price) ELSE NULL END", "CASE  WHEN ((d_day_name = 'Friday')) THEN (ss_sales_price) ELSE NULL END", "CASE  WHEN ((d_day_name = 'Saturday')) THEN (ss_sales_price) ELSE NULL END"]
+             Estimated Cardinality: 117630
+          -> PROJECTION  (rows=1908802 time_s=0.0065)
+               Projections: ['#1', '#0', '__internal_compress_string_ubigint(#2)', '#3']
+               Estimated Cardinality: 117630
+            -> HASH_JOIN  (rows=1908802 time_s=0.0436)
+                 Join Type: INNER
+                 Conditions: ss_store_sk = s_store_sk
+                 Estimated Cardinality: 117630
+              -> HASH_JOIN  (rows=5512077 time_s=0.0331)
+                   Join Type: INNER
+                   Conditions: ss_sold_date_sk = d_date_sk
+                   Estimated Cardinality: 230647
+                -> TABLE_SCAN  (rows=5512077 time_s=0.2389)
+                     Table: tpcds.main.store_sales
+                     Type: Sequential Scan
+                     Projections: ['ss_sold_date_sk', 'ss_store_sk', 'ss_sales_price']
+                     Estimated Cardinality: 28800991
+                     Dynamic Filters: ['optional: ss_sold_date_sk>=2451545 AND optional: ss_sold_date_sk<=2451910', 'optional: ss_store_sk IN (3, 4, 10, 11, 12, 15, 26, 31, 37, 39, 46, 47, 49, 57, 58, 61, 67, 68, 75, 76, 77, 78, 85, 86, 87, 91, 92, 93, 97, 98, 99) AND optional: ss_store_sk>=3 AND optional: ss_store_sk<=99']
+                -> FILTER  (rows=366 time_s=0.0)
+                     Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                     Estimated Cardinality: 585
+                  -> TABLE_SCAN  (rows=366 time_s=0.0)
+                       Table: tpcds.main.date_dim
+                       Type: Sequential Scan
+                       Projections: ['d_date_sk', 'd_day_name']
+                       Filters: d_year=2000
+                       Estimated Cardinality: 585
+              -> FILTER  (rows=31 time_s=0.0)
+                   Expression: (s_store_sk <= 100)
+                   Estimated Cardinality: 51
+                -> TABLE_SCAN  (rows=31 time_s=0.0001)
+                     Table: tpcds.main.store
+                     Type: Sequential Scan
+                     Projections: ['s_store_sk', 's_store_name', 's_store_id']
+                     Filters: s_gmt_offset=-5.00
+                     Estimated Cardinality: 51

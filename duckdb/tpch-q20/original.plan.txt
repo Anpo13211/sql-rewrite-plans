@@ -1,0 +1,89 @@
+-- DuckDB 1.5.5, tpch-q20, original; latency 0.122028933 s, cpu 0.8495433549999992 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> ORDER_BY  (rows=1804 time_s=0.0002)
+       Order By: tpch.main.supplier.s_name ASC
+    -> HASH_JOIN  (rows=1804 time_s=0.0012)
+         Join Type: RIGHT_SEMI
+         Conditions: #0 = s_suppkey
+         Estimated Cardinality: 769
+      -> PROJECTION  (rows=58655 time_s=0.0)
+           Projections: #2
+           Estimated Cardinality: 1600000
+        -> FILTER  (rows=58655 time_s=0.0023)
+             Expression: (CAST(ps_availqty AS DECIMAL(38,3)) > SUBQUERY)
+             Estimated Cardinality: 1600000
+          -> RIGHT_DELIM_JOIN  (rows=0 time_s=0.0094)
+               Join Type: RIGHT
+               Conditions: ['ps_suppkey IS NOT DISTINCT FROM ps_suppkey', 'ps_partkey IS NOT DISTINCT FROM ps_partkey']
+               Estimated Cardinality: 0
+               Delim Index: 1
+            -> HASH_JOIN  (rows=86204 time_s=0.0183)
+                 Join Type: SEMI
+                 Conditions: ps_partkey = #0
+                 Estimated Cardinality: 1600000
+              -> TABLE_SCAN  (rows=175420 time_s=0.0608)
+                   Table: tpch.main.partsupp
+                   Type: Sequential Scan
+                   Projections: ['ps_partkey', 'ps_availqty', 'ps_suppkey']
+                   Estimated Cardinality: 8000000
+                   Dynamic Filters: optional: ps_partkey>=5 AND optional: ps_partkey<=1999994 AND optional: ps_partkey IN BF(#0)
+              -> TABLE_SCAN  (rows=21551 time_s=0.0794)
+                   Table: tpch.main.part
+                   Type: Sequential Scan
+                   Projections: p_partkey
+                   Filters: p_name>='forest' AND p_name<'foresu'
+                   Estimated Cardinality: 400000
+            -> HASH_JOIN  (rows=86204 time_s=0.0045)
+                 Join Type: RIGHT
+                 Conditions: ['ps_suppkey IS NOT DISTINCT FROM ps_suppkey', 'ps_partkey IS NOT DISTINCT FROM ps_partkey']
+                 Estimated Cardinality: 0
+              -> PROJECTION  (rows=58782 time_s=0.0016)
+                   Projections: ['(0.5 * sum(l_quantity))', 'ps_suppkey', 'ps_partkey']
+                   Estimated Cardinality: 2558829
+                -> PROJECTION  (rows=58782 time_s=0.0001)
+                     Projections: ['__internal_decompress_integral_bigint(#0, 1)', '__internal_decompress_integral_bigint(#1, 1)', '#2']
+                     Estimated Cardinality: 2558829
+                  -> HASH_GROUP_BY  (rows=58782 time_s=0.0142)
+                       Groups: ['#0', '#1']
+                       Aggregates: sum(#2)
+                       Estimated Cardinality: 2558829
+                    -> PROJECTION  (rows=98107 time_s=0.0)
+                         Projections: ['ps_suppkey', 'ps_partkey', 'l_quantity']
+                         Estimated Cardinality: 5117658
+                      -> PROJECTION  (rows=98107 time_s=0.0002)
+                           Projections: ['__internal_compress_integral_uinteger(#0, 1)', '__internal_compress_integral_uinteger(#1, 1)', '#2', '#3', '#4']
+                           Estimated Cardinality: 5117658
+                        -> HASH_JOIN  (rows=98107 time_s=0.2381)
+                             Join Type: INNER
+                             Conditions: ['l_partkey = ps_partkey', 'l_suppkey = ps_suppkey']
+                             Estimated Cardinality: 5117658
+                          -> TABLE_SCAN  (rows=9099165 time_s=0.4142)
+                               Table: tpch.main.lineitem
+                               Type: Sequential Scan
+                               Projections: ['l_partkey', 'l_suppkey', 'l_quantity']
+                               Filters: l_shipdate>='1994-01-01'::DATE AND l_shipdate<'1995-01-01'::DATE
+                               Estimated Cardinality: 11997210
+                               Dynamic Filters: ['optional: l_partkey>=5 AND optional: l_partkey<=1999994', 'optional: l_suppkey>=2 AND optional: l_suppkey<=100000']
+                          -> DELIM_SCAN  (rows=0 time_s=0)
+                               Delim Index: 1
+                               Estimated Cardinality: 1599978
+              -> DUMMY_SCAN  (rows=0 time_s=0)
+            -> HASH_GROUP_BY  (rows=86204 time_s=0.0037)
+                 Groups: ['#2', '#0']
+                 Estimated Cardinality: 1599978
+      -> HASH_JOIN  (rows=4054 time_s=0.0001)
+           Join Type: INNER
+           Conditions: s_nationkey = n_nationkey
+           Estimated Cardinality: 3846
+        -> TABLE_SCAN  (rows=4054 time_s=0.0014)
+             Table: tpch.main.supplier
+             Type: Sequential Scan
+             Projections: ['s_suppkey', 's_nationkey', 's_name', 's_address']
+             Estimated Cardinality: 100000
+             Dynamic Filters: s_nationkey=3
+        -> TABLE_SCAN  (rows=1 time_s=0.0)
+             Table: tpch.main.nation
+             Type: Sequential Scan
+             Projections: n_nationkey
+             Filters: n_name='CANADA'
+             Estimated Cardinality: 1

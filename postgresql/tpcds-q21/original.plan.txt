@@ -1,0 +1,29 @@
+-- PostgreSQL 18, tpcds-q21, original; execution 3534.094 ms, planning 0.884 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=14747015 read=0)
+  -> Sort  (rows=100.0 loops=1 est_rows=820 buffers hit=14747015 read=0)
+       Sort Key: ['warehouse.w_warehouse_name NULLS FIRST', 'item.i_item_id NULLS FIRST']
+    -> Aggregate [Sorted] [Finalize]  (rows=18749.0 loops=1 est_rows=820 buffers hit=14747015 read=0)
+         Filter: ((CASE WHEN (sum(CASE WHEN (date_dim.d_date < '2000-03-11'::date) THEN inventory.inv_quantity_on_hand ELSE 0 END) > 0) THEN (((sum(CASE WHEN (date_dim.d_date >= '2000-03-11'::date) THEN inventory.inv_quantity_on_hand ELSE 0 END))::numeric * 1.000) / (sum(CASE WHEN (date_dim.d_date < '2000-03-11'::date) THEN inventory.inv_quantity_on_hand ELSE 0 END))::numeric) ELSE NULL::numeric END >= 0.66666666666666666667) AND (CASE WHEN (sum(CASE WHEN (date_dim.d_date < '2000-03-11'::date) THEN inventory.inv_quantity_on_hand ELSE 0 END) > 0) THEN (((sum(CASE WHEN (date_dim.d_date >= '2000-03-11'::date) THEN inventory.inv_quantity_on_hand ELSE 0 END))::numeric * 1.000) / (sum(CASE WHEN (date_dim.d_date < '2000-03-11'::date) THEN inventory.inv_quantity_on_hand ELSE 0 END))::numeric) ELSE NULL::numeric END <= 1.5000000000000000))
+         Group Key: ['warehouse.w_warehouse_name', 'item.i_item_id']
+         Rows Removed by Filter: 13511
+      -> Gather Merge  (rows=196935.0 loops=1 est_rows=7378 workers=7 buffers hit=14747015 read=0)
+        -> Aggregate [Sorted] [Partial]  (rows=24616.88 loops=8 est_rows=1054 buffers hit=14747015 read=0)
+             Group Key: ['warehouse.w_warehouse_name', 'item.i_item_id']
+          -> Sort  (rows=36292.5 loops=8 est_rows=1054 buffers hit=14747015 read=0)
+               Sort Key: ['warehouse.w_warehouse_name', 'item.i_item_id']
+            -> Hash Join [Inner]  (rows=36292.5 loops=8 est_rows=1054 buffers hit=14746959 read=0)
+                 Hash Cond: (inventory.inv_warehouse_sk = warehouse.w_warehouse_sk)
+              -> Nested Loop [Inner]  (rows=36292.5 loops=8 est_rows=1054 buffers hit=14746951 read=0)
+                -> Hash Join [Inner]  (rows=573750.0 loops=8 est_rows=15618 buffers hit=976944 read=0)
+                     Hash Cond: (inventory.inv_date_sk = date_dim.d_date_sk)
+                  -> Seq Scan on inventory  (rows=16638750.0 loops=8 est_rows=19015014 buffers hit=974912 read=0)
+                  -> Hash  (rows=7.62 loops=8 est_rows=35 buffers hit=2032 read=0)
+                    -> Seq Scan on date_dim  (rows=61.0 loops=1 est_rows=35 buffers hit=2032 read=0)
+                         Filter: ((d_date >= '2000-02-10'::date) AND (d_date <= '2000-04-10'::date))
+                         Rows Removed by Filter: 72988
+                -> Index Scan on item using scaleup_tpcds_40  (rows=0.06 loops=4590000 est_rows=1 buffers hit=13770007 read=0)
+                     Index Cond: (i_item_sk = inventory.inv_item_sk)
+                     Filter: ((i_current_price >= 0.99) AND (i_current_price <= 1.49))
+                     Rows Removed by Filter: 1
+              -> Hash  (rows=10.0 loops=8 est_rows=10 buffers hit=8 read=0)
+                -> Seq Scan on warehouse  (rows=10.0 loops=8 est_rows=10 buffers hit=8 read=0)

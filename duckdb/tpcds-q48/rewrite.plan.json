@@ -1,0 +1,403 @@
+{
+ "total_bytes_written": 0,
+ "total_bytes_read": 0,
+ "system_peak_temp_dir_size": 0,
+ "system_peak_buffer_memory": 2570374016,
+ "rows_returned": 0,
+ "wal_replay_entry_count": 0,
+ "result_set_size": 0,
+ "query_name": "EXPLAIN (ANALYZE, FORMAT JSON) SELECT SUM(ss.ss_quantity)\nFROM store_sales AS ss\nJOIN customer_demographics AS cd ON cd.cd_demo_sk = ss.ss_cdemo_sk\nJOIN customer_address AS ca ON ca.ca_address_sk = ss.ss_addr_sk\nWHERE ss.ss_sold_date_sk IN\n    (SELECT d.d_date_sk\n     FROM date_dim AS d\n     WHERE d.d_year = 2000)\n  AND ss.ss_store_sk IN\n    (SELECT s.s_store_sk\n     FROM store AS s)\n  AND ((cd.cd_marital_status = 'M'\n        AND cd.cd_education_status = '4 yr Degree'\n        AND ss.ss_sales_price BETWEEN 100.00 AND 150.00)\n       OR (cd.cd_marital_status = 'D'\n           AND cd.cd_education_status = '2 yr Degree'\n           AND ss.ss_sales_price BETWEEN 50.00 AND 100.00)\n       OR (cd.cd_marital_status = 'S'\n           AND cd.cd_education_status = 'College'\n           AND ss.ss_sales_price BETWEEN 150.00 AND 200.00))\n  AND ((ca.ca_country = 'United States'\n        AND ca.ca_state IN ('CO', 'OH', 'TX')\n        AND ss.ss_net_profit BETWEEN 0 AND 2000)\n       OR (ca.ca_country = 'United States'\n           AND ca.ca_state IN ('OR', 'MN', 'KY')\n           AND ss.ss_net_profit BETWEEN 150 AND 3000)\n       OR (ca.ca_country = 'United States'\n           AND ca.ca_state IN ('VA', 'CA', 'MS')\n           AND ss.ss_net_profit BETWEEN 50 AND 25000))",
+ "waiting_to_attach_latency": 0.0,
+ "attach_load_storage_latency": 0.0,
+ "blocked_thread_time": 0.0,
+ "cpu_time": 0.6535379550000004,
+ "extra_info": {},
+ "total_memory_allocated": 75497472,
+ "cumulative_cardinality": 2621639,
+ "checkpoint_latency": 0.0,
+ "cumulative_rows_scanned": 31044940,
+ "write_to_wal_latency": 0.0,
+ "latency": 0.10247574,
+ "attach_replay_wal_latency": 0.0,
+ "commit_local_storage_latency": 0.0,
+ "children": [
+  {
+   "system_peak_temp_dir_size": 0,
+   "system_peak_buffer_memory": 0,
+   "result_set_size": 0,
+   "operator_timing": 2.16e-07,
+   "operator_type": "EXPLAIN_ANALYZE",
+   "cpu_time": 0.6535379550000004,
+   "extra_info": {},
+   "cumulative_cardinality": 2621639,
+   "cumulative_rows_scanned": 31044940,
+   "operator_cardinality": 0,
+   "operator_name": "EXPLAIN_ANALYZE",
+   "operator_rows_scanned": 0,
+   "children": [
+    {
+     "system_peak_temp_dir_size": 0,
+     "system_peak_buffer_memory": 0,
+     "result_set_size": 16,
+     "operator_timing": 1.5631e-05,
+     "operator_type": "UNGROUPED_AGGREGATE",
+     "cpu_time": 0.6535377390000005,
+     "extra_info": {
+      "Aggregates": "sum(#0)"
+     },
+     "cumulative_cardinality": 2621639,
+     "cumulative_rows_scanned": 31044940,
+     "operator_cardinality": 1,
+     "operator_name": "UNGROUPED_AGGREGATE",
+     "operator_rows_scanned": 0,
+     "children": [
+      {
+       "system_peak_temp_dir_size": 0,
+       "system_peak_buffer_memory": 0,
+       "result_set_size": 44056,
+       "operator_timing": 9.039999999999999e-07,
+       "operator_type": "PROJECTION",
+       "cpu_time": 0.6535221080000004,
+       "extra_info": {
+        "Projections": "ss_quantity",
+        "Estimated Cardinality": "10482"
+       },
+       "cumulative_cardinality": 2621638,
+       "cumulative_rows_scanned": 31044940,
+       "operator_cardinality": 5507,
+       "operator_name": "PROJECTION",
+       "operator_rows_scanned": 0,
+       "children": [
+        {
+         "system_peak_temp_dir_size": 0,
+         "system_peak_buffer_memory": 0,
+         "result_set_size": 44056,
+         "operator_timing": 1.5610000000000002e-06,
+         "operator_type": "PROJECTION",
+         "cpu_time": 0.6535212040000005,
+         "extra_info": {
+          "Projections": "#2",
+          "Estimated Cardinality": "10482"
+         },
+         "cumulative_cardinality": 2616131,
+         "cumulative_rows_scanned": 31044940,
+         "operator_cardinality": 5507,
+         "operator_name": "PROJECTION",
+         "operator_rows_scanned": 0,
+         "children": [
+          {
+           "system_peak_temp_dir_size": 0,
+           "system_peak_buffer_memory": 0,
+           "result_set_size": 154196,
+           "operator_timing": 0.00310371,
+           "operator_type": "FILTER",
+           "cpu_time": 0.6535196430000004,
+           "extra_info": {
+            "Expression": "((((ss_net_profit >= 0.00) AND (ss_net_profit <= 2000.00)) AND ((ca_state = 'CO') OR (ca_state = 'OH') OR (ca_state = 'TX'))) OR (((ss_net_profit >= 150.00) AND (ss_net_profit <= 3000.00)) AND ((ca_state = 'OR') OR (ca_state = 'MN') OR (ca_state = 'KY'))) OR (((ca_state = 'VA') OR (ca_state = 'CA') OR (ca_state = 'MS')) AND ((ss_net_profit >= 50.00) AND constant_or_null(true, ss_net_profit, 25000.00))))",
+            "Estimated Cardinality": "10482"
+           },
+           "cumulative_cardinality": 2610624,
+           "cumulative_rows_scanned": 31044940,
+           "operator_cardinality": 5507,
+           "operator_name": "FILTER",
+           "operator_rows_scanned": 0,
+           "children": [
+            {
+             "system_peak_temp_dir_size": 0,
+             "system_peak_buffer_memory": 0,
+             "result_set_size": 1184988,
+             "operator_timing": 0.005513985000000001,
+             "operator_type": "HASH_JOIN",
+             "cpu_time": 0.6504159330000004,
+             "extra_info": {
+              "Join Type": "INNER",
+              "Conditions": "ca_address_sk = ss_addr_sk",
+              "Estimated Cardinality": "10482"
+             },
+             "cumulative_cardinality": 2605117,
+             "cumulative_rows_scanned": 31044940,
+             "operator_cardinality": 42321,
+             "operator_name": "HASH_JOIN",
+             "operator_rows_scanned": 0,
+             "children": [
+              {
+               "system_peak_temp_dir_size": 0,
+               "system_peak_buffer_memory": 0,
+               "result_set_size": 451944,
+               "operator_timing": 0.009311692,
+               "operator_type": "TABLE_SCAN",
+               "cpu_time": 0.009311692,
+               "extra_info": {
+                "Table": "tpcds.main.customer_address",
+                "Type": "Sequential Scan",
+                "Projections": [
+                 "ca_address_sk",
+                 "ca_state"
+                ],
+                "Filters": "ca_country='United States'",
+                "Estimated Cardinality": "50000",
+                "Dynamic Filters": "optional: ca_address_sk>=2 AND optional: ca_address_sk<=249999 AND optional: ca_address_sk IN BF(ss_addr_sk)"
+               },
+               "cumulative_cardinality": 18831,
+               "cumulative_rows_scanned": 250000,
+               "operator_cardinality": 18831,
+               "operator_name": "SEQ_SCAN",
+               "operator_rows_scanned": 250000,
+               "children": []
+              },
+              {
+               "system_peak_temp_dir_size": 0,
+               "system_peak_buffer_memory": 0,
+               "result_set_size": 877260,
+               "operator_timing": 0.0012178620000000001,
+               "operator_type": "HASH_JOIN",
+               "cpu_time": 0.6355902560000004,
+               "extra_info": {
+                "Join Type": "SEMI",
+                "Conditions": "ss_store_sk = #0",
+                "Estimated Cardinality": "46081"
+               },
+               "cumulative_cardinality": 2543965,
+               "cumulative_rows_scanned": 30794940,
+               "operator_cardinality": 43863,
+               "operator_name": "HASH_JOIN",
+               "operator_rows_scanned": 0,
+               "children": [
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 1235108,
+                 "operator_timing": 0.001169123,
+                 "operator_type": "HASH_JOIN",
+                 "cpu_time": 0.6343305290000004,
+                 "extra_info": {
+                  "Join Type": "SEMI",
+                  "Conditions": "ss_sold_date_sk = #0",
+                  "Estimated Cardinality": "230407"
+                 },
+                 "cumulative_cardinality": 2500002,
+                 "cumulative_rows_scanned": 30794840,
+                 "operator_cardinality": 44111,
+                 "operator_name": "HASH_JOIN",
+                 "operator_rows_scanned": 0,
+                 "children": [
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 1587996,
+                   "operator_timing": 5.6001e-05,
+                   "operator_type": "PROJECTION",
+                   "cpu_time": 0.6331268990000004,
+                   "extra_info": {
+                    "Projections": [
+                     "#0",
+                     "#1",
+                     "#2",
+                     "#4",
+                     "#5"
+                    ],
+                    "Estimated Cardinality": "1152039"
+                   },
+                   "cumulative_cardinality": 2455159,
+                   "cumulative_rows_scanned": 30721791,
+                   "operator_cardinality": 44111,
+                   "operator_name": "PROJECTION",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 3175992,
+                     "operator_timing": 0.005180802,
+                     "operator_type": "FILTER",
+                     "cpu_time": 0.6330708980000004,
+                     "extra_info": {
+                      "Expression": "((((ss_sales_price >= 100.00) AND (ss_sales_price <= 150.00)) AND (cd_marital_status = 'M') AND (cd_education_status = '4 yr Degree')) OR (((ss_sales_price >= 50.00) AND (ss_sales_price <= 100.00)) AND (cd_marital_status = 'D') AND (cd_education_status = '2 yr Degree')) OR ((cd_marital_status = 'S') AND (cd_education_status = 'College') AND ((ss_sales_price >= 150.00) AND constant_or_null(true, ss_sales_price, 200.00))))",
+                      "Estimated Cardinality": "1152039"
+                     },
+                     "cumulative_cardinality": 2411048,
+                     "cumulative_rows_scanned": 30721791,
+                     "operator_cardinality": 44111,
+                     "operator_name": "FILTER",
+                     "operator_rows_scanned": 0,
+                     "children": [
+                      {
+                       "system_peak_temp_dir_size": 0,
+                       "system_peak_buffer_memory": 0,
+                       "result_set_size": 9610056,
+                       "operator_timing": 0.09378988600000013,
+                       "operator_type": "HASH_JOIN",
+                       "cpu_time": 0.6278900960000003,
+                       "extra_info": {
+                        "Join Type": "INNER",
+                        "Conditions": "ss_cdemo_sk = cd_demo_sk",
+                        "Estimated Cardinality": "1152039"
+                       },
+                       "cumulative_cardinality": 2366937,
+                       "cumulative_rows_scanned": 30721791,
+                       "operator_cardinality": 133473,
+                       "operator_name": "HASH_JOIN",
+                       "operator_rows_scanned": 0,
+                       "children": [
+                        {
+                         "system_peak_temp_dir_size": 0,
+                         "system_peak_buffer_memory": 0,
+                         "result_set_size": 7105152,
+                         "operator_timing": 0.5030859520000002,
+                         "operator_type": "TABLE_SCAN",
+                         "cpu_time": 0.5030859520000002,
+                         "extra_info": {
+                          "Table": "tpcds.main.store_sales",
+                          "Type": "Sequential Scan",
+                          "Projections": [
+                           "ss_cdemo_sk",
+                           "ss_addr_sk",
+                           "ss_sold_date_sk",
+                           "ss_store_sk",
+                           "ss_sales_price",
+                           "ss_net_profit",
+                           "ss_quantity"
+                          ],
+                          "Filters": "(((ss_sales_price >= 100.00) AND (ss_sales_price <= 150.00)) OR ((ss_sales_price >= 50.00) AND (ss_sales_price <= 100.00)) OR ((ss_sales_price >= 150.00) AND constant_or_null(true, ss_sales_price, 200.00)))",
+                          "Estimated Cardinality": "5760198",
+                          "Dynamic Filters": [
+                           "optional: ss_cdemo_sk>=23 AND optional: ss_cdemo_sk<=1920772 AND optional: ss_cdemo_sk IN BF(cd_demo_sk)",
+                           "optional: ss_sold_date_sk>=2451545 AND optional: ss_sold_date_sk<=2451910 AND optional: ss_sold_date_sk IN BF(#0)",
+                           "optional: ss_store_sk>=1 AND optional: ss_store_sk<=100 AND optional: ss_store_sk IN BF(#0)"
+                          ]
+                         },
+                         "cumulative_cardinality": 148024,
+                         "cumulative_rows_scanned": 28800991,
+                         "operator_cardinality": 148024,
+                         "operator_name": "SEQ_SCAN",
+                         "operator_rows_scanned": 28800991,
+                         "children": []
+                        },
+                        {
+                         "system_peak_temp_dir_size": 0,
+                         "system_peak_buffer_memory": 0,
+                         "result_set_size": 6585600,
+                         "operator_timing": 0.026770013999999998,
+                         "operator_type": "FILTER",
+                         "cpu_time": 0.031014257999999996,
+                         "extra_info": {
+                          "Expression": "(((cd_marital_status = 'M') AND (cd_education_status = '4 yr Degree')) OR ((cd_marital_status = 'D') AND (cd_education_status = '2 yr Degree')) OR ((cd_marital_status = 'S') AND (cd_education_status = 'College')))",
+                          "Estimated Cardinality": "384160"
+                         },
+                         "cumulative_cardinality": 2085440,
+                         "cumulative_rows_scanned": 1920800,
+                         "operator_cardinality": 164640,
+                         "operator_name": "FILTER",
+                         "operator_rows_scanned": 0,
+                         "children": [
+                          {
+                           "system_peak_temp_dir_size": 0,
+                           "system_peak_buffer_memory": 0,
+                           "result_set_size": 76832000,
+                           "operator_timing": 0.0042442439999999994,
+                           "operator_type": "TABLE_SCAN",
+                           "cpu_time": 0.0042442439999999994,
+                           "extra_info": {
+                            "Table": "tpcds.main.customer_demographics",
+                            "Type": "Sequential Scan",
+                            "Projections": [
+                             "cd_demo_sk",
+                             "cd_marital_status",
+                             "cd_education_status"
+                            ],
+                            "Estimated Cardinality": "1920800"
+                           },
+                           "cumulative_cardinality": 1920800,
+                           "cumulative_rows_scanned": 1920800,
+                           "operator_cardinality": 1920800,
+                           "operator_name": "SEQ_SCAN",
+                           "operator_rows_scanned": 1920800,
+                           "children": []
+                          }
+                         ]
+                        }
+                       ]
+                      }
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 2928,
+                   "operator_timing": 6.056e-06,
+                   "operator_type": "FILTER",
+                   "cpu_time": 3.4507e-05,
+                   "extra_info": {
+                    "Expression": "(d_date_sk BETWEEN 2450816 AND 2452642)",
+                    "Estimated Cardinality": "585"
+                   },
+                   "cumulative_cardinality": 732,
+                   "cumulative_rows_scanned": 73049,
+                   "operator_cardinality": 366,
+                   "operator_name": "FILTER",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 2928,
+                     "operator_timing": 2.8451000000000003e-05,
+                     "operator_type": "TABLE_SCAN",
+                     "cpu_time": 2.8451000000000003e-05,
+                     "extra_info": {
+                      "Table": "tpcds.main.date_dim",
+                      "Type": "Sequential Scan",
+                      "Projections": "d_date_sk",
+                      "Filters": "d_year=2000",
+                      "Estimated Cardinality": "585"
+                     },
+                     "cumulative_cardinality": 366,
+                     "cumulative_rows_scanned": 73049,
+                     "operator_cardinality": 366,
+                     "operator_name": "SEQ_SCAN",
+                     "operator_rows_scanned": 73049,
+                     "children": []
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 800,
+                 "operator_timing": 4.1865e-05,
+                 "operator_type": "TABLE_SCAN",
+                 "cpu_time": 4.1865e-05,
+                 "extra_info": {
+                  "Table": "tpcds.main.store",
+                  "Type": "Index Scan",
+                  "Projections": "s_store_sk",
+                  "Filters": "s_store_sk<=100",
+                  "Estimated Cardinality": "102"
+                 },
+                 "cumulative_cardinality": 100,
+                 "cumulative_rows_scanned": 100,
+                 "operator_cardinality": 100,
+                 "operator_name": "SEQ_SCAN",
+                 "operator_rows_scanned": 100,
+                 "children": []
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

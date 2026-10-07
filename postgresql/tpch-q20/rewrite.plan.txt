@@ -1,0 +1,46 @@
+-- PostgreSQL 18, tpch-q20, rewrite; execution 168.975 ms, planning 0.507 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Sort  (rows=1804.0 loops=1 est_rows=1 buffers hit=168473 read=0)
+     Sort Key: ['ts.s_name']
+  -> Nested Loop [Inner] <CTE target_suppliers>  (rows=4054.0 loops=1 est_rows=4000 buffers hit=1877 read=0)
+    -> Seq Scan on nation n  (rows=1.0 loops=1 est_rows=1 buffers hit=1 read=0)
+         Filter: ((n_name)::text = 'CANADA'::text)
+         Rows Removed by Filter: 24
+    -> Bitmap Heap Scan on supplier s  (rows=4054.0 loops=1 est_rows=4000 buffers hit=1876 read=0)
+      -> Bitmap Index Scan using scaleup_tpch_09  (rows=4054.0 loops=1 est_rows=4000 buffers hit=5 read=0)
+           Index Cond: (s_nationkey = n.n_nationkey)
+  -> Aggregate [Sorted] <CTE candidate_pairs>  (rows=3517.0 loops=1 est_rows=3317 buffers hit=128076 read=0)
+       Group Key: ['ps.ps_partkey', 'ps.ps_suppkey']
+    -> Sort  (rows=3517.0 loops=1 est_rows=3317 buffers hit=128076 read=0)
+         Sort Key: ['ps.ps_partkey', 'ps.ps_suppkey']
+      -> Hash Join [Inner]  (rows=3517.0 loops=1 est_rows=3317 buffers hit=128076 read=0)
+           Hash Cond: (ps.ps_suppkey = ts_1.s_suppkey)
+        -> Gather  (rows=86204.0 loops=1 est_rows=80809 workers=4 buffers hit=126207 read=0)
+          -> Nested Loop [Inner]  (rows=17240.8 loops=5 est_rows=20202 buffers hit=126207 read=0)
+            -> Seq Scan on part p  (rows=4310.2 loops=5 est_rows=5050 buffers hit=38232 read=0)
+                 Filter: ((p_name)::text ~~ 'forest%'::text)
+                 Rows Removed by Filter: 395690
+            -> Index Scan on partsupp ps using scaleup_tpch_05  (rows=4.0 loops=21551 est_rows=18 buffers hit=87975 read=0)
+                 Index Cond: (ps_partkey = p.p_partkey)
+        -> Hash  (rows=4054.0 loops=1 est_rows=4000 buffers hit=1869 read=0)
+          -> CTE Scan (CTE target_suppliers)  (rows=4054.0 loops=1 est_rows=4000 buffers hit=1869 read=0)
+  -> Unique <CTE qualifying_suppliers>  (rows=1804.0 loops=1 est_rows=1 buffers hit=168465 read=0)
+    -> Sort  (rows=2377.0 loops=1 est_rows=1 buffers hit=168465 read=0)
+         Sort Key: ['q.ps_suppkey']
+      -> Subquery Scan  (rows=2377.0 loops=1 est_rows=1 buffers hit=168465 read=0)
+        -> Aggregate [Sorted]  (rows=2377.0 loops=1 est_rows=1 buffers hit=168465 read=0)
+             Filter: ((cp.ps_availqty)::numeric > (0.5 * sum(l.l_quantity)))
+             Group Key: ['cp.ps_partkey', 'cp.ps_suppkey', 'cp.ps_availqty']
+             Rows Removed by Filter: 7
+          -> Incremental Sort  (rows=4015.0 loops=1 est_rows=2 buffers hit=168465 read=0)
+               Sort Key: ['cp.ps_partkey', 'cp.ps_suppkey', 'cp.ps_availqty']
+            -> Nested Loop [Inner]  (rows=4015.0 loops=1 est_rows=1 buffers hit=168465 read=0)
+              -> CTE Scan (CTE candidate_pairs)  (rows=3517.0 loops=1 est_rows=3317 buffers hit=128076 read=0)
+              -> Index Scan on lineitem l using scaleup_tpch_13  (rows=1.14 loops=3517 est_rows=1 buffers hit=40389 read=0)
+                   Index Cond: ((l_partkey = cp.ps_partkey) AND (l_suppkey = cp.ps_suppkey))
+                   Filter: ((l_shipdate >= '1994-01-01'::date) AND (l_shipdate < '1995-01-01'::date))
+                   Rows Removed by Filter: 6
+  -> Hash Join [Inner]  (rows=1804.0 loops=1 est_rows=1 buffers hit=168473 read=0)
+       Hash Cond: (ts.s_suppkey = qs.ps_suppkey)
+    -> CTE Scan (CTE target_suppliers)  (rows=4054.0 loops=1 est_rows=4000 buffers hit=8 read=0)
+    -> Hash  (rows=1804.0 loops=1 est_rows=1 buffers hit=168465 read=0)
+      -> CTE Scan (CTE qualifying_suppliers)  (rows=1804.0 loops=1 est_rows=1 buffers hit=168465 read=0)

@@ -1,0 +1,66 @@
+-- DuckDB 1.5.5, tpcds-q84, original; latency 0.043487868 s, cpu 0.15720561 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0004)
+       Top: 100
+       Order By: tpcds.main.customer.c_customer_id ASC
+    -> PROJECTION  (rows=1201 time_s=0.0005)
+         Projections: ['customer_id', 'customername']
+         Estimated Cardinality: 234
+      -> HASH_JOIN  (rows=1201 time_s=0.0077)
+           Join Type: INNER
+           Conditions: sr_cdemo_sk = c_current_cdemo_sk
+           Estimated Cardinality: 234
+        -> TABLE_SCAN  (rows=9154 time_s=0.0558)
+             Table: tpcds.main.store_returns
+             Type: Sequential Scan
+             Projections: sr_cdemo_sk
+             Filters: sr_cdemo_sk>=4 AND sr_cdemo_sk<=1920791
+             Estimated Cardinality: 2877532
+             Dynamic Filters: optional: sr_cdemo_sk>=3529 AND optional: sr_cdemo_sk<=1917185 AND optional: sr_cdemo_sk IN BF(c_current_cdemo_sk)
+        -> HASH_JOIN  (rows=837 time_s=0.0037)
+             Join Type: INNER
+             Conditions: cd_demo_sk = c_current_cdemo_sk
+             Estimated Cardinality: 156
+          -> TABLE_SCAN  (rows=6432 time_s=0.0295)
+               Table: tpcds.main.customer_demographics
+               Type: Sequential Scan
+               Projections: cd_demo_sk
+               Filters: cd_demo_sk>=4 AND cd_demo_sk<=1920791
+               Estimated Cardinality: 1920800
+               Dynamic Filters: optional: cd_demo_sk>=3529 AND optional: cd_demo_sk<=1917185 AND optional: cd_demo_sk IN BF(c_current_cdemo_sk)
+          -> HASH_JOIN  (rows=846 time_s=0.0)
+               Join Type: INNER
+               Conditions: hd_income_band_sk = ib_income_band_sk
+               Estimated Cardinality: 156
+            -> HASH_JOIN  (rows=846 time_s=0.0016)
+                 Join Type: INNER
+                 Conditions: hd_demo_sk = c_current_hdemo_sk
+                 Estimated Cardinality: 821
+              -> TABLE_SCAN  (rows=631 time_s=0.0)
+                   Table: tpcds.main.household_demographics
+                   Type: Sequential Scan
+                   Projections: ['hd_income_band_sk', 'hd_demo_sk']
+                   Estimated Cardinality: 7200
+                   Dynamic Filters: ['optional: hd_income_band_sk>=5 AND optional: hd_income_band_sk<=8', 'optional: hd_demo_sk>=3 AND optional: hd_demo_sk<=7199 AND optional: hd_demo_sk IN BF(c_current_hdemo_sk)']
+              -> HASH_JOIN  (rows=4352 time_s=0.0058)
+                   Join Type: INNER
+                   Conditions: c_current_addr_sk = ca_address_sk
+                   Estimated Cardinality: 821
+                -> TABLE_SCAN  (rows=499956 time_s=0.0471)
+                     Table: tpcds.main.customer
+                     Type: Sequential Scan
+                     Projections: ['c_current_addr_sk', 'c_current_cdemo_sk', 'c_current_hdemo_sk', 'c_customer_id', 'c_last_name', 'c_first_name']
+                     Estimated Cardinality: 500000
+                     Dynamic Filters: optional: c_current_addr_sk>=12 AND optional: c_current_addr_sk<=249956
+                -> TABLE_SCAN  (rows=2211 time_s=0.0049)
+                     Table: tpcds.main.customer_address
+                     Type: Sequential Scan
+                     Projections: ca_address_sk
+                     Filters: ca_city='Edgewood'
+                     Estimated Cardinality: 500
+            -> TABLE_SCAN  (rows=4 time_s=0.0)
+                 Table: tpcds.main.income_band
+                 Type: Sequential Scan
+                 Projections: ib_income_band_sk
+                 Filters: ['ib_lower_bound>=38128', 'ib_upper_bound<=88128']
+                 Estimated Cardinality: 4

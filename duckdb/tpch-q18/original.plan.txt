@@ -1,0 +1,89 @@
+-- DuckDB 1.5.5, tpch-q18, original; latency 0.39800977 s, cpu 2.998308856000001 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0002)
+       Top: 100
+       Order By: ['tpch.main.orders.o_totalprice DESC', 'tpch.main.orders.o_orderdate ASC']
+    -> PROJECTION  (rows=624 time_s=0.0)
+         Projections: ['#0', '__internal_decompress_integral_bigint(#1, 1)', '__internal_decompress_integral_bigint(#2, 1)', '#3', '#4', '#5']
+         Estimated Cardinality: 12192438
+      -> HASH_GROUP_BY  (rows=624 time_s=0.0028)
+           Groups: ['#0', '#1', '#2', '#3', '#4']
+           Aggregates: sum(#5)
+           Estimated Cardinality: 12192438
+        -> PROJECTION  (rows=4368 time_s=0.0)
+             Projections: ['c_name', 'c_custkey', 'o_orderkey', 'o_orderdate', 'o_totalprice', 'l_quantity']
+             Estimated Cardinality: 12192438
+          -> PROJECTION  (rows=4368 time_s=0.0)
+               Projections: ['#0', '__internal_compress_integral_uinteger(#1, 1)', '#2', '#3', '__internal_compress_integral_uinteger(#4, 1)', '#5']
+               Estimated Cardinality: 12192438
+            -> PROJECTION  (rows=4368 time_s=0.0)
+                 Projections: ['#0', '__internal_decompress_integral_bigint(#1, 1)', '#2', '#3', '__internal_decompress_integral_bigint(#4, 1)', '#5']
+                 Estimated Cardinality: 12192438
+              -> HASH_JOIN  (rows=4368 time_s=0.1739)
+                   Join Type: INNER
+                   Conditions: l_orderkey = o_orderkey
+                   Estimated Cardinality: 12192438
+                -> PROJECTION  (rows=59986052 time_s=0.0242)
+                     Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1']
+                     Estimated Cardinality: 59986052
+                  -> TABLE_SCAN  (rows=59986052 time_s=0.1245)
+                       Table: tpch.main.lineitem
+                       Type: Sequential Scan
+                       Projections: ['l_orderkey', 'l_quantity']
+                       Estimated Cardinality: 59986052
+                -> PROJECTION  (rows=624 time_s=0.0)
+                     Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1', '#2', '__internal_compress_integral_uinteger(#3, 1)', '#4']
+                     Estimated Cardinality: 3023933
+                  -> PROJECTION  (rows=624 time_s=0.0)
+                       Projections: ['#0', '#1', '#2', '__internal_decompress_integral_bigint(#3, 1)', '#4']
+                       Estimated Cardinality: 3023933
+                    -> HASH_JOIN  (rows=624 time_s=0.1157)
+                         Join Type: INNER
+                         Conditions: o_custkey = c_custkey
+                         Estimated Cardinality: 3023933
+                      -> PROJECTION  (rows=624 time_s=0.0)
+                           Projections: ['#0', '__internal_compress_integral_uinteger(#1, 1)', '#2', '#3']
+                           Estimated Cardinality: 3000000
+                        -> HASH_JOIN  (rows=624 time_s=0.0136)
+                             Join Type: SEMI
+                             Conditions: o_orderkey = #0
+                             Estimated Cardinality: 3000000
+                          -> TABLE_SCAN  (rows=127529 time_s=0.1339)
+                               Table: tpch.main.orders
+                               Type: Sequential Scan
+                               Projections: ['o_orderkey', 'o_custkey', 'o_orderdate', 'o_totalprice']
+                               Estimated Cardinality: 15000000
+                               Dynamic Filters: optional: o_orderkey>=6882 AND optional: o_orderkey<=59993957 AND optional: o_orderkey IN BF(#0)
+                          -> PROJECTION  (rows=624 time_s=0.0)
+                               Projections: #0
+                               Estimated Cardinality: 1000527
+                            -> FILTER  (rows=624 time_s=0.0452)
+                                 Expression: (sum(l_quantity) > 300.00)
+                                 Estimated Cardinality: 1000527
+                              -> PROJECTION  (rows=15000000 time_s=0.0065)
+                                   Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1']
+                                   Estimated Cardinality: 5002635
+                                -> HASH_GROUP_BY  (rows=15000000 time_s=2.1821)
+                                     Groups: #0
+                                     Aggregates: sum_no_overflow(#1)
+                                     Estimated Cardinality: 5002635
+                                  -> PROJECTION  (rows=59986052 time_s=0.0038)
+                                       Projections: ['l_orderkey', 'l_quantity']
+                                       Estimated Cardinality: 59986052
+                                    -> PROJECTION  (rows=59986052 time_s=0.0248)
+                                         Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1']
+                                         Estimated Cardinality: 59986052
+                                      -> TABLE_SCAN  (rows=59986052 time_s=0.1214)
+                                           Table: tpch.main.lineitem
+                                           Type: Sequential Scan
+                                           Projections: ['l_orderkey', 'l_quantity']
+                                           Estimated Cardinality: 59986052
+                      -> PROJECTION  (rows=1499999 time_s=0.0006)
+                           Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1']
+                           Estimated Cardinality: 1500000
+                        -> TABLE_SCAN  (rows=1499999 time_s=0.0248)
+                             Table: tpch.main.customer
+                             Type: Sequential Scan
+                             Projections: ['c_custkey', 'c_name']
+                             Filters: c_custkey<=1499999
+                             Estimated Cardinality: 1500000

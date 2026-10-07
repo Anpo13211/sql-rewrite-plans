@@ -1,0 +1,105 @@
+-- DuckDB 1.5.5, tpcds-q25, original; latency 0.037931774 s, cpu 0.13703294100000002 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=2 time_s=0.0)
+       Top: 100
+       Order By: ['tpcds.main.item.i_item_id ASC', 'tpcds.main.item.i_item_desc ASC', 'tpcds.main.store.s_store_id ASC', 'tpcds.main.store.s_store_name ASC']
+    -> PROJECTION  (rows=2 time_s=0.0)
+         Projections: ['#0', '#1', '#2', '__internal_decompress_string(#3)', '#4', '#5', '#6']
+         Estimated Cardinality: 1127
+      -> HASH_GROUP_BY  (rows=2 time_s=0.0001)
+           Groups: ['#0', '#1', '#2', '#3']
+           Aggregates: ['sum(#4)', 'sum(#5)', 'sum(#6)']
+           Estimated Cardinality: 1127
+        -> PROJECTION  (rows=2 time_s=0.0)
+             Projections: ['i_item_id', 'i_item_desc', 's_store_id', 's_store_name', 'ss_net_profit', 'sr_net_loss', 'cs_net_profit']
+             Estimated Cardinality: 1128
+          -> PROJECTION  (rows=2 time_s=0.0)
+               Projections: ['#0', '#1', '#2', '#4', '#3', '#5', '__internal_compress_string_ubigint(#6)']
+               Estimated Cardinality: 1128
+            -> HASH_JOIN  (rows=2 time_s=0.0002)
+                 Join Type: INNER
+                 Conditions: i_item_sk = ss_item_sk
+                 Estimated Cardinality: 1128
+              -> TABLE_SCAN  (rows=73684 time_s=0.0046)
+                   Table: tpcds.main.item
+                   Type: Sequential Scan
+                   Projections: ['i_item_sk', 'i_item_id', 'i_item_desc']
+                   Filters: optional: Dynamic Filter (i_item_id)
+                   Estimated Cardinality: 102000
+                   Dynamic Filters: optional: i_item_sk IN (28317, 74527) AND optional: i_item_sk>=28317 AND optional: i_item_sk<=74527
+              -> HASH_JOIN  (rows=2 time_s=0.0001)
+                   Join Type: INNER
+                   Conditions: ss_store_sk = s_store_sk
+                   Estimated Cardinality: 1092
+                -> HASH_JOIN  (rows=2 time_s=0.0001)
+                     Join Type: INNER
+                     Conditions: ss_sold_date_sk = d_date_sk
+                     Estimated Cardinality: 1071
+                  -> HASH_JOIN  (rows=2 time_s=0.0019)
+                       Join Type: INNER
+                       Conditions: ['ss_item_sk = cs_item_sk', 'ss_customer_sk = cs_bill_customer_sk', 'ss_ticket_number = sr_ticket_number']
+                       Estimated Cardinality: 133768
+                    -> TABLE_SCAN  (rows=14053 time_s=0.0209)
+                         Table: tpcds.main.store_sales
+                         Type: Sequential Scan
+                         Projections: ['ss_sold_date_sk', 'ss_item_sk', 'ss_store_sk', 'ss_customer_sk', 'ss_ticket_number', 'ss_net_profit']
+                         Filters: ss_ticket_number<=2399999
+                         Estimated Cardinality: 28800991
+                         Dynamic Filters: ['optional: ss_sold_date_sk>=2452001 AND optional: ss_sold_date_sk<=2452030', 'optional: ss_item_sk IN (7, 15425, 28317, 29633, 31961, 37303, 52679, 55621, 62413, 67463, 68125, 74527, 83651, 94885) AND optional: ss_item_sk>=7 AND optional: ss_item_sk<=94885', 'optional: ss_store_sk>=1 AND optional: ss_store_sk<=100', 'optional: ss_customer_sk IN (29539, 60289, 107202, 170759, 226936, 246355, 265245, 297396, 301214, 387677, 401962, 422073, 464653, 477976) AND optional: ss_customer_sk>=29539 AND optional: ss_customer_sk<=477976', 'optional: ss_ticket_number IN (277948, 571749, 581623, 600465, 702281, 721871, 772183, 1144466, 1406251, 1897334, 1948285, 2146282, 2231846, 2394307) AND optional: ss_ticket_number>=277948 AND optional: ss_ticket_number<=2394307']
+                    -> HASH_JOIN  (rows=14 time_s=0.0602)
+                         Join Type: INNER
+                         Conditions: ['cs_item_sk = sr_item_sk', 'cs_bill_customer_sk = sr_customer_sk']
+                         Estimated Cardinality: 4358
+                      -> HASH_JOIN  (rows=1497454 time_s=0.0055)
+                           Join Type: INNER
+                           Conditions: cs_sold_date_sk = d_date_sk
+                           Estimated Cardinality: 115329
+                        -> TABLE_SCAN  (rows=1543172 time_s=0.0148)
+                             Table: tpcds.main.catalog_sales
+                             Type: Sequential Scan
+                             Projections: ['cs_bill_customer_sk', 'cs_item_sk', 'cs_sold_date_sk', 'cs_net_profit']
+                             Estimated Cardinality: 14401261
+                             Dynamic Filters: ['optional: cs_bill_customer_sk>=5 AND optional: cs_bill_customer_sk<=500000', 'optional: cs_item_sk>=1 AND optional: cs_item_sk<=101999', 'optional: cs_sold_date_sk>=2452001 AND optional: cs_sold_date_sk<=2452214']
+                        -> FILTER  (rows=214 time_s=0.0)
+                             Expression: (d_date_sk BETWEEN 2450815 AND 2452653)
+                             Estimated Cardinality: 585
+                          -> TABLE_SCAN  (rows=214 time_s=0.0001)
+                               Table: tpcds.main.date_dim
+                               Type: Sequential Scan
+                               Projections: d_date_sk
+                               Filters: ['d_moy>=4 AND d_moy<=10', 'd_year=2001']
+                               Estimated Cardinality: 585
+                      -> HASH_JOIN  (rows=259364 time_s=0.0032)
+                           Join Type: INNER
+                           Conditions: sr_returned_date_sk = d_date_sk
+                           Estimated Cardinality: 23044
+                        -> TABLE_SCAN  (rows=259364 time_s=0.025)
+                             Table: tpcds.main.store_returns
+                             Type: Sequential Scan
+                             Projections: ['sr_customer_sk', 'sr_item_sk', 'sr_ticket_number', 'sr_returned_date_sk', 'sr_net_loss']
+                             Estimated Cardinality: 2877532
+                             Dynamic Filters: optional: sr_returned_date_sk>=2452001 AND optional: sr_returned_date_sk<=2452214
+                        -> FILTER  (rows=214 time_s=0.0)
+                             Expression: (d_date_sk BETWEEN 2450820 AND 2452822)
+                             Estimated Cardinality: 585
+                          -> TABLE_SCAN  (rows=214 time_s=0.0001)
+                               Table: tpcds.main.date_dim
+                               Type: Sequential Scan
+                               Projections: d_date_sk
+                               Filters: ['d_moy>=4 AND d_moy<=10', 'd_year=2001']
+                               Estimated Cardinality: 585
+                  -> FILTER  (rows=30 time_s=0.0)
+                       Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                       Estimated Cardinality: 585
+                    -> TABLE_SCAN  (rows=30 time_s=0.0001)
+                         Table: tpcds.main.date_dim
+                         Type: Sequential Scan
+                         Projections: d_date_sk
+                         Filters: ['d_moy=4', 'd_year=2001']
+                         Estimated Cardinality: 585
+                -> TABLE_SCAN  (rows=100 time_s=0.0001)
+                     Table: tpcds.main.store
+                     Type: Index Scan
+                     Projections: ['s_store_sk', 's_store_id', 's_store_name']
+                     Filters: s_store_sk<=100
+                     Estimated Cardinality: 102

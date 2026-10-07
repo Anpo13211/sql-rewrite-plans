@@ -1,0 +1,156 @@
+-- DuckDB 1.5.5, tpcds-q58, rewrite; latency 0.073318466 s, cpu 0.4232086320000001 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0)
+       CTE Name: week_keys
+       Table Index: 0
+       Estimated Cardinality: 100
+    -> PROJECTION  (rows=7 time_s=0.0)
+         Projections: d_date_sk
+         Estimated Cardinality: 21
+      -> HASH_JOIN  (rows=7 time_s=0.0001)
+           Join Type: INNER
+           Conditions: d_week_seq = SUBQUERY
+           Estimated Cardinality: 21
+        -> TABLE_SCAN  (rows=7 time_s=0.0001)
+             Table: tpcds.main.date_dim
+             Type: Sequential Scan
+             Projections: ['d_week_seq', 'd_date_sk']
+             Estimated Cardinality: 73049
+             Dynamic Filters: d_week_seq=5218
+        -> PROJECTION  (rows=1 time_s=0.0)
+             Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+             Estimated Cardinality: 1
+          -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+               Aggregates: ['"first"(#0)', 'count_star()']
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: #0
+                 Estimated Cardinality: 2
+              -> TABLE_SCAN  (rows=1 time_s=0.0001)
+                   Table: tpcds.main.date_dim
+                   Type: Sequential Scan
+                   Projections: d_week_seq
+                   Filters: d_date='2000-01-03'::DATE
+                   Estimated Cardinality: 2
+    -> CTE  (rows=0 time_s=0.0012)
+         CTE Name: channel_item
+         Table Index: 1
+         Estimated Cardinality: 100
+      -> UNION  (rows=135575 time_s=0)
+        -> PROJECTION  (rows=59619 time_s=0.0)
+             Projections: ['channel', 'item_sk', 'revenue']
+             Estimated Cardinality: 96052
+          -> PROJECTION  (rows=59619 time_s=0.0001)
+               Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1']
+               Estimated Cardinality: 96052
+            -> HASH_GROUP_BY  (rows=59619 time_s=0.0245)
+                 Groups: #0
+                 Aggregates: sum(#1)
+                 Estimated Cardinality: 96052
+              -> PROJECTION  (rows=197074 time_s=0.0)
+                   Projections: ['ss_item_sk', 'ss_ext_sales_price']
+                   Estimated Cardinality: 5760198
+                -> PROJECTION  (rows=197074 time_s=0.0003)
+                     Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1']
+                     Estimated Cardinality: 5760198
+                  -> HASH_JOIN  (rows=197074 time_s=0.0337)
+                       Join Type: SEMI
+                       Conditions: ss_sold_date_sk = d_date_sk
+                       Estimated Cardinality: 5760198
+                    -> TABLE_SCAN  (rows=197074 time_s=0.2201)
+                         Table: tpcds.main.store_sales
+                         Type: Sequential Scan
+                         Projections: ['ss_sold_date_sk', 'ss_item_sk', 'ss_ext_sales_price']
+                         Estimated Cardinality: 28800991
+                         Dynamic Filters: optional: ss_sold_date_sk>=2451541 AND optional: ss_sold_date_sk<=2451547
+                    -> CTE_SCAN  (rows=7 time_s=0.0)
+                         CTE Index: 0
+                         Estimated Cardinality: 21
+        -> PROJECTION  (rows=41542 time_s=0.0)
+             Projections: ["'cs'", 'cs_item_sk', 'sum(cs_ext_sales_price)']
+             Estimated Cardinality: 96134
+          -> PROJECTION  (rows=41542 time_s=0.0001)
+               Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1']
+               Estimated Cardinality: 96134
+            -> HASH_GROUP_BY  (rows=41542 time_s=0.0113)
+                 Groups: #0
+                 Aggregates: sum(#1)
+                 Estimated Cardinality: 96134
+              -> PROJECTION  (rows=75933 time_s=0.0)
+                   Projections: ['cs_item_sk', 'cs_ext_sales_price']
+                   Estimated Cardinality: 2880252
+                -> PROJECTION  (rows=75933 time_s=0.0001)
+                     Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1']
+                     Estimated Cardinality: 2880252
+                  -> HASH_JOIN  (rows=75933 time_s=0.0013)
+                       Join Type: SEMI
+                       Conditions: cs_sold_date_sk = d_date_sk
+                       Estimated Cardinality: 2880252
+                    -> TABLE_SCAN  (rows=106908 time_s=0.0007)
+                         Table: tpcds.main.catalog_sales
+                         Type: Sequential Scan
+                         Projections: ['cs_sold_date_sk', 'cs_item_sk', 'cs_ext_sales_price']
+                         Estimated Cardinality: 14401261
+                         Dynamic Filters: optional: cs_sold_date_sk>=2451541 AND optional: cs_sold_date_sk<=2451547
+                    -> CTE_SCAN  (rows=7 time_s=0.0)
+                         CTE Index: 0
+                         Estimated Cardinality: 21
+        -> PROJECTION  (rows=34414 time_s=0.0)
+             Projections: ["'ws'", 'ws_item_sk', 'sum(ws_ext_sales_price)']
+             Estimated Cardinality: 96467
+          -> PROJECTION  (rows=34414 time_s=0.0001)
+               Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1']
+               Estimated Cardinality: 96467
+            -> HASH_GROUP_BY  (rows=34414 time_s=0.0086)
+                 Groups: #0
+                 Aggregates: sum(#1)
+                 Estimated Cardinality: 96467
+              -> PROJECTION  (rows=52128 time_s=0.0)
+                   Projections: ['ws_item_sk', 'ws_ext_sales_price']
+                   Estimated Cardinality: 1439513
+                -> PROJECTION  (rows=52128 time_s=0.0001)
+                     Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1']
+                     Estimated Cardinality: 1439513
+                  -> HASH_JOIN  (rows=52128 time_s=0.009)
+                       Join Type: SEMI
+                       Conditions: ws_sold_date_sk = d_date_sk
+                       Estimated Cardinality: 1439513
+                    -> TABLE_SCAN  (rows=52128 time_s=0.0474)
+                         Table: tpcds.main.web_sales
+                         Type: Sequential Scan
+                         Projections: ['ws_sold_date_sk', 'ws_item_sk', 'ws_ext_sales_price']
+                         Estimated Cardinality: 7197566
+                         Dynamic Filters: optional: ws_sold_date_sk>=2451541 AND optional: ws_sold_date_sk<=2451547
+                    -> CTE_SCAN  (rows=7 time_s=0.0)
+                         CTE Index: 0
+                         Estimated Cardinality: 21
+      -> TOP_N  (rows=31 time_s=0.0001)
+           Top: 100
+           Order By: ['revenue.item_id ASC', 'revenue.ss_item_rev ASC']
+        -> PROJECTION  (rows=31 time_s=0.0)
+             Projections: ['item_id', 'ss_item_rev', 'ss_dev', 'cs_item_rev', 'cs_dev', 'ws_item_rev', 'ws_dev', 'average']
+             Estimated Cardinality: 1990
+          -> PROJECTION  (rows=31 time_s=0.0001)
+               Projections: ['item_id', 'ss_item_rev', '(CAST(((ss_item_rev + cs_item_rev) + ws_item_rev) AS DOUBLE) / 3.0)', 'cs_item_rev', 'ws_item_rev']
+               Estimated Cardinality: 1990
+            -> FILTER  (rows=31 time_s=0.0068)
+                 Expression: ((CAST(ss_item_rev AS DECIMAL(38,3)) >= (0.9 * cs_item_rev)) AND (CAST(ss_item_rev AS DECIMAL(38,3)) >= (0.9 * ws_item_rev)) AND (CAST(cs_item_rev AS DECIMAL(38,3)) >= (0.9 * ss_item_rev)) AND (CAST(cs_item_rev AS DECIMAL(38,3)) >= (0.9 * ws_item_rev)) AND (CAST(ws_item_rev AS DECIMAL(38,3)) >= (0.9 * ss_item_rev)) AND (CAST(ws_item_rev AS DECIMAL(38,3)) >= (0.9 * cs_item_rev)) AND (CAST(ss_item_rev AS DECIMAL(38,3)) <= (1.1 * cs_item_rev)) AND (CAST(ss_item_rev AS DECIMAL(38,3)) <= (1.1 * ws_item_rev)) AND (CAST(cs_item_rev AS DECIMAL(38,3)) <= (1.1 * ss_item_rev)) AND (CAST(cs_item_rev AS DECIMAL(38,3)) <= (1.1 * ws_item_rev)) AND (CAST(ws_item_rev AS DECIMAL(38,3)) <= (1.1 * ss_item_rev)) AND (CAST(ws_item_rev AS DECIMAL(38,3)) <= (1.1 * cs_item_rev)))
+                 Estimated Cardinality: 1990
+              -> HASH_GROUP_BY  (rows=50906 time_s=0.0432)
+                   Groups: #0
+                   Aggregates: ['sum(#1) FILTER (WHERE #3) Filter: #3', 'sum(#3) FILTER (WHERE #4) Filter: #4', 'sum(#5) FILTER (WHERE #5) Filter: #5']
+                   Estimated Cardinality: 1990
+                -> PROJECTION  (rows=135575 time_s=0.0014)
+                     Projections: ['i_item_id', 'revenue', "(channel = 'ss')", 'revenue', "(channel = 'cs')", 'revenue', "(channel = 'ws')"]
+                     Estimated Cardinality: 413374
+                  -> HASH_JOIN  (rows=135575 time_s=0.0103)
+                       Join Type: INNER
+                       Conditions: item_sk = i_item_sk
+                       Estimated Cardinality: 413374
+                    -> CTE_SCAN  (rows=135575 time_s=0.0002)
+                         CTE Index: 1
+                         Estimated Cardinality: 288653
+                    -> TABLE_SCAN  (rows=102000 time_s=0.0021)
+                         Table: tpcds.main.item
+                         Type: Sequential Scan
+                         Projections: ['i_item_sk', 'i_item_id']
+                         Estimated Cardinality: 102000

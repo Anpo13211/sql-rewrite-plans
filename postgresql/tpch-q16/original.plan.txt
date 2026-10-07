@@ -1,0 +1,20 @@
+-- PostgreSQL 18, tpch-q16, original; execution 1116.403 ms, planning 0.315 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Sort  (rows=27840.0 loops=1 est_rows=152302 buffers hit=84467 read=0)
+     Sort Key: ['(count(DISTINCT partsupp.ps_suppkey)) DESC', 'part.p_brand', 'part.p_type', 'part.p_size']
+  -> Aggregate [Sorted]  (rows=27840.0 loops=1 est_rows=152302 buffers hit=84467 read=0)
+       Group Key: ['part.p_brand', 'part.p_type', 'part.p_size']
+    -> Gather Merge  (rows=1186602.0 loops=1 est_rows=580640 workers=6 buffers hit=84467 read=0)
+      -> Sort  (rows=169514.57 loops=7 est_rows=96773 buffers hit=84467 read=0)
+           Sort Key: ['part.p_brand', 'part.p_type', 'part.p_size', 'partsupp.ps_suppkey']
+        -> Hash Join [Inner]  (rows=169514.57 loops=7 est_rows=96773 buffers hit=84329 read=0)
+             Hash Cond: (partsupp.ps_partkey = part.p_partkey)
+          -> Index Only Scan on partsupp using scaleup_tpch_05  (rows=1142217.14 loops=7 est_rows=666688 buffers hit=46097 read=0)
+               Filter: (NOT (ANY (ps_suppkey = (hashed SubPlan 1).col1)))
+               Rows Removed by Filter: 640
+            -> Seq Scan on supplier <SubPlan 1>  (rows=56.0 loops=7 est_rows=10 buffers hit=15400 read=0)
+                 Filter: ((s_comment)::text ~~ '%Customer%Complaints%'::text)
+                 Rows Removed by Filter: 99944
+          -> Hash  (rows=42403.43 loops=7 est_rows=72572 buffers hit=38232 read=0)
+            -> Seq Scan on part  (rows=42403.43 loops=7 est_rows=72572 buffers hit=38232 read=0)
+                 Filter: (((p_brand)::text <> 'Brand#45'::text) AND ((p_type)::text !~~ 'MEDIUM POLISHED%'::text) AND (p_size = ANY ('{49,14,23,45,19,3,36,9}'::integer[])))
+                 Rows Removed by Filter: 243311

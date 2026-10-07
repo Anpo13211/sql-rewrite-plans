@@ -1,0 +1,35 @@
+-- PostgreSQL 18, tpcds-q27, original; execution 987.575 ms, planning 0.707 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=584873 read=0)
+  -> Gather <CTE results>  (rows=25041.0 loops=1 est_rows=564 workers=3 buffers hit=584873 read=0)
+    -> Nested Loop [Inner]  (rows=6260.25 loops=4 est_rows=182 buffers hit=584873 read=0)
+      -> Nested Loop [Inner]  (rows=6260.25 loops=4 est_rows=182 buffers hit=509747 read=0)
+        -> Hash Join [Inner]  (rows=31719.0 loops=4 est_rows=38342 buffers hit=498059 read=0)
+             Hash Cond: (store_sales.ss_store_sk = store.s_store_sk)
+          -> Nested Loop [Inner]  (rows=98161.25 loops=4 est_rows=132207 buffers hit=498039 read=0)
+            -> Seq Scan on customer_demographics  (rows=6860.0 loops=4 est_rows=9244 buffers hit=23072 read=0)
+                 Filter: (((cd_gender)::text = 'M'::text) AND ((cd_marital_status)::text = 'S'::text) AND ((cd_education_status)::text = 'College'::text))
+                 Rows Removed by Filter: 473340
+            -> Index Scan on store_sales using scaleup_tpcds_56  (rows=14.31 loops=27440 est_rows=26 buffers hit=474967 read=0)
+                 Index Cond: (ss_cdemo_sk = customer_demographics.cd_demo_sk)
+          -> Hash  (rows=31.0 loops=4 est_rows=31 buffers hit=20 read=0)
+            -> Seq Scan on store  (rows=31.0 loops=4 est_rows=31 buffers hit=20 read=0)
+                 Filter: ((s_state)::text = 'TN'::text)
+                 Rows Removed by Filter: 71
+        -> Memoize  (rows=0.2 loops=126876 est_rows=1 buffers hit=11688 read=0)
+          -> Index Scan on date_dim using scaleup_tpcds_36  (rows=0.2 loops=3899 est_rows=1 buffers hit=11688 read=0)
+               Index Cond: (d_date_sk = store_sales.ss_sold_date_sk)
+               Filter: (d_year = 2002)
+               Rows Removed by Filter: 1
+      -> Index Scan on item using scaleup_tpcds_40  (rows=1.0 loops=25041 est_rows=1 buffers hit=75126 read=0)
+           Index Cond: (i_item_sk = store_sales.ss_item_sk)
+  -> Sort  (rows=100.0 loops=1 est_rows=503 buffers hit=584873 read=0)
+       Sort Key: ['results.i_item_id NULLS FIRST', 'results.s_state NULLS FIRST']
+    -> Append  (rows=39547.0 loops=1 est_rows=503 buffers hit=584873 read=0)
+      -> Aggregate [Hashed]  (rows=19773.0 loops=1 est_rows=251 buffers hit=584873 read=0)
+           Group Key: ['results.i_item_id', 'results.s_state']
+        -> CTE Scan (CTE results)  (rows=25041.0 loops=1 est_rows=564 buffers hit=584873 read=0)
+      -> Aggregate [Hashed]  (rows=19773.0 loops=1 est_rows=251 buffers hit=0 read=0)
+           Group Key: ['results_1.i_item_id']
+        -> CTE Scan (CTE results)  (rows=25041.0 loops=1 est_rows=564 buffers hit=0 read=0)
+      -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=0 read=0)
+        -> CTE Scan (CTE results)  (rows=25041.0 loops=1 est_rows=564 buffers hit=0 read=0)

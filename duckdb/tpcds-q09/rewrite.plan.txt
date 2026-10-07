@@ -1,0 +1,45 @@
+-- DuckDB 1.5.5, tpcds-q09, rewrite; latency 0.076957384 s, cpu 0.556753001 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> PROJECTION  (rows=1 time_s=0.0)
+       Projections: ['bucket1', 'bucket2', 'bucket3', 'bucket4', 'bucket5']
+       Estimated Cardinality: 1
+    -> CROSS_PRODUCT  (rows=1 time_s=0.0)
+      -> PROJECTION  (rows=1 time_s=0.0)
+           Projections: ['c1', 'd1', 'n1', 'c2', 'd2', 'n2', 'c3', 'd3', 'n3', 'c4', 'd4', 'n4', 'c5', 'd5', 'n5']
+           Estimated Cardinality: 1
+        -> PROJECTION  (rows=1 time_s=0.0)
+             Projections: ['sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))', 'sum(net_sum) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))', 'sum(net_count) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))', 'sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))', 'sum(net_sum) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))', 'sum(net_count) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))', 'sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))', 'sum(net_sum) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))', '#14', 'c4', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))', 'n4', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))']
+             Estimated Cardinality: 1
+          -> PROJECTION  (rows=1 time_s=0.0)
+               Projections: ['sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))', 'sum(net_sum) FILTER (WHERE ((qty >= CAST(1 AS BIGINT)) AND (qty <= CAST(20 AS BIGINT))))', 'sum(net_count) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))', 'sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(21 AS BIGINT)) AND (qty <= CAST(40 AS BIGINT))))', 'sum(net_sum) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))', 'sum(net_count) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))', 'sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(41 AS BIGINT)) AND (qty <= CAST(60 AS BIGINT))))', 'sum(net_sum) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))', 'CAST(CASE  WHEN ((sum(net_count) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT)))) = 0)) THEN (NULL) ELSE sum(net_count) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT)))) END AS DOUBLE)', 'sum(ROW_COUNT) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(61 AS BIGINT)) AND (qty <= CAST(80 AS BIGINT))))', 'sum(net_sum) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))', 'sum(discount_sum) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))', 'sum(discount_count) FILTER (WHERE ((qty >= CAST(81 AS BIGINT)) AND (qty <= CAST(100 AS BIGINT))))']
+               Estimated Cardinality: 1
+            -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0002)
+                 Aggregates: ['sum(#0) FILTER (WHERE #1) Filter: #1', 'sum(#2) FILTER (WHERE #3) Filter: #3', 'sum(#4) FILTER (WHERE #5) Filter: #5', 'sum(#6) FILTER (WHERE #7) Filter: #7', 'sum(#8) FILTER (WHERE #9) Filter: #9', 'sum(#10) FILTER (WHERE #11) Filter: #11', 'sum(#12) FILTER (WHERE #13) Filter: #13', 'sum(#14) FILTER (WHERE #15) Filter: #15', 'sum(#16) FILTER (WHERE #17) Filter: #17', 'sum(#18) FILTER (WHERE #19) Filter: #19', 'sum(#20) FILTER (WHERE #21) Filter: #21', 'sum(#22) FILTER (WHERE #23) Filter: #23', 'sum(#24) FILTER (WHERE #25) Filter: #25', 'sum(#26) FILTER (WHERE #27) Filter: #27', 'sum(#28) FILTER (WHERE #29) Filter: #29', 'sum(#30) FILTER (WHERE #31) Filter: #31', 'sum(#32) FILTER (WHERE #33) Filter: #33', 'sum(#34) FILTER (WHERE #35) Filter: #35', 'sum(#36) FILTER (WHERE #37) Filter: #37', 'sum(#38) FILTER (WHERE #39) Filter: #39', 'sum(#40) FILTER (WHERE #41) Filter: #41']
+              -> PROJECTION  (rows=101 time_s=0.0)
+                   Projections: ['ROW_COUNT', '#1', 'discount_sum', '#1', 'discount_count', '#1', 'net_sum', '#1', 'net_count', '#6', 'ROW_COUNT', '#6', 'discount_sum', '#6', 'discount_count', '#6', 'net_sum', '#7', 'net_count', '#7', 'ROW_COUNT', '#8', 'discount_sum', '#7', 'discount_count', '#7', 'net_sum', '#8', 'net_count', '#9', 'ROW_COUNT', '#9', 'discount_sum', '#8', 'discount_count', '#8', 'net_sum', '#9', 'discount_sum', '#9', 'discount_count', '#9']
+                   Estimated Cardinality: 96
+                -> PROJECTION  (rows=101 time_s=0.0)
+                     Projections: ['ROW_COUNT', '((qty <= 20) AND constant_or_null(true, qty, 1))', 'discount_sum', 'discount_count', 'net_sum', 'net_count', '((qty >= 21) AND (qty <= 40))', '((qty >= 41) AND (qty <= 60))', '((qty >= 61) AND (qty <= 80))', '((qty >= 81) AND constant_or_null(true, qty, 100))']
+                     Estimated Cardinality: 96
+                  -> PROJECTION  (rows=101 time_s=0.0)
+                       Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1', '#2', '#3', '#4', '#5']
+                       Estimated Cardinality: 96
+                    -> PERFECT_HASH_GROUP_BY  (rows=101 time_s=0.3354)
+                         Groups: #0
+                         Aggregates: ['count_star()', 'sum_no_overflow(#1)', 'count(#2)', 'sum_no_overflow(#3)', 'count(#4)']
+                      -> PROJECTION  (rows=28800991 time_s=0.0037)
+                           Projections: ['ss_quantity', 'ss_ext_discount_amt', 'ss_ext_discount_amt', 'ss_net_paid', 'ss_net_paid']
+                           Estimated Cardinality: 28800991
+                        -> PROJECTION  (rows=28800991 time_s=0.0516)
+                             Projections: ['__internal_compress_integral_utinyint(#0, 1)', '#1', '#2']
+                             Estimated Cardinality: 28800991
+                          -> TABLE_SCAN  (rows=28800991 time_s=0.1658)
+                               Table: tpcds.main.store_sales
+                               Type: Sequential Scan
+                               Projections: ['ss_quantity', 'ss_ext_discount_amt', 'ss_net_paid']
+                               Estimated Cardinality: 28800991
+      -> TABLE_SCAN  (rows=1 time_s=0.0)
+           Table: tpcds.main.reason
+           Type: Index Scan
+           Filters: r_reason_sk=1
+           Estimated Cardinality: 1

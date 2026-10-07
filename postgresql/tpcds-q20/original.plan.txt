@@ -1,0 +1,24 @@
+-- PostgreSQL 18, tpcds-q20, original; execution 454.392 ms, planning 0.35 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=541254 read=0)
+  -> Sort  (rows=100.0 loops=1 est_rows=1793 buffers hit=541254 read=0)
+       Sort Key: ['item.i_category NULLS FIRST', 'item.i_class NULLS FIRST', 'item.i_item_id NULLS FIRST', 'item.i_item_desc NULLS FIRST', '((((sum(catalog_sales.cs_ext_sales_price)) * 100.0000) / sum((sum(catalog_sales.cs_ext_sales_price))) OVER w1)) NULLS FIRST']
+    -> WindowAgg  (rows=14107.0 loops=1 est_rows=1793 buffers hit=541254 read=0)
+      -> Sort  (rows=14107.0 loops=1 est_rows=1793 buffers hit=541254 read=0)
+           Sort Key: ['item.i_class']
+        -> Aggregate [Sorted]  (rows=14107.0 loops=1 est_rows=1793 buffers hit=541254 read=0)
+             Group Key: ['item.i_category', 'item.i_class', 'item.i_item_id', 'item.i_item_desc', 'item.i_current_price']
+          -> Gather Merge  (rows=40709.0 loops=1 est_rows=1793 workers=1 buffers hit=541254 read=0)
+            -> Sort  (rows=20354.5 loops=2 est_rows=1055 buffers hit=541254 read=0)
+                 Sort Key: ['item.i_category NULLS FIRST', 'item.i_class NULLS FIRST', 'item.i_item_id NULLS FIRST', 'item.i_item_desc NULLS FIRST', 'item.i_current_price']
+              -> Nested Loop [Inner]  (rows=20354.5 loops=2 est_rows=1055 buffers hit=541239 read=0)
+                -> Nested Loop [Inner]  (rows=68079.0 loops=2 est_rows=3578 buffers hit=132765 read=0)
+                  -> Seq Scan on date_dim  (rows=15.5 loops=2 est_rows=18 buffers hit=2032 read=0)
+                       Filter: ((d_date >= '1999-02-22'::date) AND (d_date <= '1999-03-24'::date))
+                       Rows Removed by Filter: 36509
+                  -> Bitmap Heap Scan on catalog_sales  (rows=4392.19 loops=31 est_rows=7810 buffers hit=130733 read=0)
+                    -> Bitmap Index Scan using scaleup_tpcds_17  (rows=4392.19 loops=31 est_rows=7810 buffers hit=205 read=0)
+                         Index Cond: (cs_sold_date_sk = date_dim.d_date_sk)
+                -> Index Scan on item using scaleup_tpcds_40  (rows=0.3 loops=136158 est_rows=1 buffers hit=408474 read=0)
+                     Index Cond: (i_item_sk = catalog_sales.cs_item_sk)
+                     Filter: ((i_category)::text = ANY ('{Sports,Books,Home}'::text[]))
+                     Rows Removed by Filter: 1

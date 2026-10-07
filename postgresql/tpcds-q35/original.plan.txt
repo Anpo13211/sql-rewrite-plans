@@ -1,0 +1,46 @@
+-- PostgreSQL 18, tpcds-q35, original; execution 26517.74 ms, planning 0.877 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=26339069 read=0)
+  -> Aggregate [Sorted]  (rows=100.0 loops=1 est_rows=70596 buffers hit=26339069 read=0)
+       Group Key: ['ca.ca_state', 'customer_demographics.cd_gender', 'customer_demographics.cd_marital_status', 'customer_demographics.cd_dep_count', 'customer_demographics.cd_dep_employed_count', 'customer_demographics.cd_dep_college_count']
+    -> Incremental Sort  (rows=133.0 loops=1 est_rows=70596 buffers hit=26339069 read=0)
+         Sort Key: ['ca.ca_state NULLS FIRST', 'customer_demographics.cd_gender NULLS FIRST', 'customer_demographics.cd_marital_status NULLS FIRST', 'customer_demographics.cd_dep_count NULLS FIRST', 'customer_demographics.cd_dep_employed_count NULLS FIRST', 'customer_demographics.cd_dep_college_count NULLS FIRST']
+      -> Nested Loop [Inner]  (rows=2390.0 loops=1 est_rows=70596 buffers hit=26339069 read=0)
+           Join Filter: (ca.ca_address_sk = c.c_current_addr_sk)
+           Rows Removed by Join Filter: 591755405
+        -> Gather Merge  (rows=7557.0 loops=1 est_rows=250000 workers=2 buffers hit=4582 read=0)
+          -> Sort  (rows=2590.0 loops=3 est_rows=104167 buffers hit=4582 read=0)
+               Sort Key: ['ca.ca_state NULLS FIRST']
+            -> Seq Scan on customer_address ca  (rows=83333.33 loops=3 est_rows=104167 buffers hit=4504 read=0)
+        -> Materialize  (rows=78305.91 loops=7557 est_rows=70596 buffers hit=26334487 read=0)
+          -> Nested Loop [Inner]  (rows=78309.0 loops=1 est_rows=70596 buffers hit=26334487 read=0)
+            -> Nested Loop [Inner]  (rows=81152.0 loops=1 est_rows=73179 buffers hit=26021251 read=0)
+              -> Aggregate [Hashed]  (rows=208691.0 loops=1 est_rows=102409 buffers hit=679696 read=0)
+                   Group Key: ['store_sales.ss_customer_sk']
+                -> Gather  (rows=3098296.0 loops=1 est_rows=102409 workers=6 buffers hit=679696 read=0)
+                  -> Hash Join [Inner]  (rows=442613.71 loops=7 est_rows=17068 buffers hit=679696 read=0)
+                       Hash Cond: (store_sales.ss_sold_date_sk = date_dim.d_date_sk)
+                    -> Seq Scan on store_sales  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+                    -> Hash  (rows=39.14 loops=7 est_rows=160 buffers hit=2032 read=0)
+                      -> Seq Scan on date_dim  (rows=274.0 loops=1 est_rows=160 buffers hit=2032 read=0)
+                           Filter: ((d_qoy < 4) AND (d_year = 2002))
+                           Rows Removed by Filter: 72775
+              -> Index Scan on customer c using scaleup_tpcds_33  (rows=0.39 loops=208691 est_rows=1 buffers hit=25341555 read=0)
+                   Index Cond: (c_customer_sk = store_sales.ss_customer_sk)
+                   Filter: (EXISTS(SubPlan 1) OR EXISTS(SubPlan 3))
+                   Rows Removed by Filter: 1
+                -> Nested Loop [Inner] <SubPlan 1>  (rows=0.13 loops=208690 est_rows=1 buffers hit=10167229 read=0)
+                  -> Index Scan on web_sales using scaleup_tpcds_79  (rows=11.43 loops=208690 est_rows=25 buffers hit=3011524 read=0)
+                       Index Cond: (ws_bill_customer_sk = c.c_customer_sk)
+                  -> Index Scan on date_dim date_dim_1 using scaleup_tpcds_36  (rows=0.01 loops=2385524 est_rows=1 buffers hit=7155705 read=0)
+                       Index Cond: (d_date_sk = web_sales.ws_sold_date_sk)
+                       Filter: ((d_qoy < 4) AND (d_year = 2002))
+                       Rows Removed by Filter: 1
+                -> Nested Loop [Inner] <SubPlan 3>  (rows=0.3 loops=182426 est_rows=1 buffers hit=14339566 read=0)
+                  -> Index Scan on catalog_sales using scaleup_tpcds_24  (rows=18.94 loops=182426 est_rows=38 buffers hit=4001833 read=0)
+                       Index Cond: (cs_ship_customer_sk = c.c_customer_sk)
+                  -> Index Scan on date_dim date_dim_2 using scaleup_tpcds_36  (rows=0.02 loops=3454597 est_rows=1 buffers hit=10337733 read=0)
+                       Index Cond: (d_date_sk = catalog_sales.cs_sold_date_sk)
+                       Filter: ((d_qoy < 4) AND (d_year = 2002))
+                       Rows Removed by Filter: 1
+            -> Index Scan on customer_demographics using scaleup_tpcds_35  (rows=0.96 loops=81152 est_rows=1 buffers hit=313236 read=0)
+                 Index Cond: (cd_demo_sk = c.c_current_cdemo_sk)

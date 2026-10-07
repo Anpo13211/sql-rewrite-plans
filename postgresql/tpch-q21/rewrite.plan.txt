@@ -1,0 +1,36 @@
+-- PostgreSQL 18, tpch-q21, rewrite; execution 2210.913 ms, planning 0.952 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=1 buffers hit=9750052 read=0)
+  -> Seq Scan on nation n <InitPlan 1>  (rows=1.0 loops=1 est_rows=1 buffers hit=1 read=0)
+       Filter: ((n_name)::text = 'SAUDI ARABIA'::text)
+       Rows Removed by Filter: 24
+  -> Sort  (rows=100.0 loops=1 est_rows=1 buffers hit=9750052 read=0)
+       Sort Key: ['(count(*)) DESC', 's.s_name']
+    -> Aggregate [Sorted]  (rows=4009.0 loops=1 est_rows=1 buffers hit=9750052 read=0)
+         Group Key: ['s.s_name']
+      -> Sort  (rows=39448.0 loops=1 est_rows=1 buffers hit=9750052 read=0)
+           Sort Key: ['s.s_name']
+        -> Nested Loop [Inner]  (rows=39448.0 loops=1 est_rows=1 buffers hit=9750052 read=0)
+          -> Nested Loop [Semi]  (rows=81045.0 loops=1 est_rows=1 buffers hit=9425872 read=0)
+            -> Gather  (rows=135716.0 loops=1 est_rows=1 workers=7 buffers hit=8746584 read=0)
+              -> Nested Loop [Anti]  (rows=16964.5 loops=8 est_rows=1 buffers hit=8746583 read=0)
+                -> Hash Join [Inner]  (rows=190295.75 loops=8 est_rows=113251 buffers hit=1107144 read=0)
+                     Hash Cond: (l1.l_suppkey = s.s_suppkey)
+                  -> Seq Scan on lineitem l1  (rows=4741168.5 loops=8 est_rows=2856576 buffers hit=1105296 read=0)
+                       Filter: (l_receiptdate > l_commitdate)
+                       Rows Removed by Filter: 2757088
+                  -> Hash  (rows=501.25 loops=8 est_rows=2353 buffers hit=1848 read=0)
+                    -> Bitmap Heap Scan on supplier s  (rows=4010.0 loops=1 est_rows=2353 buffers hit=1848 read=0)
+                      -> Bitmap Index Scan using scaleup_tpch_09  (rows=4010.0 loops=1 est_rows=4000 buffers hit=5 read=0)
+                           Index Cond: (s_nationkey = (InitPlan 1).col1)
+                -> Index Scan on lineitem l3 using scaleup_tpch_07  (rows=0.91 loops=1522366 est_rows=49 buffers hit=7639439 read=0)
+                     Index Cond: (l_orderkey = l1.l_orderkey)
+                     Filter: ((l_receiptdate > l_commitdate) AND (l_suppkey <> l1.l_suppkey))
+                     Rows Removed by Filter: 1
+            -> Index Scan on lineitem l2 using scaleup_tpch_07  (rows=0.6 loops=135716 est_rows=147 buffers hit=679288 read=0)
+                 Index Cond: (l_orderkey = l1.l_orderkey)
+                 Filter: (l_suppkey <> l1.l_suppkey)
+                 Rows Removed by Filter: 1
+          -> Index Scan on orders o using scaleup_tpch_06  (rows=0.49 loops=81045 est_rows=1 buffers hit=324180 read=0)
+               Index Cond: (o_orderkey = l1.l_orderkey)
+               Filter: ((o_orderstatus)::text = 'F'::text)
+               Rows Removed by Filter: 1

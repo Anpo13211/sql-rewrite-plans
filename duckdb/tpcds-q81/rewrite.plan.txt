@@ -1,0 +1,121 @@
+-- DuckDB 1.5.5, tpcds-q81, rewrite; latency 0.113668432 s, cpu 0.46233454500000004 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.004)
+       CTE Name: return_by_address
+       Table Index: 0
+       Estimated Cardinality: 100
+    -> PROJECTION  (rows=284047 time_s=0.0012)
+         Projections: ['__internal_decompress_integral_bigint(#0, 1)', '__internal_decompress_integral_bigint(#1, 1)', '#2']
+         Estimated Cardinality: 288243
+      -> HASH_GROUP_BY  (rows=284047 time_s=0.103)
+           Groups: ['#0', '#1']
+           Aggregates: sum(#2)
+           Estimated Cardinality: 288243
+        -> PROJECTION  (rows=287935 time_s=0.0001)
+             Projections: ['cr_returning_customer_sk', 'cr_returning_addr_sk', 'cr_return_amt_inc_tax']
+             Estimated Cardinality: 288244
+          -> PROJECTION  (rows=287935 time_s=0.0031)
+               Projections: ['__internal_compress_integral_uinteger(#0, 1)', '__internal_compress_integral_uinteger(#1, 1)', '#2']
+               Estimated Cardinality: 288244
+            -> HASH_JOIN  (rows=287935 time_s=0.0096)
+                 Join Type: SEMI
+                 Conditions: cr_returned_date_sk = #0
+                 Estimated Cardinality: 288244
+              -> TABLE_SCAN  (rows=287935 time_s=0.014)
+                   Table: tpcds.main.catalog_returns
+                   Type: Sequential Scan
+                   Projections: ['cr_returned_date_sk', 'cr_returning_customer_sk', 'cr_returning_addr_sk', 'cr_return_amt_inc_tax']
+                   Estimated Cardinality: 1441224
+                   Dynamic Filters: optional: cr_returned_date_sk>=2451545 AND optional: cr_returned_date_sk<=2451910 AND optional: cr_returned_date_sk IN BF(#0)
+              -> FILTER  (rows=366 time_s=0.0)
+                   Expression: (d_date_sk BETWEEN 2450827 AND 2452918)
+                   Estimated Cardinality: 585
+                -> TABLE_SCAN  (rows=366 time_s=0.0001)
+                     Table: tpcds.main.date_dim
+                     Type: Sequential Scan
+                     Projections: d_date_sk
+                     Filters: d_year=2000
+                     Estimated Cardinality: 585
+    -> CTE  (rows=0 time_s=0.0049)
+         CTE Name: customer_totals
+         Table Index: 1
+         Estimated Cardinality: 100
+      -> PROJECTION  (rows=276170 time_s=0.0055)
+           Projections: ['#0', '__internal_decompress_string(#1)', '#2']
+           Estimated Cardinality: 137639
+        -> HASH_GROUP_BY  (rows=276170 time_s=0.089)
+             Groups: ['#0', '#1']
+             Aggregates: sum(#2)
+             Estimated Cardinality: 137639
+          -> PROJECTION  (rows=281213 time_s=0.0001)
+               Projections: ['cr_returning_customer_sk', 'ca_state', 'address_total']
+               Estimated Cardinality: 137648
+            -> PROJECTION  (rows=281213 time_s=0.0014)
+                 Projections: ['#0', '#1', '__internal_compress_string_uinteger(#2)']
+                 Estimated Cardinality: 137648
+              -> HASH_JOIN  (rows=281213 time_s=0.0467)
+                   Join Type: INNER
+                   Conditions: cr_returning_addr_sk = ca_address_sk
+                   Estimated Cardinality: 137648
+                -> CTE_SCAN  (rows=284047 time_s=0.0005)
+                     CTE Index: 0
+                     Estimated Cardinality: 288243
+                -> TABLE_SCAN  (rows=250000 time_s=0.0057)
+                     Table: tpcds.main.customer_address
+                     Type: Sequential Scan
+                     Projections: ['ca_address_sk', 'ca_state']
+                     Estimated Cardinality: 250000
+      -> CTE  (rows=0 time_s=0.0)
+           CTE Name: state_thresholds
+           Table Index: 2
+           Estimated Cardinality: 100
+        -> PROJECTION  (rows=52 time_s=0.0)
+             Projections: ['ctr_state', 'minimum_return']
+             Estimated Cardinality: 121032
+          -> HASH_GROUP_BY  (rows=52 time_s=0.0269)
+               Groups: #0
+               Aggregates: avg(#1)
+               Estimated Cardinality: 121032
+            -> PROJECTION  (rows=276170 time_s=0.0001)
+                 Projections: ['ctr_state', 'ctr_total_return']
+                 Estimated Cardinality: 137639
+              -> CTE_SCAN  (rows=276170 time_s=0.0004)
+                   CTE Index: 1
+                   Estimated Cardinality: 137639
+        -> TOP_N  (rows=100 time_s=0.0006)
+             Top: 100
+             Order By: ['tc.c_customer_id ASC', 'ct.ctr_total_return ASC']
+          -> HASH_JOIN  (rows=3384 time_s=0.0129)
+               Join Type: INNER
+               Conditions: c_customer_sk = ctr_customer_sk
+               Estimated Cardinality: 53491
+            -> PROJECTION  (rows=24412 time_s=0.0004)
+                 Projections: ['c_customer_sk', 'c_customer_id', 'c_salutation', 'c_first_name', 'c_last_name', 'ca_street_number', 'ca_street_name', 'ca_street_type', 'ca_suite_number', 'ca_city', 'ca_county', 'ca_state', 'ca_zip', 'ca_country', 'ca_gmt_offset', 'ca_location_type']
+                 Estimated Cardinality: 7467
+              -> HASH_JOIN  (rows=24412 time_s=0.0074)
+                   Join Type: INNER
+                   Conditions: c_current_addr_sk = ca_address_sk
+                   Estimated Cardinality: 7467
+                -> TABLE_SCAN  (rows=499921 time_s=0.0399)
+                     Table: tpcds.main.customer
+                     Type: Sequential Scan
+                     Projections: ['c_current_addr_sk', 'c_customer_sk', 'c_customer_id', 'c_salutation', 'c_first_name', 'c_last_name']
+                     Filters: optional: Dynamic Filter (c_customer_id)
+                     Estimated Cardinality: 500000
+                     Dynamic Filters: ['optional: c_current_addr_sk>=25 AND optional: c_current_addr_sk<=249998', 'optional: c_customer_sk>=41 AND optional: c_customer_sk<=499978']
+                -> TABLE_SCAN  (rows=12087 time_s=0.0519)
+                     Table: tpcds.main.customer_address
+                     Type: Sequential Scan
+                     Projections: ['ca_address_sk', 'ca_state', 'ca_street_number', 'ca_street_name', 'ca_street_type', 'ca_suite_number', 'ca_city', 'ca_county', 'ca_zip', 'ca_country', 'ca_gmt_offset', 'ca_location_type']
+                     Filters: ca_state='GA'
+                     Estimated Cardinality: 4546
+            -> HASH_JOIN  (rows=67847 time_s=0.0325)
+                 Join Type: INNER
+                 Conditions: ['ctr_state = ctr_state', 'CAST(ctr_total_return AS DOUBLE) > minimum_return']
+                 Estimated Cardinality: 15910
+              -> CTE_SCAN  (rows=276170 time_s=0.0004)
+                   CTE Index: 1
+                   Estimated Cardinality: 137639
+              -> CTE_SCAN  (rows=52 time_s=0.0)
+                   CTE Index: 2
+                   Estimated Cardinality: 121032

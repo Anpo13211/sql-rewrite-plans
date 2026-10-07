@@ -1,0 +1,219 @@
+-- DuckDB 1.5.5, tpcds-q54, rewrite; latency 0.041430556 s, cpu 0.14281116499999993 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0)
+       CTE Name: qualified_buyers
+       Table Index: 2
+       Estimated Cardinality: 0
+    -> PROJECTION  (rows=15599 time_s=0.0)
+         Projections: __internal_decompress_integral_bigint(#0, 1)
+         Estimated Cardinality: 1155
+      -> HASH_GROUP_BY  (rows=15599 time_s=0.003)
+           Groups: #0
+           Estimated Cardinality: 1155
+        -> PROJECTION  (rows=15599 time_s=0.0)
+             Projections: customer_sk
+             Estimated Cardinality: 1155
+          -> PROJECTION  (rows=15599 time_s=0.0)
+               Projections: __internal_compress_integral_uinteger(#0, 1)
+               Estimated Cardinality: 1155
+            -> HASH_GROUP_BY  (rows=15599 time_s=0.006)
+                 Groups: #0
+                 Estimated Cardinality: 1155
+              -> UNION  (rows=17955 time_s=0)
+                -> PROJECTION  (rows=11958 time_s=0.0)
+                     Projections: customer_sk
+                     Estimated Cardinality: 1155
+                  -> HASH_JOIN  (rows=11958 time_s=0.0027)
+                       Join Type: INNER
+                       Conditions: cs_item_sk = i_item_sk
+                       Estimated Cardinality: 1155
+                    -> HASH_JOIN  (rows=485160 time_s=0.0029)
+                         Join Type: INNER
+                         Conditions: cs_sold_date_sk = d_date_sk
+                         Estimated Cardinality: 115329
+                      -> TABLE_SCAN  (rows=486025 time_s=0.0073)
+                           Table: tpcds.main.catalog_sales
+                           Type: Sequential Scan
+                           Projections: ['cs_item_sk', 'cs_sold_date_sk', 'cs_bill_customer_sk']
+                           Estimated Cardinality: 14401261
+                           Dynamic Filters: ['optional: cs_item_sk>=20 AND optional: cs_item_sk<=101998', 'optional: cs_sold_date_sk>=2451149 AND optional: cs_sold_date_sk<=2451179']
+                      -> FILTER  (rows=31 time_s=0.0)
+                           Expression: (d_date_sk BETWEEN 2450815 AND 2452653)
+                           Estimated Cardinality: 585
+                        -> TABLE_SCAN  (rows=31 time_s=0.0002)
+                             Table: tpcds.main.date_dim
+                             Type: Sequential Scan
+                             Projections: d_date_sk
+                             Filters: ['d_moy=12', 'd_year=1998']
+                             Estimated Cardinality: 585
+                    -> TABLE_SCAN  (rows=2566 time_s=0.0014)
+                         Table: tpcds.main.item
+                         Type: Sequential Scan
+                         Projections: i_item_sk
+                         Filters: ["i_category='Women'", "i_class='maternity'"]
+                         Estimated Cardinality: 963
+                -> PROJECTION  (rows=5997 time_s=0.0)
+                     Projections: customer_sk
+                     Estimated Cardinality: 575
+                  -> HASH_JOIN  (rows=5997 time_s=0.0057)
+                       Join Type: INNER
+                       Conditions: ws_item_sk = i_item_sk
+                       Estimated Cardinality: 575
+                    -> HASH_JOIN  (rows=244488 time_s=0.0153)
+                         Join Type: INNER
+                         Conditions: ws_sold_date_sk = d_date_sk
+                         Estimated Cardinality: 57640
+                      -> TABLE_SCAN  (rows=1341317 time_s=0.0643)
+                           Table: tpcds.main.web_sales
+                           Type: Sequential Scan
+                           Projections: ['ws_item_sk', 'ws_sold_date_sk', 'ws_bill_customer_sk']
+                           Estimated Cardinality: 7197566
+                           Dynamic Filters: ['optional: ws_item_sk>=20 AND optional: ws_item_sk<=101998', 'optional: ws_sold_date_sk>=2451149 AND optional: ws_sold_date_sk<=2451179']
+                      -> FILTER  (rows=31 time_s=0.0)
+                           Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                           Estimated Cardinality: 585
+                        -> TABLE_SCAN  (rows=31 time_s=0.0002)
+                             Table: tpcds.main.date_dim
+                             Type: Sequential Scan
+                             Projections: d_date_sk
+                             Filters: ['d_moy=12', 'd_year=1998']
+                             Estimated Cardinality: 585
+                    -> TABLE_SCAN  (rows=2566 time_s=0.0036)
+                         Table: tpcds.main.item
+                         Type: Sequential Scan
+                         Projections: i_item_sk
+                         Filters: ["i_category='Women'", "i_class='maternity'"]
+                         Estimated Cardinality: 963
+    -> CTE  (rows=0 time_s=0.0)
+         CTE Name: bounds
+         Table Index: 3
+         Estimated Cardinality: 0
+      -> PROJECTION  (rows=1 time_s=0.0)
+           Projections: ['lo', 'hi']
+           Estimated Cardinality: 1
+        -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0003)
+             Aggregates: min(#0) FILTER (WHERE #1) Filter: #1
+          -> PROJECTION  (rows=73049 time_s=0.0002)
+               Projections: ['d_month_seq', '((d_year = 1998) AND (d_moy = 12))']
+               Estimated Cardinality: 73049
+            -> TABLE_SCAN  (rows=73049 time_s=0.0003)
+                 Table: tpcds.main.date_dim
+                 Type: Sequential Scan
+                 Projections: ['d_year', 'd_moy', 'd_month_seq']
+                 Estimated Cardinality: 73049
+      -> CTE  (rows=0 time_s=0.0)
+           CTE Name: revenue_dates
+           Table Index: 4
+           Estimated Cardinality: 0
+        -> PROJECTION  (rows=90 time_s=0.0)
+             Projections: d_date_sk
+             Estimated Cardinality: 411
+          -> NESTED_LOOP_JOIN  (rows=90 time_s=0.0)
+               Join Type: INNER
+               Conditions: ['d_month_seq >= lo', 'd_month_seq <= hi']
+               Estimated Cardinality: 411
+            -> TABLE_SCAN  (rows=90 time_s=0.0005)
+                 Table: tpcds.main.date_dim
+                 Type: Sequential Scan
+                 Projections: ['d_month_seq', 'd_date_sk']
+                 Estimated Cardinality: 73049
+                 Dynamic Filters: d_month_seq>=1188 AND d_month_seq<=1190
+            -> CTE_SCAN  (rows=1 time_s=0.0)
+                 CTE Index: 3
+                 Estimated Cardinality: 1
+        -> CTE  (rows=0 time_s=0.0)
+             CTE Name: location_multiplicity
+             Table Index: 5
+             Estimated Cardinality: 0
+          -> PROJECTION  (rows=3 time_s=0.0)
+               Projections: ['#0', '__internal_decompress_string(#1)', '#2']
+               Estimated Cardinality: 7
+            -> HASH_GROUP_BY  (rows=3 time_s=0.0008)
+                 Groups: ['#0', '#1']
+                 Aggregates: count_star()
+                 Estimated Cardinality: 7
+              -> PROJECTION  (rows=101 time_s=0.0)
+                   Projections: ['s_county', 's_state']
+                   Estimated Cardinality: 20
+                -> PROJECTION  (rows=101 time_s=0.0)
+                     Projections: ['#0', '__internal_compress_string_uinteger(#1)']
+                     Estimated Cardinality: 20
+                  -> TABLE_SCAN  (rows=101 time_s=0.0001)
+                       Table: tpcds.main.store
+                       Type: Sequential Scan
+                       Projections: ['s_county', 's_state']
+                       Filters: ['(s_county IS NOT NULL)', '(s_state IS NOT NULL)']
+                       Estimated Cardinality: 20
+          -> TOP_N  (rows=1 time_s=0.0)
+               Top: 100
+               Order By: ['segments.SEGMENT ASC', 'count_star() ASC', '(segments.SEGMENT * 50) ASC']
+            -> PROJECTION  (rows=1 time_s=0.0)
+                 Projections: ['SEGMENT', 'num_customers', 'segment_base']
+                 Estimated Cardinality: 0
+              -> HASH_GROUP_BY  (rows=1 time_s=0.0001)
+                   Groups: #0
+                   Aggregates: count_star()
+                   Estimated Cardinality: 0
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: SEGMENT
+                     Estimated Cardinality: 0
+                  -> PROJECTION  (rows=1 time_s=0.0)
+                       Projections: SEGMENT
+                       Estimated Cardinality: 0
+                    -> PROJECTION  (rows=1 time_s=0.0)
+                         Projections: revenue
+                         Estimated Cardinality: 0
+                      -> HASH_GROUP_BY  (rows=1 time_s=0.0003)
+                           Groups: ['#0', '#1']
+                           Aggregates: sum(#2)
+                           Estimated Cardinality: 0
+                        -> PROJECTION  (rows=9 time_s=0.0)
+                             Projections: ['c_customer_sk', 'store_matches', 'ss_ext_sales_price']
+                             Estimated Cardinality: 0
+                          -> HASH_JOIN  (rows=9 time_s=0.0001)
+                               Join Type: INNER
+                               Conditions: d_date_sk = ss_sold_date_sk
+                               Estimated Cardinality: 0
+                            -> CTE_SCAN  (rows=90 time_s=0.0)
+                                 CTE Index: 4
+                                 Estimated Cardinality: 411
+                            -> HASH_JOIN  (rows=548 time_s=0.0)
+                                 Join Type: INNER
+                                 Conditions: ss_customer_sk = customer_sk
+                                 Estimated Cardinality: 107
+                              -> TABLE_SCAN  (rows=548 time_s=0.0083)
+                                   Table: tpcds.main.store_sales
+                                   Type: Index Scan
+                                   Projections: ['ss_customer_sk', 'ss_sold_date_sk', 'ss_ext_sales_price']
+                                   Estimated Cardinality: 28800991
+                                   Dynamic Filters: optional: ss_customer_sk IN (42185, 60028, 78508, 130039, 219503, 274439, 302374, 323104, 329315, 332024, 343164) AND optional: ss_customer_sk>=42185 AND optional: ss_customer_sk<=343164
+                              -> HASH_JOIN  (rows=11 time_s=0.0003)
+                                   Join Type: INNER
+                                   Conditions: customer_sk = c_customer_sk
+                                   Estimated Cardinality: 1
+                                -> CTE_SCAN  (rows=15599 time_s=0.0)
+                                     CTE Index: 2
+                                     Estimated Cardinality: 1155
+                                -> HASH_JOIN  (rows=403 time_s=0.0014)
+                                     Join Type: INNER
+                                     Conditions: c_current_addr_sk = ca_address_sk
+                                     Estimated Cardinality: 809
+                                  -> TABLE_SCAN  (rows=498927 time_s=0.0018)
+                                       Table: tpcds.main.customer
+                                       Type: Sequential Scan
+                                       Projections: ['c_customer_sk', 'c_current_addr_sk']
+                                       Estimated Cardinality: 500000
+                                       Dynamic Filters: optional: c_current_addr_sk>=921 AND optional: c_current_addr_sk<=249491
+                                  -> HASH_JOIN  (rows=210 time_s=0.0015)
+                                       Join Type: INNER
+                                       Conditions: ['ca_county = s_county', 'ca_state = s_state']
+                                       Estimated Cardinality: 492
+                                    -> TABLE_SCAN  (rows=15435 time_s=0.0138)
+                                         Table: tpcds.main.customer_address
+                                         Type: Sequential Scan
+                                         Projections: ['ca_address_sk', 'ca_county', 'ca_state']
+                                         Estimated Cardinality: 250000
+                                         Dynamic Filters: ["optional: ca_county IN ('Williamson County', 'Walker County', 'Ziebach County') AND optional: ca_county>='Walker County' AND optional: ca_county<='Ziebach County'", "optional: ca_state IN ('AL', 'TN', 'SD') AND optional: ca_state>='AL' AND optional: ca_state<='TN'"]
+                                    -> CTE_SCAN  (rows=3 time_s=0.0)
+                                         CTE Index: 5
+                                         Estimated Cardinality: 7

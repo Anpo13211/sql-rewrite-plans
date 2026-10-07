@@ -1,0 +1,19 @@
+-- PostgreSQL 18, tpcds-q86, original; execution 780.388 ms, planning 0.353 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=4598683 read=0)
+  -> Sort  (rows=100.0 loops=1 est_rows=1001 buffers hit=4598683 read=0)
+       Sort Key: ['((GROUPING(item.i_category) + GROUPING(item.i_class))) DESC', '(CASE WHEN (((GROUPING(item.i_category) + GROUPING(item.i_class))) = 0) THEN item.i_category ELSE NULL::character varying END) NULLS FIRST', '(rank() OVER w1) NULLS FIRST']
+    -> WindowAgg  (rows=168.0 loops=1 est_rows=1001 buffers hit=4598683 read=0)
+      -> Sort  (rows=168.0 loops=1 est_rows=1001 buffers hit=4598683 read=0)
+           Sort Key: ['((GROUPING(item.i_category) + GROUPING(item.i_class)))', '(CASE WHEN (GROUPING(item.i_class) = 0) THEN item.i_category ELSE NULL::character varying END)', '(sum(web_sales.ws_net_paid)) DESC']
+        -> Aggregate [Mixed]  (rows=168.0 loops=1 est_rows=1001 buffers hit=4598683 read=0)
+          -> Gather  (rows=1446551.0 loops=1 est_rows=36548 workers=6 buffers hit=4598683 read=0)
+            -> Nested Loop [Inner]  (rows=206650.14 loops=7 est_rows=6091 buffers hit=4598683 read=0)
+              -> Hash Join [Inner]  (rows=206650.14 loops=7 est_rows=6091 buffers hit=259024 read=0)
+                   Hash Cond: (web_sales.ws_sold_date_sk = d1.d_date_sk)
+                -> Seq Scan on web_sales  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+                -> Hash  (rows=52.29 loops=7 est_rows=218 buffers hit=2032 read=0)
+                  -> Seq Scan on date_dim d1  (rows=366.0 loops=1 est_rows=218 buffers hit=2032 read=0)
+                       Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+                       Rows Removed by Filter: 72683
+              -> Index Scan on item using scaleup_tpcds_40  (rows=1.0 loops=1446551 est_rows=1 buffers hit=4339659 read=0)
+                   Index Cond: (i_item_sk = web_sales.ws_item_sk)

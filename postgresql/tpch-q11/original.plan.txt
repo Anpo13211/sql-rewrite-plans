@@ -1,0 +1,30 @@
+-- PostgreSQL 18, tpch-q11, original; execution 641.542 ms, planning 0.44 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Sort  (rows=0.0 loops=1 est_rows=106670 buffers hit=676193 read=0)
+     Sort Key: ['(sum((partsupp.ps_supplycost * (partsupp.ps_availqty)::numeric))) DESC']
+  -> Aggregate [Finalize] <InitPlan 1>  (rows=1.0 loops=1 est_rows=1 buffers hit=338270 read=0)
+    -> Gather  (rows=2.0 loops=1 est_rows=2 workers=1 buffers hit=338270 read=0)
+      -> Aggregate [Partial]  (rows=1.0 loops=2 est_rows=1 buffers hit=338270 read=0)
+        -> Nested Loop [Inner]  (rows=161960.0 loops=2 est_rows=188241 buffers hit=338270 read=0)
+          -> Hash Join [Inner]  (rows=2024.5 loops=2 est_rows=2353 buffers hit=2202 read=0)
+               Hash Cond: (supplier_1.s_nationkey = nation_1.n_nationkey)
+            -> Seq Scan on supplier supplier_1  (rows=50000.0 loops=2 est_rows=58824 buffers hit=2200 read=0)
+            -> Hash  (rows=1.0 loops=2 est_rows=1 buffers hit=2 read=0)
+              -> Seq Scan on nation nation_1  (rows=1.0 loops=2 est_rows=1 buffers hit=2 read=0)
+                   Filter: ((n_name)::text = 'GERMANY'::text)
+                   Rows Removed by Filter: 24
+          -> Index Scan on partsupp partsupp_1 using scaleup_tpch_11  (rows=80.0 loops=4049 est_rows=82 buffers hit=336068 read=0)
+               Index Cond: (ps_suppkey = supplier_1.s_suppkey)
+  -> Aggregate [Hashed]  (rows=0.0 loops=1 est_rows=106670 buffers hit=676193 read=0)
+       Filter: (sum((partsupp.ps_supplycost * (partsupp.ps_availqty)::numeric)) > (InitPlan 1).col1)
+       Group Key: ['partsupp.ps_partkey']
+       Rows Removed by Filter: 304774
+    -> Nested Loop [Inner]  (rows=323920.0 loops=1 est_rows=320010 buffers hit=337923 read=0)
+      -> Nested Loop [Inner]  (rows=4049.0 loops=1 est_rows=4000 buffers hit=1856 read=0)
+        -> Seq Scan on nation  (rows=1.0 loops=1 est_rows=1 buffers hit=1 read=0)
+             Filter: ((n_name)::text = 'GERMANY'::text)
+             Rows Removed by Filter: 24
+        -> Bitmap Heap Scan on supplier  (rows=4049.0 loops=1 est_rows=4000 buffers hit=1855 read=0)
+          -> Bitmap Index Scan using scaleup_tpch_09  (rows=4049.0 loops=1 est_rows=4000 buffers hit=6 read=0)
+               Index Cond: (s_nationkey = nation.n_nationkey)
+      -> Index Scan on partsupp using scaleup_tpch_11  (rows=80.0 loops=4049 est_rows=82 buffers hit=336067 read=0)
+           Index Cond: (ps_suppkey = supplier.s_suppkey)

@@ -1,0 +1,72 @@
+-- DuckDB 1.5.5, tpcds-q43, rewrite; latency 0.076728046 s, cpu 0.5151724139999997 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0)
+       CTE Name: stores
+       Table Index: 0
+       Estimated Cardinality: 75
+    -> TABLE_SCAN  (rows=31 time_s=0.0)
+         Table: tpcds.main.store
+         Type: Sequential Scan
+         Projections: ['s_store_sk', 's_store_name', 's_store_id']
+         Filters: s_gmt_offset=-5.00
+         Estimated Cardinality: 51
+    -> CTE  (rows=0 time_s=0.0)
+         CTE Name: dates
+         Table Index: 1
+         Estimated Cardinality: 75
+      -> TABLE_SCAN  (rows=366 time_s=0.0)
+           Table: tpcds.main.date_dim
+           Type: Sequential Scan
+           Projections: ['d_date_sk', 'd_day_name']
+           Filters: d_year=2000
+           Estimated Cardinality: 585
+      -> TOP_N  (rows=18 time_s=0.0001)
+           Top: 100
+           Order By: ['s.s_store_name ASC', 's.s_store_id ASC', "sum(x.day_sales) FILTER (WHERE (x.d_day_name = 'Sunday')) ASC", "sum(x.day_sales) FILTER (WHERE (x.d_day_name = 'Monday')) ASC", "sum(x.day_sales) FILTER (WHERE (x.d_day_name = 'Tuesday')) ASC", "sum(x.day_sales) FILTER (WHERE (x.d_day_name = 'Wednesday')) ASC", "sum(x.day_sales) FILTER (WHERE (x.d_day_name = 'Thursday')) ASC", "sum(x.day_sales) FILTER (WHERE (x.d_day_name = 'Friday')) ASC", "sum(x.day_sales) FILTER (WHERE (x.d_day_name = 'Saturday')) ASC"]
+        -> HASH_GROUP_BY  (rows=18 time_s=0.0025)
+             Groups: ['#0', '#1']
+             Aggregates: ['sum(#2) FILTER (WHERE #7) Filter: #7', 'sum(#4) FILTER (WHERE #8) Filter: #8', 'sum(#6) FILTER (WHERE #9) Filter: #9', 'sum(#8) FILTER (WHERE #10) Filter: #10', 'sum(#10) FILTER (WHERE #11) Filter: #11', 'sum(#12) FILTER (WHERE #12) Filter: #12', 'sum(#14) FILTER (WHERE #13) Filter: #13']
+             Estimated Cardinality: 75
+          -> PROJECTION  (rows=126 time_s=0.0)
+               Projections: ['s_store_name', 's_store_id', 'day_sales', "(d_day_name = 'Sunday')", 'day_sales', "(d_day_name = 'Monday')", 'day_sales', "(d_day_name = 'Tuesday')", 'day_sales', "(d_day_name = 'Wednesday')", 'day_sales', "(d_day_name = 'Thursday')", 'day_sales', "(d_day_name = 'Friday')", 'day_sales', "(d_day_name = 'Saturday')"]
+               Estimated Cardinality: 76
+            -> HASH_JOIN  (rows=126 time_s=0.0002)
+                 Join Type: INNER
+                 Conditions: ss_store_sk = s_store_sk
+                 Estimated Cardinality: 76
+              -> PROJECTION  (rows=126 time_s=0.0)
+                   Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1', '#2']
+                   Estimated Cardinality: 2979
+                -> HASH_GROUP_BY  (rows=126 time_s=0.1121)
+                     Groups: ['#0', '#1']
+                     Aggregates: sum(#2)
+                     Estimated Cardinality: 2979
+                  -> PROJECTION  (rows=1908802 time_s=0.0045)
+                       Projections: ['ss_store_sk', 'd_day_name', 'ss_sales_price']
+                       Estimated Cardinality: 117630
+                    -> PROJECTION  (rows=1908802 time_s=0.013)
+                         Projections: ['__internal_compress_integral_utinyint(#0, 1)', '#1', '#2', '#3', '#4', '#5']
+                         Estimated Cardinality: 117630
+                      -> HASH_JOIN  (rows=1908802 time_s=0.0454)
+                           Join Type: INNER
+                           Conditions: ss_store_sk = s_store_sk
+                           Estimated Cardinality: 117630
+                        -> HASH_JOIN  (rows=5512077 time_s=0.0983)
+                             Join Type: INNER
+                             Conditions: ss_sold_date_sk = d_date_sk
+                             Estimated Cardinality: 230647
+                          -> TABLE_SCAN  (rows=5512077 time_s=0.2389)
+                               Table: tpcds.main.store_sales
+                               Type: Sequential Scan
+                               Projections: ['ss_sold_date_sk', 'ss_store_sk', 'ss_sales_price']
+                               Estimated Cardinality: 28800991
+                               Dynamic Filters: ['optional: ss_sold_date_sk>=2451545 AND optional: ss_sold_date_sk<=2451910', 'optional: ss_store_sk IN (3, 4, 10, 11, 12, 15, 26, 31, 37, 39, 46, 47, 49, 57, 58, 61, 67, 68, 75, 76, 77, 78, 85, 86, 87, 91, 92, 93, 97, 98, 99) AND optional: ss_store_sk>=3 AND optional: ss_store_sk<=99']
+                          -> CTE_SCAN  (rows=366 time_s=0.0)
+                               CTE Index: 1
+                               Estimated Cardinality: 585
+                        -> CTE_SCAN  (rows=31 time_s=0.0)
+                             CTE Index: 0
+                             Estimated Cardinality: 51
+              -> CTE_SCAN  (rows=31 time_s=0.0)
+                   CTE Index: 0
+                   Estimated Cardinality: 51

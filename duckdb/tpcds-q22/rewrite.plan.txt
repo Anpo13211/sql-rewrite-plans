@@ -1,0 +1,59 @@
+-- DuckDB 1.5.5, tpcds-q22, rewrite; latency 0.293080162 s, cpu 1.7770686540000007 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0054)
+       Top: 100
+       Order By: ['(sum(v.qoh_sum) / "nullif"(sum(v.qoh_count), 0)) ASC', 'i.i_product_name ASC', 'i.i_brand ASC', 'i.i_class ASC', 'i.i_category ASC']
+    -> PROJECTION  (rows=203751 time_s=0.0028)
+         Projections: ['i_product_name', 'i_brand', 'i_class', 'i_category', 'qoh']
+         Estimated Cardinality: 45023
+      -> HASH_GROUP_BY  (rows=203751 time_s=0.0772)
+           Groups: ['#0', '#1', '#2', '#3']
+           Aggregates: ['sum(#4)', 'sum(#5)']
+           Estimated Cardinality: 45023
+        -> PROJECTION  (rows=51000 time_s=0.0)
+             Projections: ['i_product_name', 'i_brand', 'i_class', 'i_category', 'qoh_sum', 'qoh_count']
+             Estimated Cardinality: 45024
+          -> HASH_JOIN  (rows=51000 time_s=0.0045)
+               Join Type: INNER
+               Conditions: i_item_sk = inv_item_sk
+               Estimated Cardinality: 45024
+            -> TABLE_SCAN  (rows=102000 time_s=0.0046)
+                 Table: tpcds.main.item
+                 Type: Sequential Scan
+                 Projections: ['i_item_sk', 'i_product_name', 'i_brand', 'i_class', 'i_category']
+                 Estimated Cardinality: 102000
+                 Dynamic Filters: optional: i_item_sk>=1 AND optional: i_item_sk<=101999
+            -> PROJECTION  (rows=51000 time_s=0.0001)
+                 Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1', '#2']
+                 Estimated Cardinality: 31440
+              -> HASH_GROUP_BY  (rows=51000 time_s=1.4504)
+                   Groups: #0
+                   Aggregates: ['sum(#1)', 'count(#2)']
+                   Estimated Cardinality: 31440
+                -> PROJECTION  (rows=26520000 time_s=0.0027)
+                     Projections: ['inv_item_sk', 'inv_quantity_on_hand', 'inv_quantity_on_hand']
+                     Estimated Cardinality: 38086
+                  -> PROJECTION  (rows=26520000 time_s=0.0238)
+                       Projections: ['__internal_compress_integral_usmallint(#0, 2450815)', '__internal_compress_integral_uinteger(#1, 1)', '#2', '#3', '#4']
+                       Estimated Cardinality: 38086
+                    -> NESTED_LOOP_JOIN  (rows=26520000 time_s=0.145)
+                         Join Type: INNER
+                         Conditions: ['inv_date_sk >= greatest(lo, 2450815)', 'inv_date_sk <= least(hi, 2452635)']
+                         Estimated Cardinality: 38086
+                      -> TABLE_SCAN  (rows=26520000 time_s=0.0604)
+                           Table: tpcds.main.inventory
+                           Type: Sequential Scan
+                           Projections: ['inv_date_sk', 'inv_item_sk', 'inv_quantity_on_hand']
+                           Estimated Cardinality: 133110000
+                           Dynamic Filters: inv_date_sk>=2451545 AND inv_date_sk<=2451910
+                      -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                           Aggregates: ['min(#0)', 'max(#1)']
+                        -> PROJECTION  (rows=366 time_s=0.0)
+                             Projections: ['d_date_sk', 'd_date_sk']
+                             Estimated Cardinality: 14609
+                          -> TABLE_SCAN  (rows=366 time_s=0.0001)
+                               Table: tpcds.main.date_dim
+                               Type: Sequential Scan
+                               Projections: d_date_sk
+                               Filters: d_month_seq>=1200 AND d_month_seq<=1211
+                               Estimated Cardinality: 14609

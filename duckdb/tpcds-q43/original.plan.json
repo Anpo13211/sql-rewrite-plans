@@ -1,0 +1,338 @@
+{
+ "total_bytes_written": 0,
+ "total_bytes_read": 0,
+ "system_peak_temp_dir_size": 0,
+ "system_peak_buffer_memory": 2228666368,
+ "rows_returned": 0,
+ "wal_replay_entry_count": 0,
+ "result_set_size": 0,
+ "query_name": "EXPLAIN (ANALYZE, FORMAT JSON) SELECT s_store_name,\n       s_store_id,\n       sum(CASE\n               WHEN (d_day_name='Sunday') THEN ss_sales_price\n               ELSE NULL\n           END) sun_sales,\n       sum(CASE\n               WHEN (d_day_name='Monday') THEN ss_sales_price\n               ELSE NULL\n           END) mon_sales,\n       sum(CASE\n               WHEN (d_day_name='Tuesday') THEN ss_sales_price\n               ELSE NULL\n           END) tue_sales,\n       sum(CASE\n               WHEN (d_day_name='Wednesday') THEN ss_sales_price\n               ELSE NULL\n           END) wed_sales,\n       sum(CASE\n               WHEN (d_day_name='Thursday') THEN ss_sales_price\n               ELSE NULL\n           END) thu_sales,\n       sum(CASE\n               WHEN (d_day_name='Friday') THEN ss_sales_price\n               ELSE NULL\n           END) fri_sales,\n       sum(CASE\n               WHEN (d_day_name='Saturday') THEN ss_sales_price\n               ELSE NULL\n           END) sat_sales\nFROM date_dim,\n     store_sales,\n     store\nWHERE d_date_sk = ss_sold_date_sk\n  AND s_store_sk = ss_store_sk\n  AND s_gmt_offset = -5\n  AND d_year = 2000\nGROUP BY s_store_name,\n         s_store_id\nORDER BY s_store_name,\n         s_store_id,\n         sun_sales,\n         mon_sales,\n         tue_sales,\n         wed_sales,\n         thu_sales,\n         fri_sales,\n         sat_sales\nLIMIT 100",
+ "waiting_to_attach_latency": 0.0,
+ "attach_load_storage_latency": 0.0,
+ "blocked_thread_time": 0.0,
+ "cpu_time": 0.6122482899999999,
+ "extra_info": {},
+ "total_memory_allocated": 52953088,
+ "cumulative_cardinality": 16751408,
+ "checkpoint_latency": 0.0,
+ "cumulative_rows_scanned": 28874142,
+ "write_to_wal_latency": 0.0,
+ "latency": 0.086532443,
+ "attach_replay_wal_latency": 0.0,
+ "commit_local_storage_latency": 0.0,
+ "children": [
+  {
+   "system_peak_temp_dir_size": 0,
+   "system_peak_buffer_memory": 0,
+   "result_set_size": 0,
+   "operator_timing": 1.45e-07,
+   "operator_type": "EXPLAIN_ANALYZE",
+   "cpu_time": 0.6122482899999999,
+   "extra_info": {},
+   "cumulative_cardinality": 16751408,
+   "cumulative_rows_scanned": 28874142,
+   "operator_cardinality": 0,
+   "operator_name": "EXPLAIN_ANALYZE",
+   "operator_rows_scanned": 0,
+   "children": [
+    {
+     "system_peak_temp_dir_size": 0,
+     "system_peak_buffer_memory": 0,
+     "result_set_size": 2592,
+     "operator_timing": 7.4316e-05,
+     "operator_type": "TOP_N",
+     "cpu_time": 0.6122481449999999,
+     "extra_info": {
+      "Top": "100",
+      "Order By": [
+       "tpcds.main.store.s_store_name ASC",
+       "tpcds.main.store.s_store_id ASC",
+       "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Sunday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC",
+       "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Monday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC",
+       "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Tuesday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC",
+       "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Wednesday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC",
+       "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Thursday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC",
+       "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Friday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC",
+       "sum(CASE  WHEN ((tpcds.main.date_dim.d_day_name = 'Saturday')) THEN (tpcds.main.store_sales.ss_sales_price) ELSE NULL END) ASC"
+      ]
+     },
+     "cumulative_cardinality": 16751408,
+     "cumulative_rows_scanned": 28874142,
+     "operator_cardinality": 18,
+     "operator_name": "TOP_N",
+     "operator_rows_scanned": 0,
+     "children": [
+      {
+       "system_peak_temp_dir_size": 0,
+       "system_peak_buffer_memory": 0,
+       "result_set_size": 2592,
+       "operator_timing": 1.2802e-05,
+       "operator_type": "PROJECTION",
+       "cpu_time": 0.612173829,
+       "extra_info": {
+        "Projections": [
+         "__internal_decompress_string(#0)",
+         "#1",
+         "#2",
+         "#3",
+         "#4",
+         "#5",
+         "#6",
+         "#7",
+         "#8"
+        ],
+        "Estimated Cardinality": "13231"
+       },
+       "cumulative_cardinality": 16751390,
+       "cumulative_rows_scanned": 28874142,
+       "operator_cardinality": 18,
+       "operator_name": "PROJECTION",
+       "operator_rows_scanned": 0,
+       "children": [
+        {
+         "system_peak_temp_dir_size": 0,
+         "system_peak_buffer_memory": 0,
+         "result_set_size": 2448,
+         "operator_timing": 0.12529869700000001,
+         "operator_type": "HASH_GROUP_BY",
+         "cpu_time": 0.612161027,
+         "extra_info": {
+          "Groups": [
+           "#0",
+           "#1"
+          ],
+          "Aggregates": [
+           "sum(#2)",
+           "sum(#3)",
+           "sum(#4)",
+           "sum(#5)",
+           "sum(#6)",
+           "sum(#7)",
+           "sum(#8)"
+          ],
+          "Estimated Cardinality": "13231"
+         },
+         "cumulative_cardinality": 16751372,
+         "cumulative_rows_scanned": 28874142,
+         "operator_cardinality": 18,
+         "operator_name": "HASH_GROUP_BY",
+         "operator_rows_scanned": 0,
+         "children": [
+          {
+           "system_peak_temp_dir_size": 0,
+           "system_peak_buffer_memory": 0,
+           "result_set_size": 99257704,
+           "operator_timing": 0.16455742199999998,
+           "operator_type": "PROJECTION",
+           "cpu_time": 0.48686233,
+           "extra_info": {
+            "Projections": [
+             "s_store_name",
+             "s_store_id",
+             "CASE  WHEN ((d_day_name = 'Sunday')) THEN (ss_sales_price) ELSE NULL END",
+             "CASE  WHEN ((d_day_name = 'Monday')) THEN (ss_sales_price) ELSE NULL END",
+             "CASE  WHEN ((d_day_name = 'Tuesday')) THEN (ss_sales_price) ELSE NULL END",
+             "CASE  WHEN ((d_day_name = 'Wednesday')) THEN (ss_sales_price) ELSE NULL END",
+             "CASE  WHEN ((d_day_name = 'Thursday')) THEN (ss_sales_price) ELSE NULL END",
+             "CASE  WHEN ((d_day_name = 'Friday')) THEN (ss_sales_price) ELSE NULL END",
+             "CASE  WHEN ((d_day_name = 'Saturday')) THEN (ss_sales_price) ELSE NULL END"
+            ],
+            "Estimated Cardinality": "117630"
+           },
+           "cumulative_cardinality": 16751354,
+           "cumulative_rows_scanned": 28874142,
+           "operator_cardinality": 1908802,
+           "operator_name": "PROJECTION",
+           "operator_rows_scanned": 0,
+           "children": [
+            {
+             "system_peak_temp_dir_size": 0,
+             "system_peak_buffer_memory": 0,
+             "result_set_size": 83987288,
+             "operator_timing": 0.006542065999999994,
+             "operator_type": "PROJECTION",
+             "cpu_time": 0.32230490800000006,
+             "extra_info": {
+              "Projections": [
+               "#1",
+               "#0",
+               "__internal_compress_string_ubigint(#2)",
+               "#3"
+              ],
+              "Estimated Cardinality": "117630"
+             },
+             "cumulative_cardinality": 14842552,
+             "cumulative_rows_scanned": 28874142,
+             "operator_cardinality": 1908802,
+             "operator_name": "PROJECTION",
+             "operator_rows_scanned": 0,
+             "children": [
+              {
+               "system_peak_temp_dir_size": 0,
+               "system_peak_buffer_memory": 0,
+               "result_set_size": 99257704,
+               "operator_timing": 0.04356776499999998,
+               "operator_type": "HASH_JOIN",
+               "cpu_time": 0.31576284200000004,
+               "extra_info": {
+                "Join Type": "INNER",
+                "Conditions": "ss_store_sk = s_store_sk",
+                "Estimated Cardinality": "117630"
+               },
+               "cumulative_cardinality": 12933750,
+               "cumulative_rows_scanned": 28874142,
+               "operator_cardinality": 1908802,
+               "operator_name": "HASH_JOIN",
+               "operator_rows_scanned": 0,
+               "children": [
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 154338156,
+                 "operator_timing": 0.03308225899999999,
+                 "operator_type": "HASH_JOIN",
+                 "cpu_time": 0.27208058100000004,
+                 "extra_info": {
+                  "Join Type": "INNER",
+                  "Conditions": "ss_sold_date_sk = d_date_sk",
+                  "Estimated Cardinality": "230647"
+                 },
+                 "cumulative_cardinality": 11024886,
+                 "cumulative_rows_scanned": 28874040,
+                 "operator_cardinality": 5512077,
+                 "operator_name": "HASH_JOIN",
+                 "operator_rows_scanned": 0,
+                 "children": [
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 110241540,
+                   "operator_timing": 0.23894554200000007,
+                   "operator_type": "TABLE_SCAN",
+                   "cpu_time": 0.23894554200000007,
+                   "extra_info": {
+                    "Table": "tpcds.main.store_sales",
+                    "Type": "Sequential Scan",
+                    "Projections": [
+                     "ss_sold_date_sk",
+                     "ss_store_sk",
+                     "ss_sales_price"
+                    ],
+                    "Estimated Cardinality": "28800991",
+                    "Dynamic Filters": [
+                     "optional: ss_sold_date_sk>=2451545 AND optional: ss_sold_date_sk<=2451910",
+                     "optional: ss_store_sk IN (3, 4, 10, 11, 12, 15, 26, 31, 37, 39, 46, 47, 49, 57, 58, 61, 67, 68, 75, 76, 77, 78, 85, 86, 87, 91, 92, 93, 97, 98, 99) AND optional: ss_store_sk>=3 AND optional: ss_store_sk<=99"
+                    ]
+                   },
+                   "cumulative_cardinality": 5512077,
+                   "cumulative_rows_scanned": 28800991,
+                   "operator_cardinality": 5512077,
+                   "operator_name": "SEQ_SCAN",
+                   "operator_rows_scanned": 28800991,
+                   "children": []
+                  },
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 8784,
+                   "operator_timing": 7.168e-06,
+                   "operator_type": "FILTER",
+                   "cpu_time": 5.2780000000000006e-05,
+                   "extra_info": {
+                    "Expression": "(d_date_sk BETWEEN 2450816 AND 2452642)",
+                    "Estimated Cardinality": "585"
+                   },
+                   "cumulative_cardinality": 732,
+                   "cumulative_rows_scanned": 73049,
+                   "operator_cardinality": 366,
+                   "operator_name": "FILTER",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 8784,
+                     "operator_timing": 4.5612e-05,
+                     "operator_type": "TABLE_SCAN",
+                     "cpu_time": 4.5612e-05,
+                     "extra_info": {
+                      "Table": "tpcds.main.date_dim",
+                      "Type": "Sequential Scan",
+                      "Projections": [
+                       "d_date_sk",
+                       "d_day_name"
+                      ],
+                      "Filters": "d_year=2000",
+                      "Estimated Cardinality": "585"
+                     },
+                     "cumulative_cardinality": 366,
+                     "cumulative_rows_scanned": 73049,
+                     "operator_cardinality": 366,
+                     "operator_name": "SEQ_SCAN",
+                     "operator_rows_scanned": 73049,
+                     "children": []
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 1240,
+                 "operator_timing": 4.0067999999999997e-05,
+                 "operator_type": "FILTER",
+                 "cpu_time": 0.000114496,
+                 "extra_info": {
+                  "Expression": "(s_store_sk <= 100)",
+                  "Estimated Cardinality": "51"
+                 },
+                 "cumulative_cardinality": 62,
+                 "cumulative_rows_scanned": 102,
+                 "operator_cardinality": 31,
+                 "operator_name": "FILTER",
+                 "operator_rows_scanned": 0,
+                 "children": [
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 1240,
+                   "operator_timing": 7.4428e-05,
+                   "operator_type": "TABLE_SCAN",
+                   "cpu_time": 7.4428e-05,
+                   "extra_info": {
+                    "Table": "tpcds.main.store",
+                    "Type": "Sequential Scan",
+                    "Projections": [
+                     "s_store_sk",
+                     "s_store_name",
+                     "s_store_id"
+                    ],
+                    "Filters": "s_gmt_offset=-5.00",
+                    "Estimated Cardinality": "51"
+                   },
+                   "cumulative_cardinality": 31,
+                   "cumulative_rows_scanned": 102,
+                   "operator_cardinality": 31,
+                   "operator_name": "SEQ_SCAN",
+                   "operator_rows_scanned": 102,
+                   "children": []
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

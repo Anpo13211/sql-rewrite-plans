@@ -1,0 +1,88 @@
+-- DuckDB 1.5.5, tpcds-q01, rewrite; latency 0.047776824 s, cpu 0.20071808600000002 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0017)
+       CTE Name: totals
+       Table Index: 0
+       Estimated Cardinality: 100
+    -> PROJECTION  (rows=177527 time_s=0.0004)
+         Projections: ['__internal_decompress_integral_bigint(#0, 1)', '__internal_decompress_integral_bigint(#1, 1)', '#2']
+         Estimated Cardinality: 7834
+      -> HASH_GROUP_BY  (rows=177527 time_s=0.057)
+           Groups: ['#0', '#1']
+           Aggregates: sum(#2)
+           Estimated Cardinality: 7834
+        -> PROJECTION  (rows=181937 time_s=0.0006)
+             Projections: ['sr_customer_sk', 'sr_store_sk', 'sr_return_amt']
+             Estimated Cardinality: 7835
+          -> PROJECTION  (rows=181937 time_s=0.005)
+               Projections: ['__internal_compress_integral_utinyint(#0, 1)', '__internal_compress_integral_uinteger(#1, 1)', '#2', '__internal_compress_integral_utinyint(#3, 1)']
+               Estimated Cardinality: 7835
+            -> HASH_JOIN  (rows=181937 time_s=0.0119)
+                 Join Type: INNER
+                 Conditions: sr_store_sk = s_store_sk
+                 Estimated Cardinality: 7835
+              -> HASH_JOIN  (rows=550303 time_s=0.0072)
+                   Join Type: INNER
+                   Conditions: sr_returned_date_sk = d_date_sk
+                   Estimated Cardinality: 23044
+                -> TABLE_SCAN  (rows=550303 time_s=0.0428)
+                     Table: tpcds.main.store_returns
+                     Type: Sequential Scan
+                     Projections: ['sr_returned_date_sk', 'sr_store_sk', 'sr_customer_sk', 'sr_return_amt']
+                     Estimated Cardinality: 2877532
+                     Dynamic Filters: ['optional: sr_returned_date_sk>=2451545 AND optional: sr_returned_date_sk<=2451910', 'optional: sr_store_sk IN (3, 4, 10, 11, 15, 17, 21, 31, 37, 39, 45, 46, 47, 49, 57, 58, 61, 67, 68, 75, 76, 77, 85, 86, 87, 91, 92, 93, 95, 97, 98) AND optional: sr_store_sk>=3 AND optional: sr_store_sk<=98']
+                -> FILTER  (rows=366 time_s=0.0)
+                     Expression: (d_date_sk BETWEEN 2450820 AND 2452822)
+                     Estimated Cardinality: 585
+                  -> TABLE_SCAN  (rows=366 time_s=0.0001)
+                       Table: tpcds.main.date_dim
+                       Type: Sequential Scan
+                       Projections: d_date_sk
+                       Filters: d_year=2000
+                       Estimated Cardinality: 585
+              -> FILTER  (rows=31 time_s=0.0)
+                   Expression: (s_store_sk <= 100)
+                   Estimated Cardinality: 34
+                -> TABLE_SCAN  (rows=31 time_s=0.0001)
+                     Table: tpcds.main.store
+                     Type: Sequential Scan
+                     Projections: s_store_sk
+                     Filters: s_state='TN'
+                     Estimated Cardinality: 34
+    -> TOP_N  (rows=100 time_s=0.0046)
+         Top: 100
+         Order By: c.c_customer_id ASC
+      -> PROJECTION  (rows=45702 time_s=0.0001)
+           Projections: c_customer_id
+           Estimated Cardinality: 1295
+        -> HASH_JOIN  (rows=45702 time_s=0.0202)
+             Join Type: INNER
+             Conditions: c_customer_sk = sr_customer_sk
+             Estimated Cardinality: 1295
+          -> TABLE_SCAN  (rows=499986 time_s=0.0182)
+               Table: tpcds.main.customer
+               Type: Sequential Scan
+               Projections: ['c_customer_sk', 'c_customer_id']
+               Filters: optional: Dynamic Filter (c_customer_id)
+               Estimated Cardinality: 500000
+               Dynamic Filters: optional: c_customer_sk>=8 AND optional: c_customer_sk<=499993
+          -> HASH_JOIN  (rows=45719 time_s=0.0168)
+               Join Type: INNER
+               Conditions: ['sr_store_sk = sr_store_sk', 'CAST(total_return AS DOUBLE) > threshold']
+               Estimated Cardinality: 1295
+            -> CTE_SCAN  (rows=177527 time_s=0.0004)
+                 CTE Index: 0
+                 Estimated Cardinality: 7834
+            -> PROJECTION  (rows=17 time_s=0.0)
+                 Projections: ['sr_store_sk', 'threshold']
+                 Estimated Cardinality: 56
+              -> HASH_GROUP_BY  (rows=17 time_s=0.0133)
+                   Groups: #0
+                   Aggregates: avg(#1)
+                   Estimated Cardinality: 56
+                -> PROJECTION  (rows=177527 time_s=0.0)
+                     Projections: ['sr_store_sk', 'total_return']
+                     Estimated Cardinality: 7834
+                  -> CTE_SCAN  (rows=177527 time_s=0.0004)
+                       CTE Index: 0
+                       Estimated Cardinality: 7834

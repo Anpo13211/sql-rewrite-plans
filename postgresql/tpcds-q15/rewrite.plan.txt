@@ -1,0 +1,29 @@
+-- PostgreSQL 18, tpcds-q15, rewrite; execution 984.565 ms, planning 0.396 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=530232 read=0)
+  -> Aggregate [Sorted] <CTE sales_by_customer>  (rows=44147.0 loops=1 est_rows=17657 buffers hit=513856 read=0)
+       Group Key: ['cs.cs_bill_customer_sk']
+    -> Gather Merge  (rows=412665.0 loops=1 est_rows=17657 workers=6 buffers hit=513856 read=0)
+      -> Sort  (rows=58952.14 loops=7 est_rows=2943 buffers hit=513856 read=0)
+           Sort Key: ['cs.cs_bill_customer_sk']
+        -> Hash Join [Inner]  (rows=58952.14 loops=7 est_rows=2943 buffers hit=513808 read=0)
+             Hash Cond: (cs.cs_sold_date_sk = d.d_date_sk)
+          -> Seq Scan on catalog_sales cs  (rows=2057323.0 loops=7 est_rows=2400266 buffers hit=511776 read=0)
+          -> Hash  (rows=13.0 loops=7 est_rows=53 buffers hit=2032 read=0)
+            -> Seq Scan on date_dim d  (rows=91.0 loops=1 est_rows=53 buffers hit=2032 read=0)
+                 Filter: ((d_qoy = 2) AND (d_year = 2001))
+                 Rows Removed by Filter: 72958
+  -> Sort  (rows=100.0 loops=1 est_rows=3237 buffers hit=148875 read=0)
+       Sort Key: ['ca.ca_zip NULLS FIRST']
+    -> Aggregate [Hashed]  (rows=524.0 loops=1 est_rows=3237 buffers hit=148875 read=0)
+         Group Key: ['ca.ca_zip']
+      -> Hash Join [Inner]  (rows=3511.0 loops=1 est_rows=17579 buffers hit=148875 read=0)
+           Hash Cond: (ca.ca_address_sk = c.c_current_addr_sk)
+           Join Filter: (("substring"((ca.ca_zip)::text, 1, 5) = ANY ('{85669,86197,88274,83405,86475,85392,85460,80348,81792}'::text[])) OR ((ca.ca_state)::text = ANY ('{CA,WA,GA}'::text[])) OR (s.high_sales IS NOT NULL))
+           Rows Removed by Join Filter: 40635
+        -> Seq Scan on customer_address ca  (rows=250000.0 loops=1 est_rows=250000 buffers hit=4504 read=0)
+        -> Hash  (rows=44146.0 loops=1 est_rows=17657 buffers hit=144371 read=0)
+          -> Hash Join [Inner]  (rows=44146.0 loops=1 est_rows=17657 buffers hit=144371 read=0)
+               Hash Cond: (c.c_customer_sk = s.cs_bill_customer_sk)
+            -> Seq Scan on customer c  (rows=500000.0 loops=1 est_rows=500000 buffers hit=11872 read=0)
+            -> Hash  (rows=44146.0 loops=1 est_rows=17657 buffers hit=132499 read=0)
+              -> CTE Scan (CTE sales_by_customer)  (rows=44147.0 loops=1 est_rows=17657 buffers hit=132499 read=0)

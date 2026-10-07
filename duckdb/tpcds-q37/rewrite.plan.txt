@@ -1,0 +1,76 @@
+-- DuckDB 1.5.5, tpcds-q37, rewrite; latency 0.017777976 s, cpu 0.0554625 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0)
+       CTE Name: candidate_items
+       Table Index: 0
+       Estimated Cardinality: 100
+    -> PROJECTION  (rows=5 time_s=0.0)
+         Projections: ['i_item_sk', 'i_item_id', 'i_item_desc', 'i_current_price']
+         Estimated Cardinality: 4080
+      -> PROJECTION  (rows=5 time_s=0.0)
+           Projections: ['#0', '#2', '#3', '#4']
+           Estimated Cardinality: 4080
+        -> FILTER  (rows=5 time_s=0.0001)
+             Expression: ((i_manufact_id = 677) OR (i_manufact_id = 940) OR (i_manufact_id = 694) OR (i_manufact_id = 808))
+             Estimated Cardinality: 4080
+          -> TABLE_SCAN  (rows=3406 time_s=0.0052)
+               Table: tpcds.main.item
+               Type: Sequential Scan
+               Projections: ['i_current_price', 'i_manufact_id', 'i_item_sk', 'i_item_id', 'i_item_desc']
+               Filters: ['i_current_price>=68.00 AND i_current_price<=98.00', 'optional: i_manufact_id IN (677, 694, 808, 940)']
+               Estimated Cardinality: 20400
+    -> TOP_N  (rows=2 time_s=0.0)
+         Top: 100
+         Order By: i.i_item_id ASC
+      -> HASH_GROUP_BY  (rows=2 time_s=0.0001)
+           Groups: ['#0', '#1', '#2']
+           Estimated Cardinality: 816
+        -> PROJECTION  (rows=2 time_s=0.0)
+             Projections: ['i_item_id', 'i_item_desc', 'i_current_price']
+             Estimated Cardinality: 816
+          -> RIGHT_DELIM_JOIN  (rows=0 time_s=0.0001)
+               Join Type: RIGHT_SEMI
+               Conditions: i_item_sk IS NOT DISTINCT FROM i_item_sk
+               Estimated Cardinality: 816
+               Delim Index: 1
+            -> CTE_SCAN  (rows=5 time_s=0.0)
+                 CTE Index: 0
+                 Estimated Cardinality: 4080
+            -> HASH_JOIN  (rows=2 time_s=0.0001)
+                 Join Type: RIGHT_SEMI
+                 Conditions: i_item_sk IS NOT DISTINCT FROM i_item_sk
+                 Estimated Cardinality: 816
+              -> PROJECTION  (rows=74 time_s=0.0)
+                   Projections: i_item_sk
+                   Estimated Cardinality: 219837
+                -> HASH_JOIN  (rows=74 time_s=0.0002)
+                     Join Type: INNER
+                     Conditions: inv_date_sk = d_date_sk
+                     Estimated Cardinality: 219837
+                  -> HASH_JOIN  (rows=74 time_s=0.0065)
+                       Join Type: INNER
+                       Conditions: inv_item_sk = i_item_sk
+                       Estimated Cardinality: 1099246
+                    -> TABLE_SCAN  (rows=1731686 time_s=0.0428)
+                         Table: tpcds.main.inventory
+                         Type: Sequential Scan
+                         Projections: ['inv_date_sk', 'inv_item_sk']
+                         Filters: inv_quantity_on_hand>=100 AND inv_quantity_on_hand<=500
+                         Estimated Cardinality: 26622000
+                         Dynamic Filters: ['optional: inv_date_sk>=2451576 AND optional: inv_date_sk<=2451636', 'optional: inv_item_sk IN (7255, 8572, 38740, 46518, 101587) AND optional: inv_item_sk>=7255 AND optional: inv_item_sk<=101587']
+                    -> DELIM_SCAN  (rows=0 time_s=0)
+                         Delim Index: 1
+                         Estimated Cardinality: 3965
+                  -> FILTER  (rows=61 time_s=0.0)
+                       Expression: (d_date_sk BETWEEN 2450815 AND 2452635)
+                       Estimated Cardinality: 14609
+                    -> TABLE_SCAN  (rows=61 time_s=0.0003)
+                         Table: tpcds.main.date_dim
+                         Type: Sequential Scan
+                         Projections: d_date_sk
+                         Filters: d_date>='2000-02-01'::DATE AND d_date<='2000-04-01'::DATE
+                         Estimated Cardinality: 14609
+              -> DUMMY_SCAN  (rows=0 time_s=0)
+            -> HASH_GROUP_BY  (rows=5 time_s=0.0001)
+                 Groups: #0
+                 Estimated Cardinality: 3965

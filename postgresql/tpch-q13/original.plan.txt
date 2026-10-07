@@ -1,0 +1,14 @@
+-- PostgreSQL 18, tpch-q13, original; execution 11017.08 ms, planning 0.232 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Sort  (rows=45.0 loops=1 est_rows=200 buffers hit=271263 read=0)
+     Sort Key: ['(count(*)) DESC', '(count(orders.o_orderkey)) DESC']
+  -> Aggregate [Hashed]  (rows=45.0 loops=1 est_rows=200 buffers hit=271263 read=0)
+       Group Key: ['count(orders.o_orderkey)']
+    -> Aggregate [Hashed]  (rows=1500000.0 loops=1 est_rows=1500196 buffers hit=271263 read=0)
+         Group Key: ['customer.c_custkey']
+      -> Hash Join [Right]  (rows=15345388.0 loops=1 est_rows=14544860 buffers hit=271263 read=0)
+           Hash Cond: (orders.o_custkey = customer.c_custkey)
+        -> Seq Scan on orders  (rows=14845369.0 loops=1 est_rows=14544860 buffers hit=267160 read=0)
+             Filter: ((o_comment)::text !~~ '%special%requests%'::text)
+             Rows Removed by Filter: 154631
+        -> Hash  (rows=1500000.0 loops=1 est_rows=1500196 buffers hit=4103 read=0)
+          -> Index Only Scan on customer using scaleup_tpch_03  (rows=1500000.0 loops=1 est_rows=1500196 buffers hit=4103 read=0)

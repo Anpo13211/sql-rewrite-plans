@@ -1,0 +1,62 @@
+-- PostgreSQL 18, tpcds-q54, original; execution 2005.492 ms, planning 0.893 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=1.0 loops=1 est_rows=2 buffers hit=3062527 read=0)
+  -> Incremental Sort  (rows=1.0 loops=1 est_rows=2 buffers hit=3062527 read=0)
+       Sort Key: ["((round((my_revenue.revenue / '50'::numeric), 0))::integer) NULLS FIRST", '(count(*)) NULLS FIRST', "((((round((my_revenue.revenue / '50'::numeric), 0))::integer) * 50))"]
+    -> Aggregate [Sorted]  (rows=1.0 loops=1 est_rows=1 buffers hit=3062527 read=0)
+         Group Key: ["((round((my_revenue.revenue / '50'::numeric), 0))::integer)"]
+      -> Sort  (rows=1.0 loops=1 est_rows=1 buffers hit=3062527 read=0)
+           Sort Key: ["((round((my_revenue.revenue / '50'::numeric), 0))::integer) NULLS FIRST"]
+        -> Subquery Scan  (rows=1.0 loops=1 est_rows=1 buffers hit=3062527 read=0)
+          -> Aggregate [Sorted]  (rows=1.0 loops=1 est_rows=1 buffers hit=3062527 read=0)
+               Group Key: ['customer.c_customer_sk']
+            -> Unique <InitPlan 1>  (rows=1.0 loops=1 est_rows=31 buffers hit=2032 read=0)
+              -> Sort  (rows=31.0 loops=1 est_rows=31 buffers hit=2032 read=0)
+                   Sort Key: ['((date_dim_2.d_month_seq + 1))']
+                -> Seq Scan on date_dim date_dim_2  (rows=31.0 loops=1 est_rows=31 buffers hit=2032 read=0)
+                     Filter: ((d_year = 1998) AND (d_moy = 12))
+                     Rows Removed by Filter: 73018
+            -> Unique <InitPlan 2>  (rows=1.0 loops=1 est_rows=31 buffers hit=2032 read=0)
+              -> Sort  (rows=31.0 loops=1 est_rows=31 buffers hit=2032 read=0)
+                   Sort Key: ['((date_dim_3.d_month_seq + 3))']
+                -> Seq Scan on date_dim date_dim_3  (rows=31.0 loops=1 est_rows=31 buffers hit=2032 read=0)
+                     Filter: ((d_year = 1998) AND (d_moy = 12))
+                     Rows Removed by Filter: 73018
+            -> Nested Loop [Inner]  (rows=315.0 loops=1 est_rows=1 buffers hit=3062527 read=0)
+              -> Nested Loop [Inner]  (rows=18448.0 loops=1 est_rows=1 buffers hit=3004331 read=0)
+                -> Nested Loop [Inner]  (rows=373.0 loops=1 est_rows=1 buffers hit=2984764 read=0)
+                     Join Filter: (((customer_address.ca_county)::text = (store.s_county)::text) AND ((customer_address.ca_state)::text = (store.s_state)::text))
+                     Rows Removed by Join Filter: 1590623
+                  -> Nested Loop [Inner]  (rows=15598.0 loops=1 est_rows=22 buffers hit=2984759 read=0)
+                    -> Unique  (rows=15598.0 loops=1 est_rows=22 buffers hit=2922367 read=0)
+                      -> Sort  (rows=17916.0 loops=1 est_rows=22 buffers hit=2922367 read=0)
+                           Sort Key: ['customer.c_customer_sk', 'customer.c_current_addr_sk']
+                        -> Gather  (rows=17916.0 loops=1 est_rows=22 workers=1 buffers hit=2922367 read=0)
+                          -> Nested Loop [Inner]  (rows=8958.0 loops=2 est_rows=13 buffers hit=2922367 read=0)
+                            -> Nested Loop [Inner]  (rows=8977.5 loops=2 est_rows=13 buffers hit=2850703 read=0)
+                              -> Nested Loop [Inner]  (rows=364847.0 loops=2 est_rows=5392 buffers hit=661621 read=0)
+                                -> Seq Scan on date_dim date_dim_1  (rows=15.5 loops=2 est_rows=18 buffers hit=2032 read=0)
+                                     Filter: ((d_moy = 12) AND (d_year = 1998))
+                                     Rows Removed by Filter: 36509
+                                -> Append  (rows=23538.52 loops=31 est_rows=11757 buffers hit=659589 read=0)
+                                  -> Bitmap Heap Scan on catalog_sales  (rows=15651.68 loops=31 est_rows=7810 buffers hit=420249 read=0)
+                                    -> Bitmap Index Scan using scaleup_tpcds_17  (rows=15651.68 loops=31 est_rows=7810 buffers hit=500 read=0)
+                                         Index Cond: (cs_sold_date_sk = date_dim_1.d_date_sk)
+                                  -> Bitmap Heap Scan on web_sales  (rows=7886.84 loops=31 est_rows=3947 buffers hit=239340 read=0)
+                                    -> Bitmap Index Scan using scaleup_tpcds_76  (rows=7886.84 loops=31 est_rows=3947 buffers hit=299 read=0)
+                                         Index Cond: (ws_sold_date_sk = date_dim_1.d_date_sk)
+                              -> Index Scan on item using scaleup_tpcds_40  (rows=0.02 loops=729694 est_rows=1 buffers hit=2189082 read=0)
+                                   Index Cond: (i_item_sk = catalog_sales.cs_item_sk)
+                                   Filter: (((i_category)::text = 'Women'::text) AND ((i_class)::text = 'maternity'::text))
+                                   Rows Removed by Filter: 1
+                            -> Index Scan on customer using scaleup_tpcds_33  (rows=1.0 loops=17955 est_rows=1 buffers hit=71664 read=0)
+                                 Index Cond: (c_customer_sk = catalog_sales.cs_bill_customer_sk)
+                    -> Index Scan on customer_address using scaleup_tpcds_34  (rows=1.0 loops=15598 est_rows=1 buffers hit=62392 read=0)
+                         Index Cond: (ca_address_sk = customer.c_current_addr_sk)
+                  -> Materialize  (rows=102.0 loops=15598 est_rows=102 buffers hit=5 read=0)
+                    -> Seq Scan on store  (rows=102.0 loops=1 est_rows=102 buffers hit=5 read=0)
+                -> Index Scan on store_sales using scaleup_tpcds_55  (rows=49.46 loops=373 est_rows=69 buffers hit=19567 read=0)
+                     Index Cond: (ss_customer_sk = customer.c_customer_sk)
+              -> Index Scan on date_dim using scaleup_tpcds_36  (rows=0.02 loops=18448 est_rows=1 buffers hit=58196 read=0)
+                   Index Cond: (d_date_sk = store_sales.ss_sold_date_sk)
+                   Filter: ((d_month_seq >= (InitPlan 1).col1) AND (d_month_seq <= (InitPlan 2).col1))
+                   Rows Removed by Filter: 1

@@ -1,0 +1,23 @@
+-- PostgreSQL 18, tpcds-q03, original; execution 2803.151 ms, planning 0.292 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=2771563 read=0)
+  -> Incremental Sort  (rows=100.0 loops=1 est_rows=4582 buffers hit=2771563 read=0)
+       Sort Key: ['dt.d_year', '(sum(store_sales.ss_ext_sales_price)) DESC', 'item.i_brand_id']
+    -> Aggregate [Sorted]  (rows=141.0 loops=1 est_rows=4582 buffers hit=2771563 read=0)
+         Group Key: ['dt.d_year', 'item.i_brand', 'item.i_brand_id']
+      -> Incremental Sort  (rows=3387.0 loops=1 est_rows=4582 buffers hit=2771563 read=0)
+           Sort Key: ['dt.d_year', 'item.i_brand', 'item.i_brand_id']
+        -> Nested Loop [Inner]  (rows=4885.0 loops=1 est_rows=4582 buffers hit=2771563 read=0)
+          -> Nested Loop [Inner]  (rows=2644535.0 loops=1 est_rows=2257887 buffers hit=2567353 read=0)
+            -> Gather Merge  (rows=3031.0 loops=1 est_rows=5997 workers=1 buffers hit=2071 read=0)
+              -> Sort  (rows=1515.5 loops=2 est_rows=3528 buffers hit=2071 read=0)
+                   Sort Key: ['dt.d_year']
+                -> Seq Scan on date_dim dt  (rows=3000.0 loops=2 est_rows=3528 buffers hit=2032 read=0)
+                     Filter: (d_moy = 11)
+                     Rows Removed by Filter: 33524
+            -> Index Scan on store_sales using scaleup_tpcds_53  (rows=872.5 loops=3031 est_rows=15095 buffers hit=2565282 read=0)
+                 Index Cond: (ss_sold_date_sk = dt.d_date_sk)
+          -> Memoize  (rows=0.0 loops=2644535 est_rows=1 buffers hit=204210 read=0)
+            -> Index Scan on item using scaleup_tpcds_40  (rows=0.0 loops=68070 est_rows=1 buffers hit=204210 read=0)
+                 Index Cond: (i_item_sk = store_sales.ss_item_sk)
+                 Filter: (i_manufact_id = 128)
+                 Rows Removed by Filter: 1

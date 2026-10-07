@@ -1,0 +1,120 @@
+-- DuckDB 1.5.5, tpch-q21, original; latency 0.488799488 s, cpu 3.0980178779999887 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0003)
+       Top: 100
+       Order By: ['count_star() DESC', 'tpch.main.supplier.s_name ASC']
+    -> HASH_GROUP_BY  (rows=4009 time_s=0.0089)
+         Groups: #0
+         Aggregates: count_star()
+         Estimated Cardinality: 9234
+      -> PROJECTION  (rows=39448 time_s=0.0001)
+           Projections: s_name
+           Estimated Cardinality: 9689
+        -> LEFT_DELIM_JOIN  (rows=0 time_s=0.0515)
+             Join Type: ANTI
+             Conditions: ['l_suppkey IS NOT DISTINCT FROM l_suppkey', 'l_orderkey IS NOT DISTINCT FROM l_orderkey']
+             Estimated Cardinality: 9689
+             Delim Index: 2
+          -> RIGHT_DELIM_JOIN  (rows=0 time_s=0.1547)
+               Join Type: RIGHT_SEMI
+               Conditions: ['l_suppkey IS NOT DISTINCT FROM l_suppkey', 'l_orderkey IS NOT DISTINCT FROM l_orderkey']
+               Estimated Cardinality: 48445
+               Delim Index: 1
+            -> HASH_JOIN  (rows=734523 time_s=0.1777)
+                 Join Type: INNER
+                 Conditions: o_orderkey = l_orderkey
+                 Estimated Cardinality: 242228
+              -> TABLE_SCAN  (rows=711755 time_s=0.1463)
+                   Table: tpch.main.orders
+                   Type: Sequential Scan
+                   Projections: o_orderkey
+                   Filters: o_orderstatus='F'
+                   Estimated Cardinality: 7500000
+                   Dynamic Filters: optional: o_orderkey>=32 AND optional: o_orderkey<=59999972 AND optional: o_orderkey IN BF(l_orderkey)
+              -> HASH_JOIN  (rows=1522366 time_s=0.186)
+                   Join Type: INNER
+                   Conditions: l_suppkey = s_suppkey
+                   Estimated Cardinality: 480502
+                -> PROJECTION  (rows=37929040 time_s=0.0045)
+                     Projections: ['#0', '#1']
+                     Estimated Cardinality: 11997210
+                  -> FILTER  (rows=37929040 time_s=0.0849)
+                       Expression: (l_receiptdate > l_commitdate)
+                       Estimated Cardinality: 11997210
+                    -> TABLE_SCAN  (rows=59985566 time_s=0.2506)
+                         Table: tpch.main.lineitem
+                         Type: Sequential Scan
+                         Projections: ['l_suppkey', 'l_orderkey', 'l_receiptdate', 'l_commitdate']
+                         Estimated Cardinality: 59986052
+                         Dynamic Filters: optional: l_suppkey>=74 AND optional: l_suppkey<=99981
+                -> HASH_JOIN  (rows=4010 time_s=0.0001)
+                     Join Type: INNER
+                     Conditions: s_nationkey = n_nationkey
+                     Estimated Cardinality: 3846
+                  -> TABLE_SCAN  (rows=4010 time_s=0.0004)
+                       Table: tpch.main.supplier
+                       Type: Sequential Scan
+                       Projections: ['s_suppkey', 's_nationkey', 's_name']
+                       Estimated Cardinality: 100000
+                       Dynamic Filters: s_nationkey=20
+                  -> TABLE_SCAN  (rows=1 time_s=0.0)
+                       Table: tpch.main.nation
+                       Type: Sequential Scan
+                       Projections: n_nationkey
+                       Filters: n_name='SAUDI ARABIA'
+                       Estimated Cardinality: 1
+            -> HASH_JOIN  (rows=707593 time_s=0.1486)
+                 Join Type: RIGHT_SEMI
+                 Conditions: ['l_suppkey IS NOT DISTINCT FROM l_suppkey', 'l_orderkey IS NOT DISTINCT FROM l_orderkey']
+                 Estimated Cardinality: 48445
+              -> PROJECTION  (rows=2930334 time_s=0.0045)
+                   Projections: ['l_suppkey', 'l_orderkey']
+                   Estimated Cardinality: 1380556
+                -> HASH_JOIN  (rows=2930334 time_s=0.6399)
+                     Join Type: INNER
+                     Conditions: ['l_orderkey = l_orderkey', 'l_suppkey != l_suppkey']
+                     Estimated Cardinality: 1380556
+                  -> TABLE_SCAN  (rows=59985983 time_s=0.1416)
+                       Table: tpch.main.lineitem
+                       Type: Sequential Scan
+                       Projections: ['l_orderkey', 'l_suppkey']
+                       Estimated Cardinality: 59986052
+                       Dynamic Filters: optional: l_orderkey>=37 AND optional: l_orderkey<=59999969
+                  -> DELIM_SCAN  (rows=0 time_s=0)
+                       Delim Index: 1
+                       Estimated Cardinality: 230269
+              -> DUMMY_SCAN  (rows=0 time_s=0)
+            -> HASH_GROUP_BY  (rows=734511 time_s=0.0223)
+                 Groups: ['#2', '#1']
+                 Estimated Cardinality: 230269
+          -> HASH_JOIN  (rows=39448 time_s=0.1735)
+               Join Type: ANTI
+               Conditions: ['l_suppkey IS NOT DISTINCT FROM l_suppkey', 'l_orderkey IS NOT DISTINCT FROM l_orderkey']
+               Estimated Cardinality: 9689
+            -> COLUMN_DATA_SCAN  (rows=707593 time_s=0.0009)
+                 Estimated Cardinality: 9689
+            -> PROJECTION  (rows=1850454 time_s=0.0026)
+                 Projections: ['l_suppkey', 'l_orderkey']
+                 Estimated Cardinality: 57499
+              -> HASH_JOIN  (rows=1850454 time_s=0.5223)
+                   Join Type: INNER
+                   Conditions: ['l_orderkey = l_orderkey', 'l_suppkey != l_suppkey']
+                   Estimated Cardinality: 57499
+                -> PROJECTION  (rows=37929315 time_s=0.0046)
+                     Projections: ['#0', '#1']
+                     Estimated Cardinality: 11997210
+                  -> FILTER  (rows=37929315 time_s=0.0872)
+                       Expression: (l_receiptdate > l_commitdate)
+                       Estimated Cardinality: 11997210
+                    -> TABLE_SCAN  (rows=59985983 time_s=0.2629)
+                         Table: tpch.main.lineitem
+                         Type: Sequential Scan
+                         Projections: ['l_orderkey', 'l_suppkey', 'l_receiptdate', 'l_commitdate']
+                         Estimated Cardinality: 59986052
+                         Dynamic Filters: optional: l_orderkey>=37 AND optional: l_orderkey<=59999969
+                -> DELIM_SCAN  (rows=0 time_s=0)
+                     Delim Index: 2
+                     Estimated Cardinality: 47953
+          -> HASH_GROUP_BY  (rows=707581 time_s=0.0209)
+               Groups: ['#1', '#0']
+               Estimated Cardinality: 47953

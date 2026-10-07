@@ -1,0 +1,297 @@
+-- DuckDB 1.5.5, tpcds-q31, rewrite; latency 0.264103868 s, cpu 1.6498099140000002 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0001)
+       CTE Name: s1
+       Table Index: 0
+       Estimated Cardinality: 0
+    -> PROJECTION  (rows=1847 time_s=0.0)
+         Projections: ['#0', '__internal_decompress_integral_bigint(#1, 2000)', '#2']
+         Estimated Cardinality: 475
+      -> HASH_GROUP_BY  (rows=1847 time_s=0.0475)
+           Groups: ['#0', '#1']
+           Aggregates: sum(#2)
+           Estimated Cardinality: 475
+        -> PROJECTION  (rows=819008 time_s=0.0001)
+             Projections: ['ca_county', 'd_year', 'ss_ext_sales_price']
+             Estimated Cardinality: 262326
+          -> PROJECTION  (rows=819008 time_s=0.0005)
+               Projections: ['#0', '__internal_compress_integral_utinyint(#2, 2000)', '#1']
+               Estimated Cardinality: 262326
+            -> HASH_JOIN  (rows=819008 time_s=0.0795)
+                 Join Type: INNER
+                 Conditions: ca_address_sk = ss_addr_sk
+                 Estimated Cardinality: 262326
+              -> TABLE_SCAN  (rows=250000 time_s=0.0069)
+                   Table: tpcds.main.customer_address
+                   Type: Sequential Scan
+                   Projections: ['ca_address_sk', 'ca_county']
+                   Estimated Cardinality: 250000
+                   Dynamic Filters: optional: ca_address_sk>=1 AND optional: ca_address_sk<=250000
+              -> HASH_JOIN  (rows=838762 time_s=0.0395)
+                   Join Type: INNER
+                   Conditions: ss_sold_date_sk = d_date_sk
+                   Estimated Cardinality: 230647
+                -> TABLE_SCAN  (rows=838762 time_s=0.2763)
+                     Table: tpcds.main.store_sales
+                     Type: Sequential Scan
+                     Projections: ['ss_sold_date_sk', 'ss_addr_sk', 'ss_ext_sales_price']
+                     Estimated Cardinality: 28800991
+                     Dynamic Filters: optional: ss_sold_date_sk>=2451545 AND optional: ss_sold_date_sk<=2451635
+                -> FILTER  (rows=91 time_s=0.0)
+                     Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                     Estimated Cardinality: 585
+                  -> TABLE_SCAN  (rows=91 time_s=0.0001)
+                       Table: tpcds.main.date_dim
+                       Type: Sequential Scan
+                       Projections: ['d_date_sk', 'd_year']
+                       Filters: ['d_qoy=1', 'd_year=2000']
+                       Estimated Cardinality: 585
+    -> CTE  (rows=0 time_s=0.0)
+         CTE Name: s2
+         Table Index: 1
+         Estimated Cardinality: 0
+      -> HASH_GROUP_BY  (rows=1847 time_s=0.0335)
+           Groups: #0
+           Aggregates: sum(#1)
+           Estimated Cardinality: 4
+        -> PROJECTION  (rows=772345 time_s=0.0001)
+             Projections: ['ca_county', 'ss_ext_sales_price']
+             Estimated Cardinality: 262326
+          -> HASH_JOIN  (rows=772345 time_s=0.0767)
+               Join Type: INNER
+               Conditions: ca_address_sk = ss_addr_sk
+               Estimated Cardinality: 262326
+            -> TABLE_SCAN  (rows=249993 time_s=0.0058)
+                 Table: tpcds.main.customer_address
+                 Type: Sequential Scan
+                 Projections: ['ca_address_sk', 'ca_county']
+                 Estimated Cardinality: 250000
+                 Dynamic Filters: optional: ca_address_sk>=4 AND optional: ca_address_sk<=249996
+            -> HASH_JOIN  (rows=791057 time_s=0.035)
+                 Join Type: INNER
+                 Conditions: ss_sold_date_sk = d_date_sk
+                 Estimated Cardinality: 230647
+              -> TABLE_SCAN  (rows=791057 time_s=0.2327)
+                   Table: tpcds.main.store_sales
+                   Type: Sequential Scan
+                   Projections: ['ss_sold_date_sk', 'ss_addr_sk', 'ss_ext_sales_price']
+                   Estimated Cardinality: 28800991
+                   Dynamic Filters: optional: ss_sold_date_sk>=2451636 AND optional: ss_sold_date_sk<=2451726
+              -> FILTER  (rows=91 time_s=0.0)
+                   Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                   Estimated Cardinality: 585
+                -> TABLE_SCAN  (rows=91 time_s=0.0002)
+                     Table: tpcds.main.date_dim
+                     Type: Sequential Scan
+                     Projections: d_date_sk
+                     Filters: ['d_qoy=2', 'd_year=2000']
+                     Estimated Cardinality: 585
+      -> CTE  (rows=0 time_s=0.0001)
+           CTE Name: s3
+           Table Index: 2
+           Estimated Cardinality: 0
+        -> HASH_GROUP_BY  (rows=1847 time_s=0.0858)
+             Groups: #0
+             Aggregates: sum(#1)
+             Estimated Cardinality: 4
+          -> PROJECTION  (rows=1431271 time_s=0.0002)
+               Projections: ['ca_county', 'ss_ext_sales_price']
+               Estimated Cardinality: 262326
+            -> HASH_JOIN  (rows=1431271 time_s=0.1555)
+                 Join Type: INNER
+                 Conditions: ca_address_sk = ss_addr_sk
+                 Estimated Cardinality: 262326
+              -> TABLE_SCAN  (rows=249998 time_s=0.0072)
+                   Table: tpcds.main.customer_address
+                   Type: Sequential Scan
+                   Projections: ['ca_address_sk', 'ca_county']
+                   Estimated Cardinality: 250000
+                   Dynamic Filters: optional: ca_address_sk>=2 AND optional: ca_address_sk<=249999
+              -> HASH_JOIN  (rows=1465854 time_s=0.0254)
+                   Join Type: INNER
+                   Conditions: ss_sold_date_sk = d_date_sk
+                   Estimated Cardinality: 230647
+                -> TABLE_SCAN  (rows=1465854 time_s=0.2246)
+                     Table: tpcds.main.store_sales
+                     Type: Sequential Scan
+                     Projections: ['ss_sold_date_sk', 'ss_addr_sk', 'ss_ext_sales_price']
+                     Estimated Cardinality: 28800991
+                     Dynamic Filters: optional: ss_sold_date_sk>=2451727 AND optional: ss_sold_date_sk<=2451818
+                -> FILTER  (rows=92 time_s=0.0)
+                     Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                     Estimated Cardinality: 585
+                  -> TABLE_SCAN  (rows=92 time_s=0.0004)
+                       Table: tpcds.main.date_dim
+                       Type: Sequential Scan
+                       Projections: d_date_sk
+                       Filters: ['d_qoy=3', 'd_year=2000']
+                       Estimated Cardinality: 585
+        -> CTE  (rows=0 time_s=0.0001)
+             CTE Name: w1
+             Table Index: 3
+             Estimated Cardinality: 0
+          -> HASH_GROUP_BY  (rows=1843 time_s=0.013)
+               Groups: #0
+               Aggregates: sum(#1)
+               Estimated Cardinality: 4
+            -> PROJECTION  (rows=218520 time_s=0.0)
+                 Projections: ['ca_county', 'ws_ext_sales_price']
+                 Estimated Cardinality: 65708
+              -> HASH_JOIN  (rows=218520 time_s=0.0213)
+                   Join Type: INNER
+                   Conditions: ca_address_sk = ws_bill_addr_sk
+                   Estimated Cardinality: 65708
+                -> TABLE_SCAN  (rows=17669 time_s=0.0089)
+                     Table: tpcds.main.customer_address
+                     Type: Sequential Scan
+                     Projections: ['ca_address_sk', 'ca_county']
+                     Estimated Cardinality: 250000
+                     Dynamic Filters: optional: ca_address_sk>=6 AND optional: ca_address_sk<=249995 AND optional: ca_address_sk IN BF(ws_bill_addr_sk)
+                -> HASH_JOIN  (rows=218549 time_s=0.0079)
+                     Join Type: INNER
+                     Conditions: ws_sold_date_sk = d_date_sk
+                     Estimated Cardinality: 57640
+                  -> TABLE_SCAN  (rows=218549 time_s=0.044)
+                       Table: tpcds.main.web_sales
+                       Type: Sequential Scan
+                       Projections: ['ws_sold_date_sk', 'ws_bill_addr_sk', 'ws_ext_sales_price']
+                       Estimated Cardinality: 7197566
+                       Dynamic Filters: optional: ws_sold_date_sk>=2451545 AND optional: ws_sold_date_sk<=2451635
+                  -> FILTER  (rows=91 time_s=0.0)
+                       Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                       Estimated Cardinality: 585
+                    -> TABLE_SCAN  (rows=91 time_s=0.0002)
+                         Table: tpcds.main.date_dim
+                         Type: Sequential Scan
+                         Projections: d_date_sk
+                         Filters: ['d_qoy=1', 'd_year=2000']
+                         Estimated Cardinality: 585
+          -> CTE  (rows=0 time_s=0.0)
+               CTE Name: w2
+               Table Index: 4
+               Estimated Cardinality: 0
+            -> HASH_GROUP_BY  (rows=1845 time_s=0.0156)
+                 Groups: #0
+                 Aggregates: sum(#1)
+                 Estimated Cardinality: 4
+              -> PROJECTION  (rows=208374 time_s=0.0)
+                   Projections: ['ca_county', 'ws_ext_sales_price']
+                   Estimated Cardinality: 65708
+                -> HASH_JOIN  (rows=208374 time_s=0.021)
+                     Join Type: INNER
+                     Conditions: ca_address_sk = ws_bill_addr_sk
+                     Estimated Cardinality: 65708
+                  -> TABLE_SCAN  (rows=16757 time_s=0.011)
+                       Table: tpcds.main.customer_address
+                       Type: Sequential Scan
+                       Projections: ['ca_address_sk', 'ca_county']
+                       Estimated Cardinality: 250000
+                       Dynamic Filters: optional: ca_address_sk>=10 AND optional: ca_address_sk<=249990 AND optional: ca_address_sk IN BF(ws_bill_addr_sk)
+                  -> HASH_JOIN  (rows=208401 time_s=0.0079)
+                       Join Type: INNER
+                       Conditions: ws_sold_date_sk = d_date_sk
+                       Estimated Cardinality: 57640
+                    -> TABLE_SCAN  (rows=208401 time_s=0.0439)
+                         Table: tpcds.main.web_sales
+                         Type: Sequential Scan
+                         Projections: ['ws_sold_date_sk', 'ws_bill_addr_sk', 'ws_ext_sales_price']
+                         Estimated Cardinality: 7197566
+                         Dynamic Filters: optional: ws_sold_date_sk>=2451636 AND optional: ws_sold_date_sk<=2451726
+                    -> FILTER  (rows=91 time_s=0.0)
+                         Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                         Estimated Cardinality: 585
+                      -> TABLE_SCAN  (rows=91 time_s=0.0002)
+                           Table: tpcds.main.date_dim
+                           Type: Sequential Scan
+                           Projections: d_date_sk
+                           Filters: ['d_qoy=2', 'd_year=2000']
+                           Estimated Cardinality: 585
+            -> CTE  (rows=0 time_s=0.0001)
+                 CTE Name: w3
+                 Table Index: 5
+                 Estimated Cardinality: 0
+              -> HASH_GROUP_BY  (rows=1847 time_s=0.0215)
+                   Groups: #0
+                   Aggregates: sum(#1)
+                   Estimated Cardinality: 4
+                -> PROJECTION  (rows=384795 time_s=0.0001)
+                     Projections: ['ca_county', 'ws_ext_sales_price']
+                     Estimated Cardinality: 65708
+                  -> HASH_JOIN  (rows=384795 time_s=0.0367)
+                       Join Type: INNER
+                       Conditions: ca_address_sk = ws_bill_addr_sk
+                       Estimated Cardinality: 65708
+                    -> TABLE_SCAN  (rows=249988 time_s=0.0071)
+                         Table: tpcds.main.customer_address
+                         Type: Sequential Scan
+                         Projections: ['ca_address_sk', 'ca_county']
+                         Estimated Cardinality: 250000
+                         Dynamic Filters: optional: ca_address_sk>=5 AND optional: ca_address_sk<=249992
+                    -> HASH_JOIN  (rows=384834 time_s=0.0065)
+                         Join Type: INNER
+                         Conditions: ws_sold_date_sk = d_date_sk
+                         Estimated Cardinality: 57640
+                      -> TABLE_SCAN  (rows=384834 time_s=0.0445)
+                           Table: tpcds.main.web_sales
+                           Type: Sequential Scan
+                           Projections: ['ws_sold_date_sk', 'ws_bill_addr_sk', 'ws_ext_sales_price']
+                           Estimated Cardinality: 7197566
+                           Dynamic Filters: optional: ws_sold_date_sk>=2451727 AND optional: ws_sold_date_sk<=2451818
+                      -> FILTER  (rows=92 time_s=0.0)
+                           Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                           Estimated Cardinality: 585
+                        -> TABLE_SCAN  (rows=92 time_s=0.0001)
+                             Table: tpcds.main.date_dim
+                             Type: Sequential Scan
+                             Projections: d_date_sk
+                             Filters: ['d_qoy=3', 'd_year=2000']
+                             Estimated Cardinality: 585
+              -> ORDER_BY  (rows=307 time_s=0.0003)
+                   Order By: s1.ca_county ASC
+                -> PROJECTION  (rows=307 time_s=0.0003)
+                     Projections: ['ca_county', 'd_year', 'web_q1_q2_increase', 'store_q1_q2_increase', 'web_q2_q3_increase', 'store_q2_q3_increase']
+                     Estimated Cardinality: 0
+                  -> FILTER  (rows=307 time_s=0.0004)
+                       Expression: (CASE  WHEN ((amount > 0.00)) THEN ((CAST((amount * 1.0000) AS DOUBLE) / CAST(amount AS DOUBLE))) ELSE NULL END > CASE  WHEN ((amount > 0.00)) THEN ((CAST((amount * 1.0000) AS DOUBLE) / CAST(amount AS DOUBLE))) ELSE NULL END)
+                       Estimated Cardinality: 0
+                    -> HASH_JOIN  (rows=930 time_s=0.0013)
+                         Join Type: INNER
+                         Conditions: ca_county = ca_county
+                         Estimated Cardinality: 0
+                      -> CTE_SCAN  (rows=1847 time_s=0.0)
+                           CTE Index: 5
+                           Estimated Cardinality: 4
+                      -> FILTER  (rows=930 time_s=0.0004)
+                           Expression: (CASE  WHEN ((amount > 0.00)) THEN ((CAST((amount * 1.0000) AS DOUBLE) / CAST(amount AS DOUBLE))) ELSE NULL END > CASE  WHEN ((amount > 0.00)) THEN ((CAST((amount * 1.0000) AS DOUBLE) / CAST(amount AS DOUBLE))) ELSE NULL END)
+                           Estimated Cardinality: 0
+                        -> HASH_JOIN  (rows=1840 time_s=0.0005)
+                             Join Type: INNER
+                             Conditions: ca_county = ca_county
+                             Estimated Cardinality: 0
+                          -> CTE_SCAN  (rows=1847 time_s=0.0)
+                               CTE Index: 0
+                               Estimated Cardinality: 475
+                          -> HASH_JOIN  (rows=1840 time_s=0.0004)
+                               Join Type: INNER
+                               Conditions: ca_county = ca_county
+                               Estimated Cardinality: 0
+                            -> CTE_SCAN  (rows=1847 time_s=0.0)
+                                 CTE Index: 1
+                                 Estimated Cardinality: 4
+                            -> HASH_JOIN  (rows=1840 time_s=0.0005)
+                                 Join Type: INNER
+                                 Conditions: ca_county = ca_county
+                                 Estimated Cardinality: 0
+                              -> CTE_SCAN  (rows=1847 time_s=0.0)
+                                   CTE Index: 2
+                                   Estimated Cardinality: 4
+                              -> HASH_JOIN  (rows=1840 time_s=0.0004)
+                                   Join Type: INNER
+                                   Conditions: ca_county = ca_county
+                                   Estimated Cardinality: 0
+                                -> CTE_SCAN  (rows=1843 time_s=0.0)
+                                     CTE Index: 3
+                                     Estimated Cardinality: 4
+                                -> CTE_SCAN  (rows=1845 time_s=0.0)
+                                     CTE Index: 4
+                                     Estimated Cardinality: 4

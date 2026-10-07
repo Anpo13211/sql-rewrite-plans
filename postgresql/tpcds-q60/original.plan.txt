@@ -1,0 +1,86 @@
+-- PostgreSQL 18, tpcds-q60, original; execution 2882.24 ms, planning 1.46 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=6433643 read=0)
+  -> Incremental Sort  (rows=100.0 loops=1 est_rows=200 buffers hit=6433643 read=0)
+       Sort Key: ['item.i_item_id', '(sum((sum(store_sales.ss_ext_sales_price))))']
+    -> Aggregate [Sorted]  (rows=101.0 loops=1 est_rows=200 buffers hit=6433643 read=0)
+         Group Key: ['item.i_item_id']
+      -> Merge Append  (rows=248.0 loops=1 est_rows=1648 buffers hit=6433643 read=0)
+           Sort Key: ['item.i_item_id']
+        -> Aggregate [Sorted]  (rows=100.0 loops=1 est_rows=907 buffers hit=3638453 read=0)
+             Group Key: ['item.i_item_id']
+          -> Sort  (rows=437.0 loops=1 est_rows=907 buffers hit=3638453 read=0)
+               Sort Key: ['item.i_item_id']
+            -> Hash Join [Semi]  (rows=39549.0 loops=1 est_rows=907 buffers hit=3638453 read=0)
+                 Hash Cond: ((item.i_item_id)::text = (item_1.i_item_id)::text)
+              -> Gather  (rows=211079.0 loops=1 est_rows=3933 workers=6 buffers hit=3633949 read=0)
+                -> Nested Loop [Inner]  (rows=30154.14 loops=7 est_rows=656 buffers hit=3633949 read=0)
+                  -> Nested Loop [Inner]  (rows=30154.14 loops=7 est_rows=656 buffers hit=3000706 read=0)
+                    -> Hash Join [Inner]  (rows=84909.43 loops=7 est_rows=1882 buffers hit=679696 read=0)
+                         Hash Cond: (store_sales.ss_sold_date_sk = date_dim.d_date_sk)
+                      -> Seq Scan on store_sales  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+                      -> Hash  (rows=4.29 loops=7 est_rows=18 buffers hit=2032 read=0)
+                        -> Seq Scan on date_dim  (rows=30.0 loops=1 est_rows=18 buffers hit=2032 read=0)
+                             Filter: ((d_year = 1998) AND (d_moy = 9))
+                             Rows Removed by Filter: 73019
+                    -> Index Scan on customer_address using scaleup_tpcds_34  (rows=0.36 loops=594366 est_rows=1 buffers hit=2321010 read=0)
+                         Index Cond: (ca_address_sk = store_sales.ss_addr_sk)
+                         Filter: (ca_gmt_offset = '-5'::numeric)
+                         Rows Removed by Filter: 1
+                  -> Index Scan on item using scaleup_tpcds_40  (rows=1.0 loops=211079 est_rows=1 buffers hit=633243 read=0)
+                       Index Cond: (i_item_sk = store_sales.ss_item_sk)
+              -> Hash  (rows=10150.0 loops=1 est_rows=10458 buffers hit=4504 read=0)
+                -> Seq Scan on item item_1  (rows=10150.0 loops=1 est_rows=10458 buffers hit=4504 read=0)
+                     Filter: ((i_category)::text = 'Music'::text)
+                     Rows Removed by Filter: 91850
+        -> Aggregate [Sorted]  (rows=84.0 loops=1 est_rows=493 buffers hit=1856804 read=0)
+             Group Key: ['item_2.i_item_id']
+          -> Sort  (rows=201.0 loops=1 est_rows=493 buffers hit=1856804 read=0)
+               Sort Key: ['item_2.i_item_id']
+            -> Hash Join [Semi]  (rows=21121.0 loops=1 est_rows=493 buffers hit=1856804 read=0)
+                 Hash Cond: ((item_2.i_item_id)::text = (item_3.i_item_id)::text)
+              -> Gather  (rows=112282.0 loops=1 est_rows=2136 workers=1 buffers hit=1852300 read=0)
+                -> Nested Loop [Inner]  (rows=56141.0 loops=2 est_rows=1256 buffers hit=1852300 read=0)
+                  -> Nested Loop [Inner]  (rows=56141.0 loops=2 est_rows=1256 buffers hit=1515454 read=0)
+                    -> Nested Loop [Inner]  (rows=154403.0 loops=2 est_rows=3462 buffers hit=283274 read=0)
+                      -> Seq Scan on date_dim date_dim_1  (rows=15.0 loops=2 est_rows=18 buffers hit=2032 read=0)
+                           Filter: ((d_year = 1998) AND (d_moy = 9))
+                           Rows Removed by Filter: 36510
+                      -> Bitmap Heap Scan on catalog_sales  (rows=10293.53 loops=30 est_rows=7810 buffers hit=281242 read=0)
+                        -> Bitmap Index Scan using scaleup_tpcds_17  (rows=10293.53 loops=30 est_rows=7810 buffers hit=351 read=0)
+                             Index Cond: (cs_sold_date_sk = date_dim_1.d_date_sk)
+                    -> Index Scan on customer_address customer_address_1 using scaleup_tpcds_34  (rows=0.36 loops=308806 est_rows=1 buffers hit=1232180 read=0)
+                         Index Cond: (ca_address_sk = catalog_sales.cs_bill_addr_sk)
+                         Filter: (ca_gmt_offset = '-5'::numeric)
+                         Rows Removed by Filter: 1
+                  -> Index Scan on item item_2 using scaleup_tpcds_40  (rows=1.0 loops=112282 est_rows=1 buffers hit=336846 read=0)
+                       Index Cond: (i_item_sk = catalog_sales.cs_item_sk)
+              -> Hash  (rows=10150.0 loops=1 est_rows=10458 buffers hit=4504 read=0)
+                -> Seq Scan on item item_3  (rows=10150.0 loops=1 est_rows=10458 buffers hit=4504 read=0)
+                     Filter: ((i_category)::text = 'Music'::text)
+                     Rows Removed by Filter: 91850
+        -> Aggregate [Sorted]  (rows=66.0 loops=1 est_rows=248 buffers hit=938386 read=0)
+             Group Key: ['item_4.i_item_id']
+          -> Sort  (rows=118.0 loops=1 est_rows=248 buffers hit=938386 read=0)
+               Sort Key: ['item_4.i_item_id']
+            -> Hash Join [Semi]  (rows=10573.0 loops=1 est_rows=248 buffers hit=938386 read=0)
+                 Hash Cond: ((item_4.i_item_id)::text = (item_5.i_item_id)::text)
+              -> Gather  (rows=56400.0 loops=1 est_rows=1077 workers=1 buffers hit=933882 read=0)
+                -> Nested Loop [Inner]  (rows=28200.0 loops=2 est_rows=634 buffers hit=933882 read=0)
+                  -> Nested Loop [Inner]  (rows=28200.0 loops=2 est_rows=634 buffers hit=764682 read=0)
+                    -> Nested Loop [Inner]  (rows=76485.0 loops=2 est_rows=1738 buffers hit=152862 read=0)
+                      -> Seq Scan on date_dim date_dim_2  (rows=15.0 loops=2 est_rows=18 buffers hit=2032 read=0)
+                           Filter: ((d_year = 1998) AND (d_moy = 9))
+                           Rows Removed by Filter: 36510
+                      -> Bitmap Heap Scan on web_sales  (rows=5099.0 loops=30 est_rows=3947 buffers hit=150830 read=0)
+                        -> Bitmap Index Scan using scaleup_tpcds_76  (rows=5099.0 loops=30 est_rows=3947 buffers hit=218 read=0)
+                             Index Cond: (ws_sold_date_sk = date_dim_2.d_date_sk)
+                    -> Index Scan on customer_address customer_address_2 using scaleup_tpcds_34  (rows=0.37 loops=152970 est_rows=1 buffers hit=611820 read=0)
+                         Index Cond: (ca_address_sk = web_sales.ws_bill_addr_sk)
+                         Filter: (ca_gmt_offset = '-5'::numeric)
+                         Rows Removed by Filter: 1
+                  -> Index Scan on item item_4 using scaleup_tpcds_40  (rows=1.0 loops=56400 est_rows=1 buffers hit=169200 read=0)
+                       Index Cond: (i_item_sk = web_sales.ws_item_sk)
+              -> Hash  (rows=10150.0 loops=1 est_rows=10458 buffers hit=4504 read=0)
+                -> Seq Scan on item item_5  (rows=10150.0 loops=1 est_rows=10458 buffers hit=4504 read=0)
+                     Filter: ((i_category)::text = 'Music'::text)
+                     Rows Removed by Filter: 91850

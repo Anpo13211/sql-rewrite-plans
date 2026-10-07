@@ -1,0 +1,21 @@
+-- PostgreSQL 18, tpch-q16, rewrite; execution 806.688 ms, planning 0.394 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Sort  (rows=27840.0 loops=1 est_rows=116116 buffers hit=934292 read=0)
+     Sort Key: ['(count(*)) DESC', 'p.p_brand', 'p.p_type', 'p.p_size']
+  -> Seq Scan on supplier s <CTE excluded_supplier>  (rows=56.0 loops=1 est_rows=10 buffers hit=2200 read=0)
+       Filter: ((s_comment)::text ~~ '%Customer%Complaints%'::text)
+       Rows Removed by Filter: 99944
+  -> Aggregate [Hashed]  (rows=27840.0 loops=1 est_rows=116116 buffers hit=934292 read=0)
+       Group Key: ['p.p_brand', 'p.p_type', 'p.p_size']
+    -> Aggregate [Hashed]  (rows=1186339.0 loops=1 est_rows=1161160 buffers hit=934292 read=0)
+         Group Key: ['p.p_brand', 'p.p_type', 'p.p_size', 'ps.ps_suppkey']
+      -> Hash Join [Anti]  (rows=1186602.0 loops=1 est_rows=1161160 buffers hit=934292 read=0)
+           Hash Cond: (ps.ps_suppkey = es.s_suppkey)
+        -> Gather  (rows=1187296.0 loops=1 est_rows=1161279 workers=4 buffers hit=932092 read=0)
+          -> Nested Loop [Inner]  (rows=237459.2 loops=5 est_rows=290320 buffers hit=932092 read=0)
+            -> Seq Scan on part p  (rows=59364.8 loops=5 est_rows=72572 buffers hit=38232 read=0)
+                 Filter: (((p_brand)::text <> 'Brand#45'::text) AND ((p_type)::text !~~ 'MEDIUM POLISHED%'::text) AND (p_size = ANY ('{49,14,23,45,19,3,36,9}'::integer[])))
+                 Rows Removed by Filter: 340635
+            -> Index Only Scan on partsupp ps using scaleup_tpch_05  (rows=4.0 loops=296824 est_rows=18 buffers hit=893860 read=0)
+                 Index Cond: (ps_partkey = p.p_partkey)
+        -> Hash  (rows=56.0 loops=1 est_rows=10 buffers hit=2200 read=0)
+          -> CTE Scan (CTE excluded_supplier)  (rows=56.0 loops=1 est_rows=10 buffers hit=2200 read=0)

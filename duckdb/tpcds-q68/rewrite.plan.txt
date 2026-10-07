@@ -1,0 +1,106 @@
+-- DuckDB 1.5.5, tpcds-q68, rewrite; latency 0.10000217 s, cpu 0.6525393559999998 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0005)
+       Top: 100
+       Order By: ['c.c_last_name ASC', 'r.ss_ticket_number ASC']
+    -> PROJECTION  (rows=6287 time_s=0.0)
+         Projections: ['c_last_name', 'c_first_name', 'ca_city', 'bought_city', 'ss_ticket_number', 'extended_price', 'extended_tax', 'list_price']
+         Estimated Cardinality: 107833
+      -> HASH_JOIN  (rows=6287 time_s=0.0154)
+           Join Type: INNER
+           Conditions: ['ss_addr_sk = ca_address_sk', 'ca_city != ca_city']
+           Estimated Cardinality: 107833
+        -> HASH_JOIN  (rows=6984 time_s=0.0097)
+             Join Type: INNER
+             Conditions: c_current_addr_sk = ca_address_sk
+             Estimated Cardinality: 189185
+          -> HASH_JOIN  (rows=6984 time_s=0.0031)
+               Join Type: INNER
+               Conditions: c_customer_sk = ss_customer_sk
+               Estimated Cardinality: 230355
+            -> TABLE_SCAN  (rows=8234 time_s=0.0121)
+                 Table: tpcds.main.customer
+                 Type: Sequential Scan
+                 Projections: ['c_customer_sk', 'c_current_addr_sk', 'c_last_name', 'c_first_name']
+                 Filters: optional: c_last_name IS NULL OR Dynamic Filter (c_last_name)
+                 Estimated Cardinality: 500000
+                 Dynamic Filters: ['optional: c_customer_sk>=282 AND optional: c_customer_sk<=499982 AND optional: c_customer_sk IN BF(ss_customer_sk)', 'optional: c_current_addr_sk>=1 AND optional: c_current_addr_sk<=250000']
+            -> PROJECTION  (rows=7417 time_s=0.0001)
+                 Projections: ['__internal_decompress_integral_bigint(#0, 1)', '__internal_decompress_integral_bigint(#1, 1)', '__internal_decompress_integral_bigint(#2, 1)', '#3', '#4', '#5']
+                 Estimated Cardinality: 230355
+              -> HASH_GROUP_BY  (rows=7417 time_s=0.0097)
+                   Groups: ['#0', '#1', '#2']
+                   Aggregates: ['sum(#3)', 'sum(#4)', 'sum(#5)']
+                   Estimated Cardinality: 230355
+                -> PROJECTION  (rows=74420 time_s=0.0002)
+                     Projections: ['ss_ticket_number', 'ss_customer_sk', 'ss_addr_sk', 'ss_ext_sales_price', 'ss_ext_tax', 'ss_ext_list_price']
+                     Estimated Cardinality: 230395
+                  -> PROJECTION  (rows=74420 time_s=0.0013)
+                       Projections: ['__internal_compress_integral_uinteger(#0, 1)', '__internal_compress_integral_uinteger(#1, 1)', '__internal_compress_integral_uinteger(#2, 1)', '#3', '#4', '#5']
+                       Estimated Cardinality: 230395
+                    -> PROJECTION  (rows=74420 time_s=0.0002)
+                         Projections: ['ss_ticket_number', 'ss_customer_sk', 'ss_addr_sk', 'ss_ext_sales_price', 'ss_ext_tax', 'ss_ext_list_price']
+                         Estimated Cardinality: 230395
+                      -> HASH_JOIN  (rows=74420 time_s=0.0031)
+                           Join Type: INNER
+                           Conditions: ss_hdemo_sk = hd_demo_sk
+                           Estimated Cardinality: 230395
+                        -> HASH_JOIN  (rows=307609 time_s=0.056)
+                             Join Type: INNER
+                             Conditions: ss_store_sk = s_store_sk
+                             Estimated Cardinality: 1151976
+                          -> HASH_JOIN  (rows=1082276 time_s=0.1087)
+                               Join Type: INNER
+                               Conditions: ss_sold_date_sk = d_date_sk
+                               Estimated Cardinality: 5759882
+                            -> TABLE_SCAN  (rows=20914929 time_s=0.4253)
+                                 Table: tpcds.main.store_sales
+                                 Type: Sequential Scan
+                                 Projections: ['ss_sold_date_sk', 'ss_store_sk', 'ss_hdemo_sk', 'ss_ticket_number', 'ss_customer_sk', 'ss_addr_sk', 'ss_ext_sales_price', 'ss_ext_tax', 'ss_ext_list_price']
+                                 Estimated Cardinality: 28800991
+                                 Dynamic Filters: ['optional: ss_sold_date_sk>=2451180 AND optional: ss_sold_date_sk<=2452246', 'optional: ss_store_sk IN (2, 3, 9, 15, 21, 28, 32, 33, 35, 36, 38, 39, 41, 43, 44, 46, 49, 52, 58, 73, 74, 78, 80, 81, 86, 90, 91, 96) AND optional: ss_store_sk>=2 AND optional: ss_store_sk<=96', 'optional: ss_hdemo_sk>=480 AND optional: ss_hdemo_sk<=6599']
+                            -> FILTER  (rows=72 time_s=0.0)
+                                 Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                                 Estimated Cardinality: 14609
+                              -> TABLE_SCAN  (rows=72 time_s=0.0002)
+                                   Table: tpcds.main.date_dim
+                                   Type: Sequential Scan
+                                   Projections: d_date_sk
+                                   Filters: ['d_dom>=1 AND d_dom<=2', 'd_year>=1999 AND d_year<=2001']
+                                   Estimated Cardinality: 14609
+                          -> FILTER  (rows=28 time_s=0.0)
+                               Expression: (s_store_sk <= 100)
+                               Estimated Cardinality: 20
+                            -> PROJECTION  (rows=29 time_s=0.0)
+                                 Projections: #0
+                                 Estimated Cardinality: 20
+                              -> FILTER  (rows=29 time_s=0.0)
+                                   Expression: ((s_city = 'Fairview') OR (s_city = 'Midway'))
+                                   Estimated Cardinality: 20
+                                -> TABLE_SCAN  (rows=102 time_s=0.0)
+                                     Table: tpcds.main.store
+                                     Type: Sequential Scan
+                                     Projections: ['s_store_sk', 's_city']
+                                     Filters: optional: s_city IN ('Fairview', 'Midway')
+                                     Estimated Cardinality: 102
+                        -> PROJECTION  (rows=1800 time_s=0.0)
+                             Projections: #0
+                             Estimated Cardinality: 1440
+                          -> FILTER  (rows=1800 time_s=0.0)
+                               Expression: ((hd_dep_count = 4) OR (hd_vehicle_count = 3))
+                               Estimated Cardinality: 1440
+                            -> TABLE_SCAN  (rows=7200 time_s=0.0)
+                                 Table: tpcds.main.household_demographics
+                                 Type: Sequential Scan
+                                 Projections: ['hd_demo_sk', 'hd_dep_count', 'hd_vehicle_count']
+                                 Estimated Cardinality: 7200
+          -> TABLE_SCAN  (rows=250000 time_s=0.0037)
+               Table: tpcds.main.customer_address
+               Type: Sequential Scan
+               Projections: ['ca_address_sk', 'ca_city']
+               Estimated Cardinality: 250000
+        -> TABLE_SCAN  (rows=250000 time_s=0.0033)
+             Table: tpcds.main.customer_address
+             Type: Sequential Scan
+             Projections: ['ca_address_sk', 'ca_city']
+             Estimated Cardinality: 250000

@@ -1,0 +1,40 @@
+-- DuckDB 1.5.5, tpcds-q22, original; latency 1.833155843 s, cpu 14.274038762999995 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0111)
+       Top: 100
+       Order By: ['avg(tpcds.main.inventory.inv_quantity_on_hand) ASC', 'tpcds.main.item.i_product_name ASC', 'tpcds.main.item.i_brand ASC', 'tpcds.main.item.i_class ASC', 'tpcds.main.item.i_category ASC']
+    -> HASH_GROUP_BY  (rows=203751 time_s=13.9647)
+         Groups: ['#0', '#1', '#2', '#3']
+         Aggregates: avg(#4)
+         Estimated Cardinality: 28276667
+      -> PROJECTION  (rows=26520000 time_s=0.0069)
+           Projections: ['i_product_name', 'i_brand', 'i_class', 'i_category', 'inv_quantity_on_hand']
+           Estimated Cardinality: 28276667
+        -> HASH_JOIN  (rows=26520000 time_s=0.0875)
+             Join Type: INNER
+             Conditions: inv_item_sk = i_item_sk
+             Estimated Cardinality: 28276667
+          -> HASH_JOIN  (rows=26520000 time_s=0.0869)
+               Join Type: INNER
+               Conditions: inv_date_sk = d_date_sk
+               Estimated Cardinality: 26620542
+            -> TABLE_SCAN  (rows=26520000 time_s=0.1123)
+                 Table: tpcds.main.inventory
+                 Type: Sequential Scan
+                 Projections: ['inv_date_sk', 'inv_item_sk', 'inv_quantity_on_hand']
+                 Estimated Cardinality: 133110000
+                 Dynamic Filters: ['optional: inv_date_sk>=2451545 AND optional: inv_date_sk<=2451910', 'optional: inv_item_sk>=1 AND optional: inv_item_sk<=102000']
+            -> FILTER  (rows=366 time_s=0.0)
+                 Expression: (d_date_sk BETWEEN 2450815 AND 2452635)
+                 Estimated Cardinality: 14609
+              -> TABLE_SCAN  (rows=366 time_s=0.0003)
+                   Table: tpcds.main.date_dim
+                   Type: Sequential Scan
+                   Projections: d_date_sk
+                   Filters: d_month_seq>=1200 AND d_month_seq<=1211
+                   Estimated Cardinality: 14609
+          -> TABLE_SCAN  (rows=102000 time_s=0.0043)
+               Table: tpcds.main.item
+               Type: Sequential Scan
+               Projections: ['i_item_sk', 'i_product_name', 'i_brand', 'i_class', 'i_category']
+               Estimated Cardinality: 102000

@@ -1,0 +1,41 @@
+-- PostgreSQL 18, tpcds-q39, original; execution 24462.966 ms, planning 0.925 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Incremental Sort  (rows=2433.0 loops=1 est_rows=30 buffers hit=979667 read=0)
+     Sort Key: ['inv1.w_warehouse_sk NULLS FIRST', 'inv1.i_item_sk NULLS FIRST', 'inv1.mean NULLS FIRST', 'inv1.cov NULLS FIRST', 'inv2.mean NULLS FIRST', 'inv2.cov NULLS FIRST']
+  -> Subquery Scan <CTE inv>  (rows=381575.0 loops=1 est_rows=220478 buffers hit=979667 read=0)
+    -> Aggregate [Sorted] [Finalize]  (rows=381575.0 loops=1 est_rows=220478 buffers hit=979667 read=0)
+         Filter: (CASE avg(inventory.inv_quantity_on_hand) WHEN '0'::numeric THEN '0'::numeric ELSE ((stddev_samp(inventory.inv_quantity_on_hand) * 1.000) / avg(inventory.inv_quantity_on_hand)) END > '1'::numeric)
+         Group Key: ['item.i_item_sk', 'warehouse.w_warehouse_name', 'warehouse.w_warehouse_sk', 'date_dim.d_moy']
+         Rows Removed by Filter: 5738425
+      -> Gather Merge  (rows=19526273.0 loops=1 est_rows=661437 workers=7 buffers hit=979667 read=0)
+        -> Aggregate [Sorted] [Partial]  (rows=2440784.12 loops=8 est_rows=94491 buffers hit=979667 read=0)
+             Group Key: ['item.i_item_sk', 'warehouse.w_warehouse_name', 'warehouse.w_warehouse_sk', 'date_dim.d_moy']
+          -> Incremental Sort  (rows=3315000.0 loops=8 est_rows=94491 buffers hit=979667 read=0)
+               Sort Key: ['item.i_item_sk', 'warehouse.w_warehouse_name', 'warehouse.w_warehouse_sk', 'date_dim.d_moy']
+            -> Nested Loop [Inner]  (rows=3315000.0 loops=8 est_rows=94491 buffers hit=979366 read=0)
+              -> Merge Join [Inner]  (rows=3315000.0 loops=8 est_rows=94491 buffers hit=979199 read=0)
+                   Merge Cond: (inventory.inv_item_sk = item.i_item_sk)
+                -> Sort  (rows=3315000.0 loops=8 est_rows=94491 buffers hit=976944 read=0)
+                     Sort Key: ['inventory.inv_item_sk']
+                  -> Hash Join [Inner]  (rows=3315000.0 loops=8 est_rows=94491 buffers hit=976944 read=0)
+                       Hash Cond: (inventory.inv_date_sk = date_dim.d_date_sk)
+                    -> Seq Scan on inventory  (rows=16638750.0 loops=8 est_rows=19015014 buffers hit=974912 read=0)
+                    -> Hash  (rows=45.62 loops=8 est_rows=214 buffers hit=2032 read=0)
+                      -> Seq Scan on date_dim  (rows=45.62 loops=8 est_rows=214 buffers hit=2032 read=0)
+                           Filter: (d_year = 2001)
+                           Rows Removed by Filter: 9086
+                -> Index Only Scan on item using scaleup_tpcds_40  (rows=101999.0 loops=8 est_rows=102000 buffers hit=2255 read=0)
+              -> Memoize  (rows=1.0 loops=26520000 est_rows=1 buffers hit=167 read=0)
+                -> Index Scan on warehouse using scaleup_tpcds_62  (rows=1.0 loops=80 est_rows=1 buffers hit=167 read=0)
+                     Index Cond: (w_warehouse_sk = inventory.inv_warehouse_sk)
+  -> Merge Join [Inner]  (rows=2433.0 loops=1 est_rows=30 buffers hit=99181 read=0)
+       Merge Cond: ((inv1.w_warehouse_sk = inv2.w_warehouse_sk) AND (inv1.i_item_sk = inv2.i_item_sk))
+    -> Sort  (rows=35851.0 loops=1 est_rows=1102 buffers hit=99181 read=0)
+         Sort Key: ['inv1.w_warehouse_sk NULLS FIRST', 'inv1.i_item_sk NULLS FIRST']
+      -> CTE Scan (CTE inv)  (rows=35854.0 loops=1 est_rows=1102 buffers hit=99181 read=0)
+           Filter: (d_moy = 1)
+           Rows Removed by Filter: 345721
+    -> Sort  (rows=35463.0 loops=1 est_rows=1102 buffers hit=0 read=0)
+         Sort Key: ['inv2.w_warehouse_sk NULLS FIRST', 'inv2.i_item_sk NULLS FIRST']
+      -> CTE Scan (CTE inv)  (rows=35463.0 loops=1 est_rows=1102 buffers hit=0 read=0)
+           Filter: (d_moy = 2)
+           Rows Removed by Filter: 346112

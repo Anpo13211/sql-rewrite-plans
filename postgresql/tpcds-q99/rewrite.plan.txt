@@ -1,0 +1,32 @@
+-- PostgreSQL 18, tpcds-q99, rewrite; execution 1007.561 ms, planning 0.359 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=3 buffers hit=513812 read=0)
+  -> Gather <CTE filtered_sales>  (rows=2865004.0 loops=1 est_rows=72750 workers=6 buffers hit=513808 read=0)
+    -> Hash Join [Inner]  (rows=409286.29 loops=7 est_rows=12125 buffers hit=513808 read=0)
+         Hash Cond: (cs.cs_ship_date_sk = d.d_date_sk)
+      -> Seq Scan on catalog_sales cs  (rows=2057323.0 loops=7 est_rows=2400266 buffers hit=511776 read=0)
+      -> Hash  (rows=52.29 loops=7 est_rows=218 buffers hit=2032 read=0)
+        -> Seq Scan on date_dim d  (rows=366.0 loops=1 est_rows=218 buffers hit=2032 read=0)
+             Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+             Rows Removed by Filter: 72683
+  -> Aggregate [Hashed] <CTE fact>  (rows=3916.0 loops=1 est_rows=4800 buffers hit=513808 read=0)
+       Group Key: ['filtered_sales.cs_warehouse_sk', 'filtered_sales.cs_ship_mode_sk', 'filtered_sales.cs_call_center_sk']
+    -> CTE Scan (CTE filtered_sales)  (rows=2865004.0 loops=1 est_rows=72750 buffers hit=513808 read=0)
+  -> Incremental Sort  (rows=100.0 loops=1 est_rows=3 buffers hit=513812 read=0)
+       Sort Key: ['(SUBSTRING(w.w_warehouse_name FROM 1 FOR 20)) NULLS FIRST', 'sm.sm_type NULLS FIRST', '(lower((cc.cc_name)::text)) NULLS FIRST']
+    -> Aggregate [Sorted]  (rows=109.0 loops=1 est_rows=3 buffers hit=513812 read=0)
+         Group Key: ['(SUBSTRING(w.w_warehouse_name FROM 1 FOR 20))', 'sm.sm_type', 'cc.cc_name']
+      -> Sort  (rows=500.0 loops=1 est_rows=3 buffers hit=513812 read=0)
+           Sort Key: ['(SUBSTRING(w.w_warehouse_name FROM 1 FOR 20)) NULLS FIRST', 'sm.sm_type NULLS FIRST', 'cc.cc_name']
+        -> Hash Join [Inner]  (rows=3200.0 loops=1 est_rows=3 buffers hit=513812 read=0)
+             Hash Cond: (f.cs_call_center_sk = cc.cc_call_center_sk)
+          -> Hash Join [Inner]  (rows=3400.0 loops=1 est_rows=24 buffers hit=513810 read=0)
+               Hash Cond: (f.cs_ship_mode_sk = sm.sm_ship_mode_sk)
+            -> Hash Join [Inner]  (rows=3569.0 loops=1 est_rows=240 buffers hit=513809 read=0)
+                 Hash Cond: (f.cs_warehouse_sk = w.w_warehouse_sk)
+              -> CTE Scan (CTE fact)  (rows=3916.0 loops=1 est_rows=4800 buffers hit=513808 read=0)
+              -> Hash  (rows=10.0 loops=1 est_rows=10 buffers hit=1 read=0)
+                -> Seq Scan on warehouse w  (rows=10.0 loops=1 est_rows=10 buffers hit=1 read=0)
+            -> Hash  (rows=20.0 loops=1 est_rows=20 buffers hit=1 read=0)
+              -> Seq Scan on ship_mode sm  (rows=20.0 loops=1 est_rows=20 buffers hit=1 read=0)
+          -> Hash  (rows=24.0 loops=1 est_rows=24 buffers hit=2 read=0)
+            -> Seq Scan on call_center cc  (rows=24.0 loops=1 est_rows=24 buffers hit=2 read=0)

@@ -1,0 +1,14 @@
+-- PostgreSQL 18, tpch-q12, rewrite; execution 1274.538 ms, planning 0.457 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Aggregate [Sorted] [Finalize]  (rows=2.0 loops=1 est_rows=7 buffers hit=2348592 read=0)
+     Group Key: ['lineitem.l_shipmode']
+  -> Gather Merge  (rows=16.0 loops=1 est_rows=49 workers=7 buffers hit=2348592 read=0)
+    -> Aggregate [Sorted] [Partial]  (rows=2.0 loops=8 est_rows=7 buffers hit=2348592 read=0)
+         Group Key: ['lineitem.l_shipmode']
+      -> Sort  (rows=38850.38 loops=8 est_rows=41870 buffers hit=2348592 read=0)
+           Sort Key: ['lineitem.l_shipmode']
+        -> Nested Loop [Inner]  (rows=38850.38 loops=8 est_rows=41870 buffers hit=2348536 read=0)
+          -> Seq Scan on lineitem  (rows=38850.38 loops=8 est_rows=41870 buffers hit=1105317 read=0)
+               Filter: ((l_receiptdate >= '1994-01-01'::date) AND (l_receiptdate < '1995-01-01'::date) AND ((l_shipmode)::text = ANY ('{MAIL,SHIP}'::text[])) AND (l_commitdate < l_receiptdate) AND (l_shipdate < l_commitdate))
+               Rows Removed by Filter: 7459406
+          -> Index Scan on orders o using scaleup_tpch_06  (rows=1.0 loops=310803 est_rows=1 buffers hit=1243219 read=0)
+               Index Cond: (o_orderkey = lineitem.l_orderkey)

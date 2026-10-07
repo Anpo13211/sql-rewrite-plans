@@ -1,0 +1,106 @@
+-- DuckDB 1.5.5, tpcds-q86, rewrite; latency 0.05880993 s, cpu 0.331038127 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0)
+       CTE Name: base
+       Table Index: 1
+       Estimated Cardinality: 100
+    -> PROJECTION  (rows=156 time_s=0.0)
+         Projections: ['__internal_decompress_string(#0)', '__internal_decompress_string(#1)', '#2']
+         Estimated Cardinality: 138077
+      -> HASH_GROUP_BY  (rows=156 time_s=0.0017)
+           Groups: ['#0', '#1']
+           Aggregates: sum(#2)
+           Estimated Cardinality: 138077
+        -> PROJECTION  (rows=53338 time_s=0.0)
+             Projections: ['i_category', 'i_class', 'item_total']
+             Estimated Cardinality: 138148
+          -> PROJECTION  (rows=53338 time_s=0.0008)
+               Projections: ['__internal_compress_string_uhugeint(#0)', '__internal_compress_string_uhugeint(#1)', '#2']
+               Estimated Cardinality: 138148
+            -> HASH_JOIN  (rows=53338 time_s=0.0022)
+                 Join Type: INNER
+                 Conditions: i_item_sk = ws_item_sk
+                 Estimated Cardinality: 138148
+              -> TABLE_SCAN  (rows=102000 time_s=0.0012)
+                   Table: tpcds.main.item
+                   Type: Sequential Scan
+                   Projections: ['i_item_sk', 'i_category', 'i_class']
+                   Estimated Cardinality: 102000
+                   Dynamic Filters: optional: i_item_sk>=1 AND optional: i_item_sk<=101999
+              -> PROJECTION  (rows=53338 time_s=0.0001)
+                   Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1']
+                   Estimated Cardinality: 96467
+                -> HASH_GROUP_BY  (rows=53338 time_s=0.2136)
+                     Groups: #0
+                     Aggregates: sum(#1)
+                     Estimated Cardinality: 96467
+                  -> PROJECTION  (rows=1446551 time_s=0.0009)
+                       Projections: ['ws_item_sk', 'ws_net_paid']
+                       Estimated Cardinality: 1439434
+                    -> PROJECTION  (rows=1446551 time_s=0.0066)
+                         Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1', '__internal_compress_integral_usmallint(#2, 2450816)']
+                         Estimated Cardinality: 1439434
+                      -> HASH_JOIN  (rows=1446551 time_s=0.0175)
+                           Join Type: INNER
+                           Conditions: ws_sold_date_sk = d_date_sk
+                           Estimated Cardinality: 1439434
+                        -> TABLE_SCAN  (rows=1446551 time_s=0.0769)
+                             Table: tpcds.main.web_sales
+                             Type: Sequential Scan
+                             Projections: ['ws_sold_date_sk', 'ws_item_sk', 'ws_net_paid']
+                             Estimated Cardinality: 7197566
+                             Dynamic Filters: optional: ws_sold_date_sk>=2451545 AND optional: ws_sold_date_sk<=2451910
+                        -> FILTER  (rows=366 time_s=0.0)
+                             Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                             Estimated Cardinality: 14609
+                          -> TABLE_SCAN  (rows=366 time_s=0.0006)
+                               Table: tpcds.main.date_dim
+                               Type: Sequential Scan
+                               Projections: d_date_sk
+                               Filters: d_month_seq>=1200 AND d_month_seq<=1211
+                               Estimated Cardinality: 14609
+    -> PROJECTION  (rows=100 time_s=0.0)
+         Projections: ['#0', '#1', '#2', '#3', '#4']
+         Estimated Cardinality: 100
+      -> TOP_N  (rows=100 time_s=0.0002)
+           Top: 100
+           Order By: ['ranked.lochierarchy DESC', '#5 ASC', 'ranked.rank_within_parent ASC']
+        -> PROJECTION  (rows=168 time_s=0.0)
+             Projections: ['total_sum', 'i_category', 'i_class', 'lochierarchy', 'rank_within_parent', 'CASE  WHEN ((lochierarchy = 0)) THEN (i_category) ELSE NULL END']
+             Estimated Cardinality: 140068
+          -> PROJECTION  (rows=168 time_s=0.0)
+               Projections: ['#0', '#1', '#2', '#3', '#4']
+               Estimated Cardinality: 140068
+            -> WINDOW  (rows=168 time_s=0.0082)
+                 Projections: RANK() OVER (PARTITION BY lochierarchy, CASE  WHEN ((lochierarchy = 0)) THEN (i_category) ELSE NULL END ORDER BY total_sum DESC NULLS LAST)
+              -> UNION  (rows=168 time_s=0)
+                -> PROJECTION  (rows=156 time_s=0.0)
+                     Projections: ['total_sum', 'i_category', 'i_class', 'lochierarchy']
+                     Estimated Cardinality: 138077
+                  -> CTE_SCAN  (rows=156 time_s=0.0)
+                       CTE Index: 1
+                       Estimated Cardinality: 138077
+                -> PROJECTION  (rows=11 time_s=0.0)
+                     Projections: ['sum(total_sum)', 'i_category', 'NULL', '1']
+                     Estimated Cardinality: 1990
+                  -> HASH_GROUP_BY  (rows=11 time_s=0.0004)
+                       Groups: #0
+                       Aggregates: sum(#1)
+                       Estimated Cardinality: 1990
+                    -> PROJECTION  (rows=156 time_s=0.0)
+                         Projections: ['i_category', 'total_sum']
+                         Estimated Cardinality: 138077
+                      -> CTE_SCAN  (rows=156 time_s=0.0)
+                           CTE Index: 1
+                           Estimated Cardinality: 138077
+                -> PROJECTION  (rows=1 time_s=0.0)
+                     Projections: ['sum(total_sum)', 'NULL', 'NULL', '2']
+                     Estimated Cardinality: 1
+                  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                       Aggregates: sum(#0)
+                    -> PROJECTION  (rows=156 time_s=0.0)
+                         Projections: total_sum
+                         Estimated Cardinality: 138077
+                      -> CTE_SCAN  (rows=156 time_s=0.0)
+                           CTE Index: 1
+                           Estimated Cardinality: 138077

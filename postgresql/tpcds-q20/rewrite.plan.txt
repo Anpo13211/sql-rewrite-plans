@@ -1,0 +1,25 @@
+-- PostgreSQL 18, tpcds-q20, rewrite; execution 294.659 ms, planning 0.37 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=137269 read=0)
+  -> Gather <CTE filtered_sales>  (rows=136158.0 loops=1 est_rows=6082 workers=1 buffers hit=132765 read=0)
+    -> Nested Loop [Inner]  (rows=68079.0 loops=2 est_rows=3578 buffers hit=132765 read=0)
+      -> Seq Scan on date_dim d  (rows=15.5 loops=2 est_rows=18 buffers hit=2032 read=0)
+           Filter: ((d_date >= '1999-02-22'::date) AND (d_date <= '1999-03-24'::date))
+           Rows Removed by Filter: 36509
+      -> Bitmap Heap Scan on catalog_sales cs  (rows=4392.19 loops=31 est_rows=7810 buffers hit=130733 read=0)
+        -> Bitmap Index Scan using scaleup_tpcds_17  (rows=4392.19 loops=31 est_rows=7810 buffers hit=205 read=0)
+             Index Cond: (cs_sold_date_sk = d.d_date_sk)
+  -> Sort  (rows=100.0 loops=1 est_rows=1793 buffers hit=137269 read=0)
+       Sort Key: ['grouped.i_category NULLS FIRST', 'grouped.i_class NULLS FIRST', 'grouped.i_item_id NULLS FIRST', 'grouped.i_item_desc NULLS FIRST', '(((grouped.itemrevenue * 100.0000) / sum(grouped.itemrevenue) OVER w1)) NULLS FIRST']
+    -> WindowAgg  (rows=14107.0 loops=1 est_rows=1793 buffers hit=137269 read=0)
+      -> Sort  (rows=14107.0 loops=1 est_rows=1793 buffers hit=137269 read=0)
+           Sort Key: ['grouped.i_class']
+        -> Subquery Scan  (rows=14107.0 loops=1 est_rows=1793 buffers hit=137269 read=0)
+          -> Aggregate [Hashed]  (rows=14107.0 loops=1 est_rows=1793 buffers hit=137269 read=0)
+               Group Key: ['i.i_item_id', 'i.i_item_desc', 'i.i_category', 'i.i_class', 'i.i_current_price']
+            -> Hash Join [Inner]  (rows=40709.0 loops=1 est_rows=1793 buffers hit=137269 read=0)
+                 Hash Cond: (fs.cs_item_sk = i.i_item_sk)
+              -> CTE Scan (CTE filtered_sales)  (rows=136158.0 loops=1 est_rows=6082 buffers hit=132765 read=0)
+              -> Hash  (rows=30436.0 loops=1 est_rows=30076 buffers hit=4504 read=0)
+                -> Seq Scan on item i  (rows=30436.0 loops=1 est_rows=30076 buffers hit=4504 read=0)
+                     Filter: ((i_category)::text = ANY ('{Sports,Books,Home}'::text[]))
+                     Rows Removed by Filter: 71564

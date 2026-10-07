@@ -1,0 +1,11 @@
+-- PostgreSQL 18, tpch-q14, original; execution 1639.191 ms, planning 0.236 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Aggregate [Finalize]  (rows=1.0 loops=1 est_rows=1 buffers hit=1143528 read=0)
+  -> Gather  (rows=5.0 loops=1 est_rows=4 workers=4 buffers hit=1143528 read=0)
+    -> Aggregate [Partial]  (rows=1.0 loops=5 est_rows=1 buffers hit=1143528 read=0)
+      -> Hash Join [Inner]  (rows=149844.6 loops=5 est_rows=186893 buffers hit=1143528 read=0)
+           Hash Cond: (part.p_partkey = lineitem.l_partkey)
+        -> Seq Scan on part  (rows=400000.0 loops=5 est_rows=499961 buffers hit=38232 read=0)
+        -> Hash  (rows=149844.6 loops=5 est_rows=109766 buffers hit=1105296 read=0)
+          -> Seq Scan on lineitem  (rows=149844.6 loops=5 est_rows=109766 buffers hit=1105296 read=0)
+               Filter: ((l_shipdate >= '1995-09-01'::date) AND (l_shipdate < '1995-10-01'::date))
+               Rows Removed by Filter: 11847366

@@ -1,0 +1,9 @@
+-- PostgreSQL 18, tpcds-q09, rewrite; execution 1092.293 ms, planning 0.206 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Nested Loop [Inner]  (rows=1.0 loops=1 est_rows=1 buffers hit=677665 read=0)
+  -> Seq Scan on reason r  (rows=1.0 loops=1 est_rows=1 buffers hit=1 read=0)
+       Filter: (r_reason_sk = 1)
+       Rows Removed by Filter: 44
+  -> Aggregate [Finalize]  (rows=1.0 loops=1 est_rows=1 buffers hit=677664 read=0)
+    -> Gather  (rows=7.0 loops=1 est_rows=6 workers=6 buffers hit=677664 read=0)
+      -> Aggregate [Partial]  (rows=1.0 loops=7 est_rows=1 buffers hit=677664 read=0)
+        -> Seq Scan on store_sales  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)

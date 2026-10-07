@@ -1,0 +1,51 @@
+-- DuckDB 1.5.5, tpch-q13, original; latency 0.481764248 s, cpu 3.5597254090000003 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> ORDER_BY  (rows=45 time_s=0.0004)
+       Order By: ['count_star() DESC', 'c_orders.c_count DESC']
+    -> HASH_GROUP_BY  (rows=45 time_s=0.0466)
+         Groups: #0
+         Aggregates: count_star()
+         Estimated Cardinality: 862680
+      -> PROJECTION  (rows=1500000 time_s=0.0001)
+           Projections: c_count
+           Estimated Cardinality: 1289919
+        -> PROJECTION  (rows=1500000 time_s=0.0001)
+             Projections: count(o_orderkey)
+             Estimated Cardinality: 1289919
+          -> PROJECTION  (rows=1500000 time_s=0.0009)
+               Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1']
+               Estimated Cardinality: 1289919
+            -> HASH_GROUP_BY  (rows=1500000 time_s=1.2271)
+                 Groups: #0
+                 Aggregates: count(#1)
+                 Estimated Cardinality: 1289919
+              -> PROJECTION  (rows=15345388 time_s=0.0016)
+                   Projections: ['c_custkey', 'o_orderkey']
+                   Estimated Cardinality: 3000000
+                -> PROJECTION  (rows=15345388 time_s=0.006)
+                     Projections: ['#0', '__internal_compress_integral_uinteger(#1, 1)']
+                     Estimated Cardinality: 3000000
+                  -> PROJECTION  (rows=15345388 time_s=0.009)
+                       Projections: ['#0', '__internal_decompress_integral_bigint(#1, 1)']
+                       Estimated Cardinality: 3000000
+                    -> HASH_JOIN  (rows=15345388 time_s=0.5741)
+                         Join Type: RIGHT
+                         Conditions: o_custkey = c_custkey
+                         Estimated Cardinality: 3000000
+                      -> PROJECTION  (rows=14845369 time_s=0.0131)
+                           Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1']
+                           Estimated Cardinality: 3000000
+                        -> TABLE_SCAN  (rows=14845369 time_s=1.6787)
+                             Table: tpch.main.orders
+                             Type: Sequential Scan
+                             Projections: ['o_custkey', 'o_orderkey']
+                             Filters: (o_comment !~~ '%special%requests%')
+                             Estimated Cardinality: 3000000
+                      -> PROJECTION  (rows=1500000 time_s=0.0005)
+                           Projections: __internal_compress_integral_uinteger(#0, 1)
+                           Estimated Cardinality: 1500000
+                        -> TABLE_SCAN  (rows=1500000 time_s=0.0015)
+                             Table: tpch.main.customer
+                             Type: Sequential Scan
+                             Projections: c_custkey
+                             Estimated Cardinality: 1500000

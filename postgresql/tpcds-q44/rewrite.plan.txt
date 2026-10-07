@@ -1,0 +1,41 @@
+-- PostgreSQL 18, tpcds-q44, rewrite; execution 1123.905 ms, planning 0.283 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=10.0 loops=1 est_rows=100 buffers hit=376792 read=0)
+  -> Aggregate [Hashed] <CTE item_stats>  (rows=99266.0 loops=1 est_rows=26002 buffers hit=376732 read=0)
+       Group Key: ['store_sales.ss_item_sk']
+    -> Bitmap Heap Scan on store_sales  (rows=543186.0 loops=1 est_rows=562641 buffers hit=376732 read=0)
+      -> Bitmap Index Scan using scaleup_tpcds_59  (rows=543186.0 loops=1 est_rows=562641 buffers hit=460 read=0)
+           Index Cond: (ss_store_sk = 4)
+  -> Nested Loop [Inner] <CTE qualified>  (rows=50055.0 loops=1 est_rows=8667 buffers hit=376732 read=0)
+       Join Filter: (s.rank_col > (0.9 * ((sum(item_stats.addr_profit) / NULLIF(sum(item_stats.addr_count), '0'::numeric)))))
+       Rows Removed by Join Filter: 49211
+    -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=376732 read=0)
+      -> CTE Scan (CTE item_stats)  (rows=99266.0 loops=1 est_rows=26002 buffers hit=376732 read=0)
+    -> CTE Scan (CTE item_stats)  (rows=99266.0 loops=1 est_rows=26002 buffers hit=0 read=0)
+  -> WindowAgg <CTE ascending>  (rows=50055.0 loops=1 est_rows=8667 buffers hit=376732 read=0)
+    -> Sort  (rows=50055.0 loops=1 est_rows=8667 buffers hit=376732 read=0)
+         Sort Key: ['qualified.rank_col']
+      -> CTE Scan (CTE qualified)  (rows=50055.0 loops=1 est_rows=8667 buffers hit=376732 read=0)
+  -> WindowAgg <CTE descending>  (rows=50055.0 loops=1 est_rows=8667 buffers hit=0 read=0)
+    -> Sort  (rows=50055.0 loops=1 est_rows=8667 buffers hit=0 read=0)
+         Sort Key: ['qualified_1.rank_col DESC']
+      -> CTE Scan (CTE qualified)  (rows=50055.0 loops=1 est_rows=8667 buffers hit=0 read=0)
+  -> Nested Loop [Inner]  (rows=10.0 loops=1 est_rows=41732 buffers hit=376792 read=0)
+    -> Nested Loop [Inner]  (rows=10.0 loops=1 est_rows=41732 buffers hit=376762 read=0)
+      -> Merge Join [Inner]  (rows=10.0 loops=1 est_rows=41732 buffers hit=376732 read=0)
+           Merge Cond: (a.rnk = d.rnk)
+        -> Sort  (rows=10.0 loops=1 est_rows=2889 buffers hit=376732 read=0)
+             Sort Key: ['a.rnk']
+          -> CTE Scan (CTE ascending)  (rows=10.0 loops=1 est_rows=2889 buffers hit=376732 read=0)
+               Filter: (rnk < 11)
+               Rows Removed by Filter: 50045
+        -> Sort  (rows=10.0 loops=1 est_rows=2889 buffers hit=0 read=0)
+             Sort Key: ['d.rnk']
+          -> CTE Scan (CTE descending)  (rows=10.0 loops=1 est_rows=2889 buffers hit=0 read=0)
+               Filter: (rnk < 11)
+               Rows Removed by Filter: 50045
+      -> Memoize  (rows=1.0 loops=10 est_rows=1 buffers hit=30 read=0)
+        -> Index Scan on item i1 using scaleup_tpcds_40  (rows=1.0 loops=10 est_rows=1 buffers hit=30 read=0)
+             Index Cond: (i_item_sk = a.item_sk)
+    -> Memoize  (rows=1.0 loops=10 est_rows=1 buffers hit=30 read=0)
+      -> Index Scan on item i2 using scaleup_tpcds_40  (rows=1.0 loops=10 est_rows=1 buffers hit=30 read=0)
+           Index Cond: (i_item_sk = d.item_sk)

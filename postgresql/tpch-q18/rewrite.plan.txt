@@ -1,0 +1,16 @@
+-- PostgreSQL 18, tpch-q18, rewrite; execution 1434.753 ms, planning 0.235 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=269854 read=0)
+  -> Nested Loop [Inner]  (rows=100.0 loops=1 est_rows=14999387 buffers hit=269854 read=0)
+    -> Nested Loop [Inner]  (rows=264.0 loops=1 est_rows=14999387 buffers hit=268492 read=0)
+      -> Gather Merge  (rows=264.0 loops=1 est_rows=14999387 workers=6 buffers hit=267436 read=0)
+        -> Sort  (rows=1009.71 loops=7 est_rows=2499898 buffers hit=267436 read=0)
+             Sort Key: ['o.o_totalprice DESC', 'o.o_orderdate']
+          -> Seq Scan on orders o  (rows=2142857.14 loops=7 est_rows=2499898 buffers hit=267160 read=0)
+      -> Memoize  (rows=1.0 loops=264 est_rows=1 buffers hit=1056 read=0)
+        -> Index Scan on customer c using scaleup_tpch_03  (rows=1.0 loops=264 est_rows=1 buffers hit=1056 read=0)
+             Index Cond: (c_custkey = o.o_custkey)
+    -> Aggregate  (rows=0.38 loops=264 est_rows=1 buffers hit=1362 read=0)
+         Filter: (sum(l.l_quantity) > '300'::numeric)
+         Rows Removed by Filter: 1
+      -> Index Scan on lineitem l using scaleup_tpch_07  (rows=6.99 loops=264 est_rows=147 buffers hit=1362 read=0)
+           Index Cond: (l_orderkey = o.o_orderkey)

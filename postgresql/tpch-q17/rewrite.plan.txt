@@ -1,0 +1,15 @@
+-- PostgreSQL 18, tpch-q17, rewrite; execution 182.886 ms, planning 0.223 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=107878 read=0)
+  -> Subquery Scan  (rows=5526.0 loops=1 est_rows=20069 buffers hit=107878 read=0)
+       Filter: (x.l_quantity < (0.2 * x.avg_quantity))
+       Rows Removed by Filter: 55859
+    -> WindowAgg  (rows=61385.0 loops=1 est_rows=60208 buffers hit=107878 read=0)
+      -> Gather Merge  (rows=61385.0 loops=1 est_rows=60208 workers=4 buffers hit=107878 read=0)
+        -> Sort  (rows=12277.0 loops=5 est_rows=15052 buffers hit=107878 read=0)
+             Sort Key: ['l.l_partkey']
+          -> Nested Loop [Inner]  (rows=12277.0 loops=5 est_rows=15052 buffers hit=107846 read=0)
+            -> Seq Scan on part p  (rows=408.8 loops=5 est_rows=516 buffers hit=38232 read=0)
+                 Filter: (((p_brand)::text = 'Brand#23'::text) AND ((p_container)::text = 'MED BOX'::text))
+                 Rows Removed by Filter: 399591
+            -> Index Scan on lineitem l using scaleup_tpch_13  (rows=30.03 loops=2044 est_rows=29 buffers hit=69614 read=0)
+                 Index Cond: (l_partkey = p.p_partkey)

@@ -1,0 +1,15 @@
+-- PostgreSQL 18, tpch-q17, original; execution 7159.644 ms, planning 0.2 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=3294839 read=0)
+  -> Hash Join [Inner]  (rows=5526.0 loops=1 est_rows=20069 buffers hit=3294839 read=0)
+       Hash Cond: (lineitem.l_partkey = part.p_partkey)
+       Join Filter: (lineitem.l_quantity < (SubPlan 1))
+       Rows Removed by Join Filter: 55859
+    -> Seq Scan on lineitem  (rows=59986052.0 loops=1 est_rows=59988096 buffers hit=1105296 read=0)
+    -> Hash  (rows=2044.0 loops=1 est_rows=2063 buffers hit=38232 read=0)
+      -> Gather  (rows=2044.0 loops=1 est_rows=2063 workers=4 buffers hit=38232 read=0)
+        -> Seq Scan on part  (rows=408.8 loops=5 est_rows=516 buffers hit=38232 read=0)
+             Filter: (((p_brand)::text = 'Brand#23'::text) AND ((p_container)::text = 'MED BOX'::text))
+             Rows Removed by Filter: 399591
+    -> Aggregate <SubPlan 1>  (rows=1.0 loops=61385 est_rows=1 buffers hit=2151311 read=0)
+      -> Index Scan on lineitem lineitem_1 using scaleup_tpch_13  (rows=31.02 loops=61385 est_rows=29 buffers hit=2151311 read=0)
+           Index Cond: (l_partkey = part.p_partkey)

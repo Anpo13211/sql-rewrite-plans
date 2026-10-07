@@ -1,0 +1,28 @@
+-- PostgreSQL 18, tpcds-q62, original; execution 659.604 ms, planning 1.486 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=259100 read=0)
+  -> Aggregate [Sorted] [Finalize]  (rows=100.0 loops=1 est_rows=378 buffers hit=259100 read=0)
+       Group Key: ['("substring"((warehouse.w_warehouse_name)::text, 1, 20))', 'ship_mode.sm_type', 'web_site.web_name']
+    -> Gather Merge  (rows=701.0 loops=1 est_rows=2268 workers=6 buffers hit=259100 read=0)
+      -> Aggregate [Sorted] [Partial]  (rows=374.43 loops=7 est_rows=378 buffers hit=259100 read=0)
+           Group Key: ['("substring"((warehouse.w_warehouse_name)::text, 1, 20))', 'ship_mode.sm_type', 'web_site.web_name']
+        -> Sort  (rows=181376.14 loops=7 est_rows=6088 buffers hit=259100 read=0)
+             Sort Key: ['("substring"((warehouse.w_warehouse_name)::text, 1, 20)) NULLS FIRST', 'ship_mode.sm_type NULLS FIRST', 'web_site.web_name NULLS FIRST']
+          -> Hash Join [Inner]  (rows=206440.0 loops=7 est_rows=6088 buffers hit=259052 read=0)
+               Hash Cond: (web_sales.ws_web_site_sk = web_site.web_site_sk)
+            -> Hash Join [Inner]  (rows=206446.14 loops=7 est_rows=6089 buffers hit=259038 read=0)
+                 Hash Cond: (web_sales.ws_ship_mode_sk = ship_mode.sm_ship_mode_sk)
+              -> Hash Join [Inner]  (rows=206458.29 loops=7 est_rows=6090 buffers hit=259031 read=0)
+                   Hash Cond: (web_sales.ws_warehouse_sk = warehouse.w_warehouse_sk)
+                -> Hash Join [Inner]  (rows=206486.71 loops=7 est_rows=6092 buffers hit=259024 read=0)
+                     Hash Cond: (web_sales.ws_ship_date_sk = date_dim.d_date_sk)
+                  -> Seq Scan on web_sales  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+                  -> Hash  (rows=52.29 loops=7 est_rows=218 buffers hit=2032 read=0)
+                    -> Seq Scan on date_dim  (rows=366.0 loops=1 est_rows=218 buffers hit=2032 read=0)
+                         Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+                         Rows Removed by Filter: 72683
+                -> Hash  (rows=10.0 loops=7 est_rows=10 buffers hit=7 read=0)
+                  -> Seq Scan on warehouse  (rows=10.0 loops=7 est_rows=10 buffers hit=7 read=0)
+              -> Hash  (rows=20.0 loops=7 est_rows=20 buffers hit=7 read=0)
+                -> Seq Scan on ship_mode  (rows=20.0 loops=7 est_rows=20 buffers hit=7 read=0)
+            -> Hash  (rows=42.0 loops=7 est_rows=42 buffers hit=14 read=0)
+              -> Seq Scan on web_site  (rows=42.0 loops=7 est_rows=42 buffers hit=14 read=0)

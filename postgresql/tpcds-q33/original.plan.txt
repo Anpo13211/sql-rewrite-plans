@@ -1,0 +1,96 @@
+-- PostgreSQL 18, tpcds-q33, original; execution 2327.323 ms, planning 1.585 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=3359144 read=0)
+  -> Sort  (rows=100.0 loops=1 est_rows=200 buffers hit=3359144 read=0)
+       Sort Key: ['(sum((sum(store_sales.ss_ext_sales_price))))']
+    -> Aggregate [Sorted]  (rows=977.0 loops=1 est_rows=200 buffers hit=3359144 read=0)
+         Group Key: ['item.i_manufact_id']
+      -> Merge Append  (rows=2930.0 loops=1 est_rows=3000 buffers hit=3359144 read=0)
+           Sort Key: ['item.i_manufact_id']
+        -> Aggregate [Sorted]  (rows=977.0 loops=1 est_rows=1000 buffers hit=2060599 read=0)
+             Group Key: ['item.i_manufact_id']
+          -> Gather Merge  (rows=96254.0 loops=1 est_rows=4054 workers=6 buffers hit=2060599 read=0)
+            -> Merge Join [Inner]  (rows=13750.57 loops=7 est_rows=676 buffers hit=2060599 read=0)
+                 Merge Cond: (item.i_manufact_id = item_1.i_manufact_id)
+              -> Sort  (rows=13828.86 loops=7 est_rows=677 buffers hit=2029071 read=0)
+                   Sort Key: ['item.i_manufact_id']
+                -> Nested Loop [Inner]  (rows=13861.0 loops=7 est_rows=677 buffers hit=2029041 read=0)
+                  -> Nested Loop [Inner]  (rows=13861.0 loops=7 est_rows=677 buffers hit=1737954 read=0)
+                    -> Hash Join [Inner]  (rows=38691.14 loops=7 est_rows=1945 buffers hit=679696 read=0)
+                         Hash Cond: (store_sales.ss_sold_date_sk = date_dim.d_date_sk)
+                      -> Seq Scan on store_sales  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+                      -> Hash  (rows=4.43 loops=7 est_rows=18 buffers hit=2032 read=0)
+                        -> Seq Scan on date_dim  (rows=31.0 loops=1 est_rows=18 buffers hit=2032 read=0)
+                             Filter: ((d_year = 1998) AND (d_moy = 5))
+                             Rows Removed by Filter: 73018
+                    -> Index Scan on customer_address using scaleup_tpcds_34  (rows=0.36 loops=270838 est_rows=1 buffers hit=1058258 read=0)
+                         Index Cond: (ca_address_sk = store_sales.ss_addr_sk)
+                         Filter: (ca_gmt_offset = '-5'::numeric)
+                         Rows Removed by Filter: 1
+                  -> Index Scan on item using scaleup_tpcds_40  (rows=1.0 loops=97027 est_rows=1 buffers hit=291087 read=0)
+                       Index Cond: (i_item_sk = store_sales.ss_item_sk)
+              -> Sort  (rows=977.0 loops=7 est_rows=1000 buffers hit=31528 read=0)
+                   Sort Key: ['item_1.i_manufact_id']
+                -> Aggregate [Hashed]  (rows=978.0 loops=7 est_rows=1000 buffers hit=31528 read=0)
+                     Group Key: ['item_1.i_manufact_id']
+                  -> Seq Scan on item item_1  (rows=10222.0 loops=7 est_rows=10173 buffers hit=31528 read=0)
+                       Filter: ((i_category)::text = 'Electronics'::text)
+                       Rows Removed by Filter: 91778
+        -> Aggregate [Sorted] [Finalize]  (rows=977.0 loops=1 est_rows=1000 buffers hit=860223 read=0)
+             Group Key: ['item_2.i_manufact_id']
+          -> Gather Merge  (rows=977.0 loops=1 est_rows=1700 workers=1 buffers hit=860223 read=0)
+            -> Aggregate [Sorted] [Partial]  (rows=488.5 loops=2 est_rows=1000 buffers hit=860223 read=0)
+                 Group Key: ['item_2.i_manufact_id']
+              -> Merge Join [Inner]  (rows=25339.5 loops=2 est_rows=1295 buffers hit=860223 read=0)
+                   Merge Cond: (item_2.i_manufact_id = item_3.i_manufact_id)
+                -> Sort  (rows=25498.5 loops=2 est_rows=1298 buffers hit=855719 read=0)
+                     Sort Key: ['item_2.i_manufact_id']
+                  -> Nested Loop [Inner]  (rows=25556.0 loops=2 est_rows=1298 buffers hit=855714 read=0)
+                    -> Nested Loop [Inner]  (rows=25556.0 loops=2 est_rows=1298 buffers hit=702378 read=0)
+                      -> Nested Loop [Inner]  (rows=70743.0 loops=2 est_rows=3578 buffers hit=137754 read=0)
+                        -> Seq Scan on date_dim date_dim_1  (rows=15.5 loops=2 est_rows=18 buffers hit=2032 read=0)
+                             Filter: ((d_year = 1998) AND (d_moy = 5))
+                             Rows Removed by Filter: 36509
+                        -> Bitmap Heap Scan on catalog_sales  (rows=4564.06 loops=31 est_rows=7810 buffers hit=135722 read=0)
+                          -> Bitmap Index Scan using scaleup_tpcds_17  (rows=4564.06 loops=31 est_rows=7810 buffers hit=211 read=0)
+                               Index Cond: (cs_sold_date_sk = date_dim_1.d_date_sk)
+                      -> Index Scan on customer_address customer_address_1 using scaleup_tpcds_34  (rows=0.36 loops=141486 est_rows=1 buffers hit=564624 read=0)
+                           Index Cond: (ca_address_sk = catalog_sales.cs_bill_addr_sk)
+                           Filter: (ca_gmt_offset = '-5'::numeric)
+                           Rows Removed by Filter: 1
+                    -> Index Scan on item item_2 using scaleup_tpcds_40  (rows=1.0 loops=51112 est_rows=1 buffers hit=153336 read=0)
+                         Index Cond: (i_item_sk = catalog_sales.cs_item_sk)
+                -> Sort  (rows=977.0 loops=1 est_rows=1000 buffers hit=4504 read=0)
+                     Sort Key: ['item_3.i_manufact_id']
+                  -> Aggregate [Hashed]  (rows=978.0 loops=1 est_rows=1000 buffers hit=4504 read=0)
+                       Group Key: ['item_3.i_manufact_id']
+                    -> Seq Scan on item item_3  (rows=10222.0 loops=1 est_rows=10173 buffers hit=4504 read=0)
+                         Filter: ((i_category)::text = 'Electronics'::text)
+                         Rows Removed by Filter: 91778
+        -> Aggregate [Sorted]  (rows=976.0 loops=1 est_rows=1000 buffers hit=438322 read=0)
+             Group Key: ['item_4.i_manufact_id']
+          -> Sort  (rows=25327.0 loops=1 est_rows=1110 buffers hit=438322 read=0)
+               Sort Key: ['item_4.i_manufact_id']
+            -> Hash Join [Inner]  (rows=25327.0 loops=1 est_rows=1110 buffers hit=438322 read=0)
+                 Hash Cond: (item_4.i_manufact_id = item_5.i_manufact_id)
+              -> Gather  (rows=25527.0 loops=1 est_rows=1113 workers=1 buffers hit=433818 read=0)
+                -> Nested Loop [Inner]  (rows=12763.5 loops=2 est_rows=655 buffers hit=433818 read=0)
+                  -> Nested Loop [Inner]  (rows=12763.5 loops=2 est_rows=655 buffers hit=357237 read=0)
+                    -> Nested Loop [Inner]  (rows=35553.0 loops=2 est_rows=1796 buffers hit=72849 read=0)
+                      -> Seq Scan on date_dim date_dim_2  (rows=15.5 loops=2 est_rows=18 buffers hit=2032 read=0)
+                           Filter: ((d_year = 1998) AND (d_moy = 5))
+                           Rows Removed by Filter: 36509
+                      -> Bitmap Heap Scan on web_sales  (rows=2293.74 loops=31 est_rows=3947 buffers hit=70817 read=0)
+                        -> Bitmap Index Scan using scaleup_tpcds_76  (rows=2293.74 loops=31 est_rows=3947 buffers hit=154 read=0)
+                             Index Cond: (ws_sold_date_sk = date_dim_2.d_date_sk)
+                    -> Index Scan on customer_address customer_address_2 using scaleup_tpcds_34  (rows=0.36 loops=71106 est_rows=1 buffers hit=284388 read=0)
+                         Index Cond: (ca_address_sk = web_sales.ws_bill_addr_sk)
+                         Filter: (ca_gmt_offset = '-5'::numeric)
+                         Rows Removed by Filter: 1
+                  -> Index Scan on item item_4 using scaleup_tpcds_40  (rows=1.0 loops=25527 est_rows=1 buffers hit=76581 read=0)
+                       Index Cond: (i_item_sk = web_sales.ws_item_sk)
+              -> Hash  (rows=977.0 loops=1 est_rows=1000 buffers hit=4504 read=0)
+                -> Aggregate [Hashed]  (rows=978.0 loops=1 est_rows=1000 buffers hit=4504 read=0)
+                     Group Key: ['item_5.i_manufact_id']
+                  -> Seq Scan on item item_5  (rows=10222.0 loops=1 est_rows=10173 buffers hit=4504 read=0)
+                       Filter: ((i_category)::text = 'Electronics'::text)
+                       Rows Removed by Filter: 91778

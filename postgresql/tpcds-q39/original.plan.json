@@ -1,0 +1,966 @@
+{
+ "Plan": {
+  "Node Type": "Incremental Sort",
+  "Parallel Aware": false,
+  "Async Capable": false,
+  "Startup Cost": 1359823.14,
+  "Total Cost": 1359840.75,
+  "Plan Rows": 30,
+  "Plan Width": 176,
+  "Actual Rows": 2433.0,
+  "Actual Loops": 1,
+  "Disabled": false,
+  "Sort Key": [
+   "inv1.w_warehouse_sk NULLS FIRST",
+   "inv1.i_item_sk NULLS FIRST",
+   "inv1.mean NULLS FIRST",
+   "inv1.cov NULLS FIRST",
+   "inv2.mean NULLS FIRST",
+   "inv2.cov NULLS FIRST"
+  ],
+  "Presorted Key": [
+   "inv1.w_warehouse_sk",
+   "inv1.i_item_sk"
+  ],
+  "Full-sort Groups": {
+   "Group Count": 77,
+   "Sort Methods Used": [
+    "quicksort"
+   ],
+   "Sort Space Memory": {
+    "Average Sort Space Used": 28,
+    "Peak Sort Space Used": 28
+   }
+  },
+  "Shared Hit Blocks": 979667,
+  "Shared Read Blocks": 0,
+  "Shared Dirtied Blocks": 0,
+  "Shared Written Blocks": 0,
+  "Local Hit Blocks": 0,
+  "Local Read Blocks": 0,
+  "Local Dirtied Blocks": 0,
+  "Local Written Blocks": 0,
+  "Temp Read Blocks": 134947,
+  "Temp Written Blocks": 134973,
+  "Plans": [
+   {
+    "Node Type": "Subquery Scan",
+    "Parent Relationship": "InitPlan",
+    "Subplan Name": "CTE inv",
+    "Parallel Aware": false,
+    "Async Capable": false,
+    "Alias": "foo",
+    "Startup Cost": 1226360.63,
+    "Total Cost": 1349789.69,
+    "Plan Rows": 220478,
+    "Plan Width": 136,
+    "Actual Rows": 381575.0,
+    "Actual Loops": 1,
+    "Disabled": false,
+    "Shared Hit Blocks": 979667,
+    "Shared Read Blocks": 0,
+    "Shared Dirtied Blocks": 0,
+    "Shared Written Blocks": 0,
+    "Local Hit Blocks": 0,
+    "Local Read Blocks": 0,
+    "Local Dirtied Blocks": 0,
+    "Local Written Blocks": 0,
+    "Temp Read Blocks": 134947,
+    "Temp Written Blocks": 134973,
+    "Plans": [
+     {
+      "Node Type": "Aggregate",
+      "Strategy": "Sorted",
+      "Partial Mode": "Finalize",
+      "Parent Relationship": "Subquery",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 1226360.63,
+      "Total Cost": 1348687.3,
+      "Plan Rows": 220478,
+      "Plan Width": 104,
+      "Actual Rows": 381575.0,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Group Key": [
+       "item.i_item_sk",
+       "warehouse.w_warehouse_name",
+       "warehouse.w_warehouse_sk",
+       "date_dim.d_moy"
+      ],
+      "Filter": "(CASE avg(inventory.inv_quantity_on_hand) WHEN '0'::numeric THEN '0'::numeric ELSE ((stddev_samp(inventory.inv_quantity_on_hand) * 1.000) / avg(inventory.inv_quantity_on_hand)) END > '1'::numeric)",
+      "Rows Removed by Filter": 5738425,
+      "Shared Hit Blocks": 979667,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 134947,
+      "Temp Written Blocks": 134973,
+      "Plans": [
+       {
+        "Node Type": "Gather Merge",
+        "Parent Relationship": "Outer",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 1226360.63,
+        "Total Cost": 1320025.08,
+        "Plan Rows": 661437,
+        "Plan Width": 104,
+        "Actual Rows": 19526273.0,
+        "Actual Loops": 1,
+        "Disabled": false,
+        "Workers Planned": 7,
+        "Workers Launched": 7,
+        "Shared Hit Blocks": 979667,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 134947,
+        "Temp Written Blocks": 134973,
+        "Plans": [
+         {
+          "Node Type": "Aggregate",
+          "Strategy": "Sorted",
+          "Partial Mode": "Partial",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 1225360.51,
+          "Total Cost": 1237998.93,
+          "Plan Rows": 94491,
+          "Plan Width": 104,
+          "Actual Rows": 2440784.12,
+          "Actual Loops": 8,
+          "Disabled": false,
+          "Group Key": [
+           "item.i_item_sk",
+           "warehouse.w_warehouse_name",
+           "warehouse.w_warehouse_sk",
+           "date_dim.d_moy"
+          ],
+          "Shared Hit Blocks": 979667,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 134947,
+          "Temp Written Blocks": 134973,
+          "Workers": [],
+          "Plans": [
+           {
+            "Node Type": "Incremental Sort",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 1225360.51,
+            "Total Cost": 1235400.43,
+            "Plan Rows": 94491,
+            "Plan Width": 44,
+            "Actual Rows": 3315000.0,
+            "Actual Loops": 8,
+            "Disabled": false,
+            "Sort Key": [
+             "item.i_item_sk",
+             "warehouse.w_warehouse_name",
+             "warehouse.w_warehouse_sk",
+             "date_dim.d_moy"
+            ],
+            "Presorted Key": [
+             "item.i_item_sk"
+            ],
+            "Full-sort Groups": {
+             "Group Count": 45442,
+             "Sort Methods Used": [
+              "quicksort"
+             ],
+             "Sort Space Memory": {
+              "Average Sort Space Used": 29,
+              "Peak Sort Space Used": 29
+             }
+            },
+            "Pre-sorted Groups": {
+             "Group Count": 12685,
+             "Sort Methods Used": [
+              "quicksort"
+             ],
+             "Sort Space Memory": {
+              "Average Sort Space Used": 29,
+              "Peak Sort Space Used": 29
+             }
+            },
+            "Shared Hit Blocks": 979667,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 134947,
+            "Temp Written Blocks": 134973,
+            "Workers": [
+             {
+              "Worker Number": 0,
+              "Full-sort Groups": {
+               "Group Count": 50372,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 29,
+                "Peak Sort Space Used": 29
+               }
+              },
+              "Pre-sorted Groups": {
+               "Group Count": 34657,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 31,
+                "Peak Sort Space Used": 31
+               }
+              }
+             },
+             {
+              "Worker Number": 1,
+              "Full-sort Groups": {
+               "Group Count": 43976,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 28,
+                "Peak Sort Space Used": 28
+               }
+              },
+              "Pre-sorted Groups": {
+               "Group Count": 13373,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 29,
+                "Peak Sort Space Used": 29
+               }
+              }
+             },
+             {
+              "Worker Number": 2,
+              "Full-sort Groups": {
+               "Group Count": 49899,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 27,
+                "Peak Sort Space Used": 27
+               }
+              },
+              "Pre-sorted Groups": {
+               "Group Count": 35605,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 29,
+                "Peak Sort Space Used": 29
+               }
+              }
+             },
+             {
+              "Worker Number": 3,
+              "Full-sort Groups": {
+               "Group Count": 50838,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 28,
+                "Peak Sort Space Used": 28
+               }
+              },
+              "Pre-sorted Groups": {
+               "Group Count": 31400,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 29,
+                "Peak Sort Space Used": 29
+               }
+              }
+             },
+             {
+              "Worker Number": 4,
+              "Full-sort Groups": {
+               "Group Count": 48400,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 28,
+                "Peak Sort Space Used": 28
+               }
+              },
+              "Pre-sorted Groups": {
+               "Group Count": 33250,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 29,
+                "Peak Sort Space Used": 29
+               }
+              }
+             },
+             {
+              "Worker Number": 5,
+              "Full-sort Groups": {
+               "Group Count": 49955,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 29,
+                "Peak Sort Space Used": 29
+               }
+              },
+              "Pre-sorted Groups": {
+               "Group Count": 30484,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 31,
+                "Peak Sort Space Used": 31
+               }
+              }
+             },
+             {
+              "Worker Number": 6,
+              "Full-sort Groups": {
+               "Group Count": 40735,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 27,
+                "Peak Sort Space Used": 27
+               }
+              },
+              "Pre-sorted Groups": {
+               "Group Count": 16219,
+               "Sort Methods Used": [
+                "quicksort"
+               ],
+               "Sort Space Memory": {
+                "Average Sort Space Used": 26,
+                "Peak Sort Space Used": 26
+               }
+              }
+             }
+            ],
+            "Plans": [
+             {
+              "Node Type": "Nested Loop",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Join Type": "Inner",
+              "Startup Cost": 1225360.41,
+              "Total Cost": 1231939.51,
+              "Plan Rows": 94491,
+              "Plan Width": 44,
+              "Actual Rows": 3315000.0,
+              "Actual Loops": 8,
+              "Disabled": false,
+              "Inner Unique": true,
+              "Shared Hit Blocks": 979366,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 134947,
+              "Temp Written Blocks": 134973,
+              "Workers": [],
+              "Plans": [
+               {
+                "Node Type": "Merge Join",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Join Type": "Inner",
+                "Startup Cost": 1225360.26,
+                "Total Cost": 1229691.54,
+                "Plan Rows": 94491,
+                "Plan Width": 28,
+                "Actual Rows": 3315000.0,
+                "Actual Loops": 8,
+                "Disabled": false,
+                "Inner Unique": true,
+                "Merge Cond": "(inventory.inv_item_sk = item.i_item_sk)",
+                "Shared Hit Blocks": 979199,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 134947,
+                "Temp Written Blocks": 134973,
+                "Workers": [],
+                "Plans": [
+                 {
+                  "Node Type": "Sort",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Startup Cost": 1225359.93,
+                  "Total Cost": 1225596.15,
+                  "Plan Rows": 94491,
+                  "Plan Width": 28,
+                  "Actual Rows": 3315000.0,
+                  "Actual Loops": 8,
+                  "Disabled": false,
+                  "Sort Key": [
+                   "inventory.inv_item_sk"
+                  ],
+                  "Sort Method": "external merge",
+                  "Sort Space Used": 107112,
+                  "Sort Space Type": "Disk",
+                  "Shared Hit Blocks": 976944,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 134947,
+                  "Temp Written Blocks": 134973,
+                  "Workers": [
+                   {
+                    "Worker Number": 0,
+                    "Sort Method": "external merge",
+                    "Sort Space Used": 153672,
+                    "Sort Space Type": "Disk"
+                   },
+                   {
+                    "Worker Number": 1,
+                    "Sort Method": "external merge",
+                    "Sort Space Used": 102448,
+                    "Sort Space Type": "Disk"
+                   },
+                   {
+                    "Worker Number": 2,
+                    "Sort Method": "external merge",
+                    "Sort Space Used": 153696,
+                    "Sort Space Type": "Disk"
+                   },
+                   {
+                    "Worker Number": 3,
+                    "Sort Method": "external merge",
+                    "Sort Space Used": 152856,
+                    "Sort Space Type": "Disk"
+                   },
+                   {
+                    "Worker Number": 4,
+                    "Sort Method": "external merge",
+                    "Sort Space Used": 153672,
+                    "Sort Space Type": "Disk"
+                   },
+                   {
+                    "Worker Number": 5,
+                    "Sort Method": "external merge",
+                    "Sort Space Used": 153672,
+                    "Sort Space Type": "Disk"
+                   },
+                   {
+                    "Worker Number": 6,
+                    "Sort Method": "external merge",
+                    "Sort Space Used": 102448,
+                    "Sort Space Type": "Disk"
+                   }
+                  ],
+                  "Plans": [
+                   {
+                    "Node Type": "Hash Join",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": true,
+                    "Async Capable": false,
+                    "Join Type": "Inner",
+                    "Startup Cost": 2571.8,
+                    "Total Cost": 1217551.24,
+                    "Plan Rows": 94491,
+                    "Plan Width": 28,
+                    "Actual Rows": 3315000.0,
+                    "Actual Loops": 8,
+                    "Disabled": false,
+                    "Inner Unique": true,
+                    "Hash Cond": "(inventory.inv_date_sk = date_dim.d_date_sk)",
+                    "Shared Hit Blocks": 976944,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Workers": [],
+                    "Plans": [
+                     {
+                      "Node Type": "Seq Scan",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": true,
+                      "Async Capable": false,
+                      "Relation Name": "inventory",
+                      "Alias": "inventory",
+                      "Startup Cost": 0.0,
+                      "Total Cost": 1165062.14,
+                      "Plan Rows": 19015014,
+                      "Plan Width": 28,
+                      "Actual Rows": 16638750.0,
+                      "Actual Loops": 8,
+                      "Disabled": false,
+                      "Shared Hit Blocks": 974912,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "Workers": []
+                     },
+                     {
+                      "Node Type": "Hash",
+                      "Parent Relationship": "Inner",
+                      "Parallel Aware": true,
+                      "Async Capable": false,
+                      "Startup Cost": 2569.12,
+                      "Total Cost": 2569.12,
+                      "Plan Rows": 214,
+                      "Plan Width": 16,
+                      "Actual Rows": 45.62,
+                      "Actual Loops": 8,
+                      "Disabled": false,
+                      "Hash Buckets": 1024,
+                      "Original Hash Buckets": 1024,
+                      "Hash Batches": 1,
+                      "Original Hash Batches": 1,
+                      "Peak Memory Usage": 40,
+                      "Shared Hit Blocks": 2032,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "Workers": [],
+                      "Plans": [
+                       {
+                        "Node Type": "Seq Scan",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": true,
+                        "Async Capable": false,
+                        "Relation Name": "date_dim",
+                        "Alias": "date_dim",
+                        "Startup Cost": 0.0,
+                        "Total Cost": 2569.12,
+                        "Plan Rows": 214,
+                        "Plan Width": 16,
+                        "Actual Rows": 45.62,
+                        "Actual Loops": 8,
+                        "Disabled": false,
+                        "Filter": "(d_year = 2001)",
+                        "Rows Removed by Filter": 9086,
+                        "Shared Hit Blocks": 2032,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0,
+                        "Workers": []
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "Node Type": "Index Only Scan",
+                  "Parent Relationship": "Inner",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Scan Direction": "Forward",
+                  "Index Name": "scaleup_tpcds_40",
+                  "Relation Name": "item",
+                  "Alias": "item",
+                  "Startup Cost": 0.29,
+                  "Total Cost": 2659.29,
+                  "Plan Rows": 102000,
+                  "Plan Width": 8,
+                  "Actual Rows": 101999.0,
+                  "Actual Loops": 8,
+                  "Disabled": false,
+                  "Heap Fetches": 0,
+                  "Index Searches": 8,
+                  "Shared Hit Blocks": 2255,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "Workers": []
+                 }
+                ]
+               },
+               {
+                "Node Type": "Memoize",
+                "Parent Relationship": "Inner",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 0.15,
+                "Total Cost": 0.16,
+                "Plan Rows": 1,
+                "Plan Width": 24,
+                "Actual Rows": 1.0,
+                "Actual Loops": 26520000,
+                "Disabled": false,
+                "Cache Key": "inventory.inv_warehouse_sk",
+                "Cache Mode": "logical",
+                "Cache Hits": 2631384,
+                "Cache Misses": 10,
+                "Cache Evictions": 0,
+                "Cache Overflows": 0,
+                "Peak Memory Usage": 2,
+                "Shared Hit Blocks": 167,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Workers": [
+                 {
+                  "Worker Number": 0,
+                  "Cache Hits": 3775025,
+                  "Cache Misses": 10,
+                  "Cache Evictions": 0,
+                  "Cache Overflows": 0,
+                  "Peak Memory Usage": 2
+                 },
+                 {
+                  "Worker Number": 1,
+                  "Cache Hits": 2516728,
+                  "Cache Misses": 10,
+                  "Cache Evictions": 0,
+                  "Cache Overflows": 0,
+                  "Peak Memory Usage": 2
+                 },
+                 {
+                  "Worker Number": 2,
+                  "Cache Hits": 3775023,
+                  "Cache Misses": 10,
+                  "Cache Evictions": 0,
+                  "Cache Overflows": 0,
+                  "Peak Memory Usage": 2
+                 },
+                 {
+                  "Worker Number": 3,
+                  "Cache Hits": 3755033,
+                  "Cache Misses": 10,
+                  "Cache Evictions": 0,
+                  "Cache Overflows": 0,
+                  "Peak Memory Usage": 2
+                 },
+                 {
+                  "Worker Number": 4,
+                  "Cache Hits": 3775146,
+                  "Cache Misses": 10,
+                  "Cache Evictions": 0,
+                  "Cache Overflows": 0,
+                  "Peak Memory Usage": 2
+                 },
+                 {
+                  "Worker Number": 5,
+                  "Cache Hits": 3774928,
+                  "Cache Misses": 10,
+                  "Cache Evictions": 0,
+                  "Cache Overflows": 0,
+                  "Peak Memory Usage": 2
+                 },
+                 {
+                  "Worker Number": 6,
+                  "Cache Hits": 2516653,
+                  "Cache Misses": 10,
+                  "Cache Evictions": 0,
+                  "Cache Overflows": 0,
+                  "Peak Memory Usage": 2
+                 }
+                ],
+                "Plans": [
+                 {
+                  "Node Type": "Index Scan",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Scan Direction": "Forward",
+                  "Index Name": "scaleup_tpcds_62",
+                  "Relation Name": "warehouse",
+                  "Alias": "warehouse",
+                  "Startup Cost": 0.14,
+                  "Total Cost": 0.15,
+                  "Plan Rows": 1,
+                  "Plan Width": 24,
+                  "Actual Rows": 1.0,
+                  "Actual Loops": 80,
+                  "Disabled": false,
+                  "Index Cond": "(w_warehouse_sk = inventory.inv_warehouse_sk)",
+                  "Rows Removed by Index Recheck": 0,
+                  "Index Searches": 80,
+                  "Shared Hit Blocks": 167,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "Workers": []
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "Node Type": "Merge Join",
+    "Parent Relationship": "Outer",
+    "Parallel Aware": false,
+    "Async Capable": false,
+    "Join Type": "Inner",
+    "Startup Cost": 10032.88,
+    "Total Cost": 10049.71,
+    "Plan Rows": 30,
+    "Plan Width": 176,
+    "Actual Rows": 2433.0,
+    "Actual Loops": 1,
+    "Disabled": false,
+    "Inner Unique": false,
+    "Merge Cond": "((inv1.w_warehouse_sk = inv2.w_warehouse_sk) AND (inv1.i_item_sk = inv2.i_item_sk))",
+    "Shared Hit Blocks": 99181,
+    "Shared Read Blocks": 0,
+    "Shared Dirtied Blocks": 0,
+    "Shared Written Blocks": 0,
+    "Local Hit Blocks": 0,
+    "Local Read Blocks": 0,
+    "Local Dirtied Blocks": 0,
+    "Local Written Blocks": 0,
+    "Temp Read Blocks": 13389,
+    "Temp Written Blocks": 13391,
+    "Plans": [
+     {
+      "Node Type": "Sort",
+      "Parent Relationship": "Outer",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 5016.44,
+      "Total Cost": 5019.19,
+      "Plan Rows": 1102,
+      "Plan Width": 88,
+      "Actual Rows": 35851.0,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Sort Key": [
+       "inv1.w_warehouse_sk NULLS FIRST",
+       "inv1.i_item_sk NULLS FIRST"
+      ],
+      "Sort Method": "quicksort",
+      "Sort Space Used": 3818,
+      "Sort Space Type": "Memory",
+      "Shared Hit Blocks": 99181,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 13389,
+      "Temp Written Blocks": 13391,
+      "Plans": [
+       {
+        "Node Type": "CTE Scan",
+        "Parent Relationship": "Outer",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "CTE Name": "inv",
+        "Alias": "inv1",
+        "Startup Cost": 0.0,
+        "Total Cost": 4960.76,
+        "Plan Rows": 1102,
+        "Plan Width": 88,
+        "Actual Rows": 35854.0,
+        "Actual Loops": 1,
+        "Disabled": false,
+        "Filter": "(d_moy = 1)",
+        "Rows Removed by Filter": 345721,
+        "Storage": "Memory",
+        "Maximum Storage": 40539,
+        "Shared Hit Blocks": 99181,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 13389,
+        "Temp Written Blocks": 13391
+       }
+      ]
+     },
+     {
+      "Node Type": "Sort",
+      "Parent Relationship": "Inner",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 5016.44,
+      "Total Cost": 5019.19,
+      "Plan Rows": 1102,
+      "Plan Width": 88,
+      "Actual Rows": 35463.0,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Sort Key": [
+       "inv2.w_warehouse_sk NULLS FIRST",
+       "inv2.i_item_sk NULLS FIRST"
+      ],
+      "Sort Method": "quicksort",
+      "Sort Space Used": 3794,
+      "Sort Space Type": "Memory",
+      "Shared Hit Blocks": 0,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0,
+      "Plans": [
+       {
+        "Node Type": "CTE Scan",
+        "Parent Relationship": "Outer",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "CTE Name": "inv",
+        "Alias": "inv2",
+        "Startup Cost": 0.0,
+        "Total Cost": 4960.76,
+        "Plan Rows": 1102,
+        "Plan Width": 88,
+        "Actual Rows": 35463.0,
+        "Actual Loops": 1,
+        "Disabled": false,
+        "Filter": "(d_moy = 2)",
+        "Rows Removed by Filter": 346112,
+        "Storage": "Memory",
+        "Maximum Storage": 40539,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "Settings": {
+  "effective_cache_size": "96GB",
+  "work_mem": "64MB",
+  "max_parallel_workers": "32",
+  "max_parallel_workers_per_gather": "31",
+  "search_path": "tpcds_sf10,pg_catalog"
+ },
+ "Planning": {
+  "Shared Hit Blocks": 20,
+  "Shared Read Blocks": 0,
+  "Shared Dirtied Blocks": 0,
+  "Shared Written Blocks": 0,
+  "Local Hit Blocks": 0,
+  "Local Read Blocks": 0,
+  "Local Dirtied Blocks": 0,
+  "Local Written Blocks": 0,
+  "Temp Read Blocks": 0,
+  "Temp Written Blocks": 0
+ },
+ "Planning Time": 0.925,
+ "Triggers": [],
+ "JIT": {
+  "Functions": 288,
+  "Options": {
+   "Inlining": true,
+   "Optimization": true,
+   "Expressions": true,
+   "Deforming": true
+  }
+ },
+ "Execution Time": 24462.966
+}

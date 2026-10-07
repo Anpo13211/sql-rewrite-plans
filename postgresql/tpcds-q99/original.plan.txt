@@ -1,0 +1,30 @@
+-- PostgreSQL 18, tpcds-q99, original; execution 1516.049 ms, planning 1.023 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=513884 read=0)
+  -> Incremental Sort  (rows=100.0 loops=1 est_rows=648 buffers hit=513884 read=0)
+       Sort Key: ['("substring"((warehouse.w_warehouse_name)::text, 1, 20)) NULLS FIRST', 'ship_mode.sm_type NULLS FIRST', '(lower((call_center.cc_name)::text)) NULLS FIRST']
+    -> Aggregate [Sorted] [Finalize]  (rows=109.0 loops=1 est_rows=648 buffers hit=513884 read=0)
+         Group Key: ['("substring"((warehouse.w_warehouse_name)::text, 1, 20))', 'ship_mode.sm_type', 'call_center.cc_name']
+      -> Gather Merge  (rows=764.0 loops=1 est_rows=3888 workers=6 buffers hit=513884 read=0)
+        -> Aggregate [Sorted] [Partial]  (rows=553.14 loops=7 est_rows=648 buffers hit=513884 read=0)
+             Group Key: ['("substring"((warehouse.w_warehouse_name)::text, 1, 20))', 'ship_mode.sm_type', 'call_center.cc_name']
+          -> Sort  (rows=286842.43 loops=7 est_rows=11944 buffers hit=513884 read=0)
+               Sort Key: ['("substring"((warehouse.w_warehouse_name)::text, 1, 20)) NULLS FIRST', 'ship_mode.sm_type NULLS FIRST', 'call_center.cc_name']
+            -> Hash Join [Inner]  (rows=407491.71 loops=7 est_rows=11944 buffers hit=513836 read=0)
+                 Hash Cond: (catalog_sales.cs_warehouse_sk = warehouse.w_warehouse_sk)
+              -> Hash Join [Inner]  (rows=407744.0 loops=7 est_rows=12007 buffers hit=513829 read=0)
+                   Hash Cond: (catalog_sales.cs_call_center_sk = call_center.cc_call_center_sk)
+                -> Hash Join [Inner]  (rows=408252.71 loops=7 est_rows=12064 buffers hit=513815 read=0)
+                     Hash Cond: (catalog_sales.cs_ship_mode_sk = ship_mode.sm_ship_mode_sk)
+                  -> Hash Join [Inner]  (rows=409286.29 loops=7 est_rows=12125 buffers hit=513808 read=0)
+                       Hash Cond: (catalog_sales.cs_ship_date_sk = date_dim.d_date_sk)
+                    -> Seq Scan on catalog_sales  (rows=2057323.0 loops=7 est_rows=2400266 buffers hit=511776 read=0)
+                    -> Hash  (rows=52.29 loops=7 est_rows=218 buffers hit=2032 read=0)
+                      -> Seq Scan on date_dim  (rows=366.0 loops=1 est_rows=218 buffers hit=2032 read=0)
+                           Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+                           Rows Removed by Filter: 72683
+                  -> Hash  (rows=20.0 loops=7 est_rows=20 buffers hit=7 read=0)
+                    -> Seq Scan on ship_mode  (rows=20.0 loops=7 est_rows=20 buffers hit=7 read=0)
+                -> Hash  (rows=24.0 loops=7 est_rows=24 buffers hit=14 read=0)
+                  -> Seq Scan on call_center  (rows=24.0 loops=7 est_rows=24 buffers hit=14 read=0)
+              -> Hash  (rows=10.0 loops=7 est_rows=10 buffers hit=7 read=0)
+                -> Seq Scan on warehouse  (rows=10.0 loops=7 est_rows=10 buffers hit=7 read=0)

@@ -1,0 +1,216 @@
+-- DuckDB 1.5.5, tpcds-q80, original; latency 0.157928807 s, cpu 1.0609005300000003 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0002)
+       Top: 100
+       Order By: ['x.channel ASC', 'x.id ASC']
+    -> HASH_GROUP_BY  (rows=520 time_s=0.0079)
+         Groups: ['#0', '#1']
+         Aggregates: ['sum(#2)', 'sum(#3)', 'sum(#4)']
+         Estimated Cardinality: 89655
+      -> PROJECTION  (rows=516 time_s=0.0)
+           Projections: ['channel', 'id', 'sales', 'returns_', 'profit']
+           Estimated Cardinality: 369331
+        -> UNION  (rows=516 time_s=0)
+          -> PROJECTION  (rows=51 time_s=0.0001)
+               Projections: ['channel', 'id', 'sales', 'returns_', 'profit']
+               Estimated Cardinality: 201710
+            -> HASH_GROUP_BY  (rows=51 time_s=0.0035)
+                 Groups: #0
+                 Aggregates: ['sum(#1)', 'sum(#2)', 'sum(#3)']
+                 Estimated Cardinality: 201710
+              -> PROJECTION  (rows=31956 time_s=0.0033)
+                   Projections: ['s_store_id', 'ss_ext_sales_price', 'COALESCE(CAST(sr_return_amt AS DECIMAL(12,2)), 0.00)', '(CAST(ss_net_profit AS DECIMAL(13,2)) - COALESCE(CAST(sr_net_loss AS DECIMAL(12,2)), 0.00))']
+                   Estimated Cardinality: 239957
+                -> HASH_JOIN  (rows=31956 time_s=0.001)
+                     Join Type: INNER
+                     Conditions: ss_store_sk = s_store_sk
+                     Estimated Cardinality: 239957
+                  -> HASH_JOIN  (rows=32321 time_s=0.0076)
+                       Join Type: INNER
+                       Conditions: ss_item_sk = i_item_sk
+                       Estimated Cardinality: 235252
+                    -> HASH_JOIN  (rows=588775 time_s=0.0052)
+                         Join Type: INNER
+                         Conditions: ss_sold_date_sk = d_date_sk
+                         Estimated Cardinality: 1107669
+                      -> HASH_JOIN  (rows=588775 time_s=0.0079)
+                           Join Type: INNER
+                           Conditions: ss_promo_sk = p_promo_sk
+                           Estimated Cardinality: 5538652
+                        -> HASH_JOIN  (rows=612808 time_s=0.3403)
+                             Join Type: LEFT
+                             Conditions: ['ss_item_sk = sr_item_sk', 'ss_ticket_number = sr_ticket_number']
+                             Estimated Cardinality: 28800991
+                          -> TABLE_SCAN  (rows=612808 time_s=0.3775)
+                               Table: tpcds.main.store_sales
+                               Type: Sequential Scan
+                               Projections: ['ss_item_sk', 'ss_ticket_number', 'ss_sold_date_sk', 'ss_store_sk', 'ss_promo_sk', 'ss_ext_sales_price', 'ss_net_profit']
+                               Estimated Cardinality: 28800991
+                               Dynamic Filters: ['optional: ss_item_sk>=11 AND optional: ss_item_sk<=101983', 'optional: ss_sold_date_sk>=2451780 AND optional: ss_sold_date_sk<=2451810', 'optional: ss_store_sk>=1 AND optional: ss_store_sk<=100', 'optional: ss_promo_sk>=1 AND optional: ss_promo_sk<=500']
+                          -> TABLE_SCAN  (rows=2877532 time_s=0.013)
+                               Table: tpcds.main.store_returns
+                               Type: Sequential Scan
+                               Projections: ['sr_item_sk', 'sr_ticket_number', 'sr_return_amt', 'sr_net_loss']
+                               Estimated Cardinality: 2877532
+                        -> TABLE_SCAN  (rows=492 time_s=0.0)
+                             Table: tpcds.main.promotion
+                             Type: Sequential Scan
+                             Projections: p_promo_sk
+                             Filters: p_channel_tv='N'
+                             Estimated Cardinality: 100
+                      -> FILTER  (rows=31 time_s=0.0)
+                           Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                           Estimated Cardinality: 14609
+                        -> TABLE_SCAN  (rows=31 time_s=0.0002)
+                             Table: tpcds.main.date_dim
+                             Type: Sequential Scan
+                             Projections: d_date_sk
+                             Filters: d_date>='2000-08-23'::DATE AND d_date<='2000-09-22'::DATE
+                             Estimated Cardinality: 14609
+                    -> TABLE_SCAN  (rows=5691 time_s=0.0006)
+                         Table: tpcds.main.item
+                         Type: Sequential Scan
+                         Projections: i_item_sk
+                         Filters: i_current_price>50.00
+                         Estimated Cardinality: 20400
+                  -> TABLE_SCAN  (rows=100 time_s=0.0001)
+                       Table: tpcds.main.store
+                       Type: Index Scan
+                       Projections: ['s_store_sk', 's_store_id']
+                       Filters: s_store_sk<=100
+                       Estimated Cardinality: 102
+          -> PROJECTION  (rows=444 time_s=0.0001)
+               Projections: ['channel', 'id', 'sales', 'returns_', 'profit']
+               Estimated Cardinality: 118554
+            -> HASH_GROUP_BY  (rows=444 time_s=0.0024)
+                 Groups: #0
+                 Aggregates: ['sum(#1)', 'sum(#2)', 'sum(#3)']
+                 Estimated Cardinality: 118554
+              -> PROJECTION  (rows=17278 time_s=0.0008)
+                   Projections: ['cp_catalog_page_id', 'cs_ext_sales_price', 'COALESCE(CAST(cr_return_amount AS DECIMAL(12,2)), 0.00)', '(CAST(cs_net_profit AS DECIMAL(13,2)) - COALESCE(CAST(cr_net_loss AS DECIMAL(12,2)), 0.00))']
+                   Estimated Cardinality: 135365
+                -> HASH_JOIN  (rows=17278 time_s=0.0005)
+                     Join Type: INNER
+                     Conditions: cs_catalog_page_sk = cp_catalog_page_sk
+                     Estimated Cardinality: 135365
+                  -> HASH_JOIN  (rows=17288 time_s=0.0021)
+                       Join Type: INNER
+                       Conditions: cs_item_sk = i_item_sk
+                       Estimated Cardinality: 117530
+                    -> HASH_JOIN  (rows=313348 time_s=0.0016)
+                         Join Type: INNER
+                         Conditions: cs_sold_date_sk = d_date_sk
+                         Estimated Cardinality: 553864
+                      -> HASH_JOIN  (rows=314252 time_s=0.0018)
+                           Join Type: INNER
+                           Conditions: cs_promo_sk = p_promo_sk
+                           Estimated Cardinality: 2769473
+                        -> HASH_JOIN  (rows=320066 time_s=0.0858)
+                             Join Type: LEFT
+                             Conditions: ['cs_item_sk = cr_item_sk', 'cs_order_number = cr_order_number']
+                             Estimated Cardinality: 14401261
+                          -> TABLE_SCAN  (rows=320066 time_s=0.005)
+                               Table: tpcds.main.catalog_sales
+                               Type: Sequential Scan
+                               Projections: ['cs_item_sk', 'cs_order_number', 'cs_sold_date_sk', 'cs_catalog_page_sk', 'cs_promo_sk', 'cs_ext_sales_price', 'cs_net_profit']
+                               Estimated Cardinality: 14401261
+                               Dynamic Filters: ['optional: cs_item_sk>=11 AND optional: cs_item_sk<=101983', 'optional: cs_sold_date_sk>=2451780 AND optional: cs_sold_date_sk<=2451810', 'optional: cs_catalog_page_sk>=1 AND optional: cs_catalog_page_sk<=10101', 'optional: cs_promo_sk>=1 AND optional: cs_promo_sk<=500']
+                          -> TABLE_SCAN  (rows=1441224 time_s=0.0067)
+                               Table: tpcds.main.catalog_returns
+                               Type: Sequential Scan
+                               Projections: ['cr_item_sk', 'cr_order_number', 'cr_return_amount', 'cr_net_loss']
+                               Estimated Cardinality: 1441224
+                        -> TABLE_SCAN  (rows=492 time_s=0.0)
+                             Table: tpcds.main.promotion
+                             Type: Sequential Scan
+                             Projections: p_promo_sk
+                             Filters: p_channel_tv='N'
+                             Estimated Cardinality: 100
+                      -> FILTER  (rows=31 time_s=0.0)
+                           Expression: (d_date_sk BETWEEN 2450815 AND 2452653)
+                           Estimated Cardinality: 14609
+                        -> TABLE_SCAN  (rows=31 time_s=0.0002)
+                             Table: tpcds.main.date_dim
+                             Type: Sequential Scan
+                             Projections: d_date_sk
+                             Filters: d_date>='2000-08-23'::DATE AND d_date<='2000-09-22'::DATE
+                             Estimated Cardinality: 14609
+                    -> TABLE_SCAN  (rows=5691 time_s=0.0005)
+                         Table: tpcds.main.item
+                         Type: Sequential Scan
+                         Projections: i_item_sk
+                         Filters: i_current_price>50.00
+                         Estimated Cardinality: 20400
+                  -> TABLE_SCAN  (rows=10101 time_s=0.0002)
+                       Table: tpcds.main.catalog_page
+                       Type: Sequential Scan
+                       Projections: ['cp_catalog_page_sk', 'cp_catalog_page_id']
+                       Filters: cp_catalog_page_sk<=10101
+                       Estimated Cardinality: 12000
+          -> PROJECTION  (rows=21 time_s=0.0001)
+               Projections: ['channel', 'id', 'sales', 'returns_', 'profit']
+               Estimated Cardinality: 49067
+            -> HASH_GROUP_BY  (rows=21 time_s=0.0021)
+                 Groups: #0
+                 Aggregates: ['sum(#1)', 'sum(#2)', 'sum(#3)']
+                 Estimated Cardinality: 49067
+              -> PROJECTION  (rows=8698 time_s=0.0009)
+                   Projections: ['web_site_id', 'ws_ext_sales_price', 'COALESCE(CAST(wr_return_amt AS DECIMAL(12,2)), 0.00)', '(CAST(ws_net_profit AS DECIMAL(13,2)) - COALESCE(CAST(wr_net_loss AS DECIMAL(12,2)), 0.00))']
+                   Estimated Cardinality: 57176
+                -> HASH_JOIN  (rows=8698 time_s=0.0003)
+                     Join Type: INNER
+                     Conditions: ws_web_site_sk = web_site_sk
+                     Estimated Cardinality: 57176
+                  -> HASH_JOIN  (rows=8698 time_s=0.0025)
+                       Join Type: INNER
+                       Conditions: ws_item_sk = i_item_sk
+                       Estimated Cardinality: 58537
+                    -> HASH_JOIN  (rows=159524 time_s=0.0017)
+                         Join Type: INNER
+                         Conditions: ws_sold_date_sk = d_date_sk
+                         Estimated Cardinality: 276814
+                      -> HASH_JOIN  (rows=159524 time_s=0.0021)
+                           Join Type: INNER
+                           Conditions: ws_promo_sk = p_promo_sk
+                           Estimated Cardinality: 1384147
+                        -> HASH_JOIN  (rows=162069 time_s=0.0818)
+                             Join Type: LEFT
+                             Conditions: ['ws_item_sk = wr_item_sk', 'ws_order_number = wr_order_number']
+                             Estimated Cardinality: 7197566
+                          -> TABLE_SCAN  (rows=162069 time_s=0.0895)
+                               Table: tpcds.main.web_sales
+                               Type: Sequential Scan
+                               Projections: ['ws_item_sk', 'ws_order_number', 'ws_sold_date_sk', 'ws_web_site_sk', 'ws_promo_sk', 'ws_ext_sales_price', 'ws_net_profit']
+                               Estimated Cardinality: 7197566
+                               Dynamic Filters: ['optional: ws_item_sk>=11 AND optional: ws_item_sk<=101983', 'optional: ws_sold_date_sk>=2451780 AND optional: ws_sold_date_sk<=2451810', 'optional: ws_web_site_sk>=1 AND optional: ws_web_site_sk<=42', 'optional: ws_promo_sk>=1 AND optional: ws_promo_sk<=500']
+                          -> TABLE_SCAN  (rows=719222 time_s=0.0033)
+                               Table: tpcds.main.web_returns
+                               Type: Sequential Scan
+                               Projections: ['wr_item_sk', 'wr_order_number', 'wr_return_amt', 'wr_net_loss']
+                               Estimated Cardinality: 719222
+                        -> TABLE_SCAN  (rows=492 time_s=0.0)
+                             Table: tpcds.main.promotion
+                             Type: Sequential Scan
+                             Projections: p_promo_sk
+                             Filters: p_channel_tv='N'
+                             Estimated Cardinality: 100
+                      -> FILTER  (rows=31 time_s=0.0)
+                           Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                           Estimated Cardinality: 14609
+                        -> TABLE_SCAN  (rows=31 time_s=0.0003)
+                             Table: tpcds.main.date_dim
+                             Type: Sequential Scan
+                             Projections: d_date_sk
+                             Filters: d_date>='2000-08-23'::DATE AND d_date<='2000-09-22'::DATE
+                             Estimated Cardinality: 14609
+                    -> TABLE_SCAN  (rows=5691 time_s=0.0002)
+                         Table: tpcds.main.item
+                         Type: Sequential Scan
+                         Projections: i_item_sk
+                         Filters: i_current_price>50.00
+                         Estimated Cardinality: 20400
+                  -> TABLE_SCAN  (rows=42 time_s=0.0)
+                       Table: tpcds.main.web_site
+                       Type: Sequential Scan
+                       Projections: ['web_site_sk', 'web_site_id']
+                       Estimated Cardinality: 42

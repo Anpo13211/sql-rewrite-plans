@@ -1,0 +1,23 @@
+-- PostgreSQL 18, tpcds-q15, original; execution 4884.864 ms, planning 0.579 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=3890455 read=0)
+  -> Aggregate [Sorted]  (rows=100.0 loops=1 est_rows=2120 buffers hit=3890455 read=0)
+       Group Key: ['customer_address.ca_zip']
+    -> Nested Loop [Inner]  (rows=6350.0 loops=1 est_rows=2120 buffers hit=3890455 read=0)
+      -> Nested Loop [Inner]  (rows=219361.0 loops=1 est_rows=1729409 buffers hit=3884953 read=0)
+           Join Filter: (("substring"((customer_address.ca_zip)::text, 1, 5) = ANY ('{85669,86197,88274,83405,86475,85392,85460,80348,81792}'::text[])) OR ((customer_address.ca_state)::text = ANY ('{CA,WA,GA}'::text[])) OR (catalog_sales.cs_sales_price > '500'::numeric))
+           Rows Removed by Join Filter: 3282694
+        -> Gather Merge  (rows=122170.0 loops=1 est_rows=500000 workers=3 buffers hit=16400 read=0)
+          -> Sort  (rows=31510.75 loops=4 est_rows=161290 buffers hit=16400 read=0)
+               Sort Key: ['customer_address.ca_zip NULLS FIRST']
+            -> Hash Join [Inner]  (rows=125000.0 loops=4 est_rows=161290 buffers hit=16376 read=0)
+                 Hash Cond: (customer.c_current_addr_sk = customer_address.ca_address_sk)
+              -> Seq Scan on customer  (rows=125000.0 loops=4 est_rows=161290 buffers hit=11872 read=0)
+              -> Hash  (rows=62500.0 loops=4 est_rows=104167 buffers hit=4504 read=0)
+                -> Seq Scan on customer_address  (rows=62500.0 loops=4 est_rows=104167 buffers hit=4504 read=0)
+        -> Index Scan on catalog_sales using scaleup_tpcds_20  (rows=28.67 loops=122170 est_rows=37 buffers hit=3868553 read=0)
+             Index Cond: (cs_bill_customer_sk = customer.c_customer_sk)
+      -> Memoize  (rows=0.03 loops=219361 est_rows=1 buffers hit=5502 read=0)
+        -> Index Scan on date_dim using scaleup_tpcds_36  (rows=0.05 loops=1835 est_rows=1 buffers hit=5502 read=0)
+             Index Cond: (d_date_sk = catalog_sales.cs_sold_date_sk)
+             Filter: ((d_qoy = 2) AND (d_year = 2001))
+             Rows Removed by Filter: 1

@@ -1,0 +1,110 @@
+-- PostgreSQL 18, tpcds-q31, rewrite; execution 6878.32 ms, planning 2.176 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Subquery Scan  (rows=307.0 loops=1 est_rows=1 buffers hit=18153700 read=0)
+  -> Aggregate [Sorted]  (rows=307.0 loops=1 est_rows=1 buffers hit=18153700 read=0)
+       Filter: ((max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 'w'::text) AND ("*SELECT* 1"."?column?_1" = 1))) > '0'::numeric) AND (max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 's'::text) AND ("*SELECT* 1"."?column?_1" = 1))) > '0'::numeric) AND (max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 'w'::text) AND ("*SELECT* 1"."?column?_1" = 2))) > '0'::numeric) AND (max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 's'::text) AND ("*SELECT* 1"."?column?_1" = 2))) > '0'::numeric) AND (((max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 'w'::text) AND ("*SELECT* 1"."?column?_1" = 2))) * 1.0000) / max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 'w'::text) AND ("*SELECT* 1"."?column?_1" = 1)))) > ((max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 's'::text) AND ("*SELECT* 1"."?column?_1" = 2))) * 1.0000) / max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 's'::text) AND ("*SELECT* 1"."?column?_1" = 1))))) AND (((max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 'w'::text) AND ("*SELECT* 1"."?column?_1" = 3))) * 1.0000) / max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 'w'::text) AND ("*SELECT* 1"."?column?_1" = 2)))) > ((max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 's'::text) AND ("*SELECT* 1"."?column?_1" = 3))) * 1.0000) / max("*SELECT* 1".sum) FILTER (WHERE (("*SELECT* 1"."?column?" = 's'::text) AND ("*SELECT* 1"."?column?_1" = 2))))))
+       Group Key: ['"*SELECT* 1".ca_county']
+       Rows Removed by Filter: 1540
+    -> Merge Append  (rows=11076.0 loops=1 est_rows=11076 buffers hit=18153700 read=0)
+         Sort Key: ['"*SELECT* 1".ca_county']
+      -> Subquery Scan  (rows=1847.0 loops=1 est_rows=1846 buffers hit=3955782 read=0)
+        -> Aggregate [Sorted] [Finalize]  (rows=1847.0 loops=1 est_rows=1846 buffers hit=3955782 read=0)
+             Group Key: ['ca.ca_county']
+          -> Gather Merge  (rows=12929.0 loops=1 est_rows=11076 workers=6 buffers hit=3955782 read=0)
+            -> Aggregate [Sorted] [Partial]  (rows=1847.0 loops=7 est_rows=1846 buffers hit=3955782 read=0)
+                 Group Key: ['ca.ca_county']
+              -> Sort  (rows=117001.14 loops=7 est_rows=5392 buffers hit=3955782 read=0)
+                   Sort Key: ['ca.ca_county']
+                -> Nested Loop [Inner]  (rows=117001.14 loops=7 est_rows=5392 buffers hit=3955734 read=0)
+                  -> Hash Join [Inner]  (rows=119823.14 loops=7 est_rows=5648 buffers hit=679696 read=0)
+                       Hash Cond: (ss.ss_sold_date_sk = d.d_date_sk)
+                    -> Seq Scan on store_sales ss  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+                    -> Hash  (rows=13.0 loops=7 est_rows=53 buffers hit=2032 read=0)
+                      -> Seq Scan on date_dim d  (rows=13.0 loops=7 est_rows=53 buffers hit=2032 read=0)
+                           Filter: ((d_qoy = 1) AND (d_year = 2000))
+                           Rows Removed by Filter: 10423
+                  -> Index Scan on customer_address ca using scaleup_tpcds_34  (rows=0.98 loops=838762 est_rows=1 buffers hit=3276038 read=0)
+                       Index Cond: (ca_address_sk = ss.ss_addr_sk)
+      -> Subquery Scan  (rows=1847.0 loops=1 est_rows=1846 buffers hit=3769130 read=0)
+        -> Aggregate [Sorted] [Finalize]  (rows=1847.0 loops=1 est_rows=1846 buffers hit=3769130 read=0)
+             Group Key: ['ca_1.ca_county']
+          -> Gather Merge  (rows=12929.0 loops=1 est_rows=11076 workers=6 buffers hit=3769130 read=0)
+            -> Aggregate [Sorted] [Partial]  (rows=1847.0 loops=7 est_rows=1846 buffers hit=3769130 read=0)
+                 Group Key: ['ca_1.ca_county']
+              -> Sort  (rows=110335.0 loops=7 est_rows=5392 buffers hit=3769130 read=0)
+                   Sort Key: ['ca_1.ca_county']
+                -> Nested Loop [Inner]  (rows=110335.0 loops=7 est_rows=5392 buffers hit=3769082 read=0)
+                  -> Hash Join [Inner]  (rows=113008.14 loops=7 est_rows=5648 buffers hit=679696 read=0)
+                       Hash Cond: (ss_1.ss_sold_date_sk = d_1.d_date_sk)
+                    -> Seq Scan on store_sales ss_1  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+                    -> Hash  (rows=13.0 loops=7 est_rows=53 buffers hit=2032 read=0)
+                      -> Seq Scan on date_dim d_1  (rows=91.0 loops=1 est_rows=53 buffers hit=2032 read=0)
+                           Filter: ((d_qoy = 2) AND (d_year = 2000))
+                           Rows Removed by Filter: 72958
+                  -> Index Scan on customer_address ca_1 using scaleup_tpcds_34  (rows=0.98 loops=791057 est_rows=1 buffers hit=3089386 read=0)
+                       Index Cond: (ca_address_sk = ss_1.ss_addr_sk)
+      -> Subquery Scan  (rows=1847.0 loops=1 est_rows=1846 buffers hit=6404834 read=0)
+        -> Aggregate [Sorted] [Finalize]  (rows=1847.0 loops=1 est_rows=1846 buffers hit=6404834 read=0)
+             Group Key: ['ca_2.ca_county']
+          -> Gather Merge  (rows=12929.0 loops=1 est_rows=11076 workers=6 buffers hit=6404834 read=0)
+            -> Aggregate [Sorted] [Partial]  (rows=1847.0 loops=7 est_rows=1846 buffers hit=6404834 read=0)
+                 Group Key: ['ca_2.ca_county']
+              -> Sort  (rows=204467.29 loops=7 est_rows=5511 buffers hit=6404834 read=0)
+                   Sort Key: ['ca_2.ca_county']
+                -> Nested Loop [Inner]  (rows=204467.29 loops=7 est_rows=5511 buffers hit=6404786 read=0)
+                  -> Hash Join [Inner]  (rows=209407.71 loops=7 est_rows=5773 buffers hit=679696 read=0)
+                       Hash Cond: (ss_2.ss_sold_date_sk = d_2.d_date_sk)
+                    -> Seq Scan on store_sales ss_2  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+                    -> Hash  (rows=13.14 loops=7 est_rows=54 buffers hit=2032 read=0)
+                      -> Seq Scan on date_dim d_2  (rows=92.0 loops=1 est_rows=54 buffers hit=2032 read=0)
+                           Filter: ((d_qoy = 3) AND (d_year = 2000))
+                           Rows Removed by Filter: 72957
+                  -> Index Scan on customer_address ca_2 using scaleup_tpcds_34  (rows=0.98 loops=1465854 est_rows=1 buffers hit=5725090 read=0)
+                       Index Cond: (ca_address_sk = ss_2.ss_addr_sk)
+      -> Subquery Scan  (rows=1843.0 loops=1 est_rows=1846 buffers hit=1133158 read=0)
+        -> Aggregate [Sorted]  (rows=1843.0 loops=1 est_rows=1846 buffers hit=1133158 read=0)
+             Group Key: ['ca_3.ca_county']
+          -> Gather Merge  (rows=218520.0 loops=1 est_rows=8864 workers=6 buffers hit=1133158 read=0)
+            -> Sort  (rows=31217.14 loops=7 est_rows=1477 buffers hit=1133158 read=0)
+                 Sort Key: ['ca_3.ca_county']
+              -> Nested Loop [Inner]  (rows=31217.14 loops=7 est_rows=1477 buffers hit=1133110 read=0)
+                -> Hash Join [Inner]  (rows=31221.29 loops=7 est_rows=1478 buffers hit=259024 read=0)
+                     Hash Cond: (ws.ws_sold_date_sk = d_3.d_date_sk)
+                  -> Seq Scan on web_sales ws  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+                  -> Hash  (rows=13.0 loops=7 est_rows=53 buffers hit=2032 read=0)
+                    -> Seq Scan on date_dim d_3  (rows=91.0 loops=1 est_rows=53 buffers hit=2032 read=0)
+                         Filter: ((d_qoy = 1) AND (d_year = 2000))
+                         Rows Removed by Filter: 72958
+                -> Index Scan on customer_address ca_3 using scaleup_tpcds_34  (rows=1.0 loops=218549 est_rows=1 buffers hit=874086 read=0)
+                     Index Cond: (ca_address_sk = ws.ws_bill_addr_sk)
+      -> Subquery Scan  (rows=1845.0 loops=1 est_rows=1846 buffers hit=1092574 read=0)
+        -> Aggregate [Sorted]  (rows=1845.0 loops=1 est_rows=1846 buffers hit=1092574 read=0)
+             Group Key: ['ca_4.ca_county']
+          -> Gather Merge  (rows=208374.0 loops=1 est_rows=8864 workers=6 buffers hit=1092574 read=0)
+            -> Sort  (rows=29767.71 loops=7 est_rows=1477 buffers hit=1092574 read=0)
+                 Sort Key: ['ca_4.ca_county']
+              -> Nested Loop [Inner]  (rows=29767.71 loops=7 est_rows=1477 buffers hit=1092526 read=0)
+                -> Hash Join [Inner]  (rows=29771.57 loops=7 est_rows=1478 buffers hit=259024 read=0)
+                     Hash Cond: (ws_1.ws_sold_date_sk = d_4.d_date_sk)
+                  -> Seq Scan on web_sales ws_1  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+                  -> Hash  (rows=13.0 loops=7 est_rows=53 buffers hit=2032 read=0)
+                    -> Seq Scan on date_dim d_4  (rows=91.0 loops=1 est_rows=53 buffers hit=2032 read=0)
+                         Filter: ((d_qoy = 2) AND (d_year = 2000))
+                         Rows Removed by Filter: 72958
+                -> Index Scan on customer_address ca_4 using scaleup_tpcds_34  (rows=1.0 loops=208401 est_rows=1 buffers hit=833502 read=0)
+                     Index Cond: (ca_address_sk = ws_1.ws_bill_addr_sk)
+      -> Subquery Scan  (rows=1847.0 loops=1 est_rows=1846 buffers hit=1798222 read=0)
+        -> Aggregate [Sorted]  (rows=1847.0 loops=1 est_rows=1846 buffers hit=1798222 read=0)
+             Group Key: ['ca_5.ca_county']
+          -> Gather Merge  (rows=384795.0 loops=1 est_rows=9061 workers=2 buffers hit=1798222 read=0)
+            -> Sort  (rows=128265.0 loops=3 est_rows=1510 buffers hit=1798222 read=0)
+                 Sort Key: ['ca_5.ca_county']
+              -> Nested Loop [Inner]  (rows=128265.0 loops=3 est_rows=1510 buffers hit=1798206 read=0)
+                -> Hash Join [Inner]  (rows=128278.0 loops=3 est_rows=1510 buffers hit=259024 read=0)
+                     Hash Cond: (ws_2.ws_sold_date_sk = d_5.d_date_sk)
+                  -> Seq Scan on web_sales ws_2  (rows=2399188.67 loops=3 est_rows=1199604 buffers hit=256992 read=0)
+                  -> Hash  (rows=30.67 loops=3 est_rows=54 buffers hit=2032 read=0)
+                    -> Seq Scan on date_dim d_5  (rows=92.0 loops=1 est_rows=54 buffers hit=2032 read=0)
+                         Filter: ((d_qoy = 3) AND (d_year = 2000))
+                         Rows Removed by Filter: 72957
+                -> Index Scan on customer_address ca_5 using scaleup_tpcds_34  (rows=1.0 loops=384834 est_rows=1 buffers hit=1539182 read=0)
+                     Index Cond: (ca_address_sk = ws_2.ws_bill_addr_sk)

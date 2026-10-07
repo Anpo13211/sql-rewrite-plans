@@ -1,0 +1,50 @@
+-- DuckDB 1.5.5, tpch-q18, rewrite; latency 0.331711765 s, cpu 2.5512047869999996 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0002)
+       Top: 100
+       Order By: ['o.o_totalprice DESC', 'o.o_orderdate ASC']
+    -> PROJECTION  (rows=624 time_s=0.0)
+         Projections: ['c_name', 'c_custkey', 'o_orderkey', 'o_orderdate', 'o_totalprice', 'sum(l_quantity)']
+         Estimated Cardinality: 1016808
+      -> HASH_JOIN  (rows=624 time_s=0.0024)
+           Join Type: INNER
+           Conditions: c_custkey = o_custkey
+           Estimated Cardinality: 1016808
+        -> TABLE_SCAN  (rows=13498 time_s=0.014)
+             Table: tpch.main.customer
+             Type: Sequential Scan
+             Projections: ['c_custkey', 'c_name']
+             Filters: c_custkey<=1499999
+             Estimated Cardinality: 1500000
+             Dynamic Filters: optional: c_custkey>=3307 AND optional: c_custkey<=1499743 AND optional: c_custkey IN BF(o_custkey)
+        -> HASH_JOIN  (rows=624 time_s=0.0104)
+             Join Type: INNER
+             Conditions: o_orderkey = l_orderkey
+             Estimated Cardinality: 1008760
+          -> TABLE_SCAN  (rows=127529 time_s=0.1242)
+               Table: tpch.main.orders
+               Type: Sequential Scan
+               Projections: ['o_orderkey', 'o_custkey', 'o_orderdate', 'o_totalprice']
+               Estimated Cardinality: 15000000
+               Dynamic Filters: optional: o_orderkey>=6882 AND optional: o_orderkey<=59993957 AND optional: o_orderkey IN BF(l_orderkey)
+          -> FILTER  (rows=624 time_s=0.0456)
+               Expression: (sum(l_quantity) > 300.00)
+               Estimated Cardinality: 1000527
+            -> PROJECTION  (rows=15000000 time_s=0.0066)
+                 Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1']
+                 Estimated Cardinality: 5002635
+              -> HASH_GROUP_BY  (rows=15000000 time_s=2.1972)
+                   Groups: #0
+                   Aggregates: sum_no_overflow(#1)
+                   Estimated Cardinality: 5002635
+                -> PROJECTION  (rows=59986052 time_s=0.0039)
+                     Projections: ['l_orderkey', 'l_quantity']
+                     Estimated Cardinality: 59986052
+                  -> PROJECTION  (rows=59986052 time_s=0.0245)
+                       Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1']
+                       Estimated Cardinality: 59986052
+                    -> TABLE_SCAN  (rows=59986052 time_s=0.1222)
+                         Table: tpch.main.lineitem
+                         Type: Sequential Scan
+                         Projections: ['l_orderkey', 'l_quantity']
+                         Estimated Cardinality: 59986052

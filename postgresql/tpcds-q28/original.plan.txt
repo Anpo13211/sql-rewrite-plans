@@ -1,0 +1,49 @@
+-- PostgreSQL 18, tpcds-q28, original; execution 4132.523 ms, planning 0.519 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=1.0 loops=1 est_rows=1 buffers hit=4067352 read=0)
+  -> Nested Loop [Inner]  (rows=1.0 loops=1 est_rows=1 buffers hit=4067352 read=0)
+    -> Nested Loop [Inner]  (rows=1.0 loops=1 est_rows=1 buffers hit=3389460 read=0)
+      -> Nested Loop [Inner]  (rows=1.0 loops=1 est_rows=1 buffers hit=2711568 read=0)
+        -> Nested Loop [Inner]  (rows=1.0 loops=1 est_rows=1 buffers hit=2033676 read=0)
+          -> Nested Loop [Inner]  (rows=1.0 loops=1 est_rows=1 buffers hit=1355784 read=0)
+            -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=677892 read=0)
+              -> Gather Merge  (rows=367014.0 loops=1 est_rows=387967 workers=6 buffers hit=677892 read=0)
+                -> Sort  (rows=52430.57 loops=7 est_rows=64661 buffers hit=677892 read=0)
+                     Sort Key: ['store_sales.ss_list_price']
+                  -> Seq Scan on store_sales  (rows=52430.57 loops=7 est_rows=64661 buffers hit=677664 read=0)
+                       Filter: ((ss_quantity >= 0) AND (ss_quantity <= 5) AND (((ss_list_price >= '8'::numeric) AND (ss_list_price <= '18'::numeric)) OR ((ss_coupon_amt >= '459'::numeric) AND (ss_coupon_amt <= '1459'::numeric)) OR ((ss_wholesale_cost >= '57'::numeric) AND (ss_wholesale_cost <= '77'::numeric))))
+                       Rows Removed by Filter: 4061997
+            -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=677892 read=0)
+              -> Gather Merge  (rows=355872.0 loops=1 est_rows=350460 workers=6 buffers hit=677892 read=0)
+                -> Sort  (rows=50838.86 loops=7 est_rows=58410 buffers hit=677892 read=0)
+                     Sort Key: ['store_sales_1.ss_list_price']
+                  -> Seq Scan on store_sales store_sales_1  (rows=50838.86 loops=7 est_rows=58410 buffers hit=677664 read=0)
+                       Filter: ((ss_quantity >= 6) AND (ss_quantity <= 10) AND (((ss_list_price >= '90'::numeric) AND (ss_list_price <= '100'::numeric)) OR ((ss_coupon_amt >= '2323'::numeric) AND (ss_coupon_amt <= '3323'::numeric)) OR ((ss_wholesale_cost >= '31'::numeric) AND (ss_wholesale_cost <= '51'::numeric))))
+                       Rows Removed by Filter: 4063588
+          -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=677892 read=0)
+            -> Gather Merge  (rows=282365.0 loops=1 est_rows=294085 workers=6 buffers hit=677892 read=0)
+              -> Sort  (rows=40337.86 loops=7 est_rows=49014 buffers hit=677892 read=0)
+                   Sort Key: ['store_sales_2.ss_list_price']
+                -> Seq Scan on store_sales store_sales_2  (rows=40337.86 loops=7 est_rows=49014 buffers hit=677664 read=0)
+                     Filter: ((ss_quantity >= 11) AND (ss_quantity <= 15) AND (((ss_list_price >= '142'::numeric) AND (ss_list_price <= '152'::numeric)) OR ((ss_coupon_amt >= '12214'::numeric) AND (ss_coupon_amt <= '13214'::numeric)) OR ((ss_wholesale_cost >= '79'::numeric) AND (ss_wholesale_cost <= '99'::numeric))))
+                     Rows Removed by Filter: 4074089
+        -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=677892 read=0)
+          -> Gather Merge  (rows=319172.0 loops=1 est_rows=301053 workers=6 buffers hit=677892 read=0)
+            -> Sort  (rows=45596.0 loops=7 est_rows=50176 buffers hit=677892 read=0)
+                 Sort Key: ['store_sales_3.ss_list_price']
+              -> Seq Scan on store_sales store_sales_3  (rows=45596.0 loops=7 est_rows=50176 buffers hit=677664 read=0)
+                   Filter: ((ss_quantity >= 16) AND (ss_quantity <= 20) AND (((ss_list_price >= '135'::numeric) AND (ss_list_price <= '145'::numeric)) OR ((ss_coupon_amt >= '6071'::numeric) AND (ss_coupon_amt <= '7071'::numeric)) OR ((ss_wholesale_cost >= '38'::numeric) AND (ss_wholesale_cost <= '58'::numeric))))
+                   Rows Removed by Filter: 4068831
+      -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=677892 read=0)
+        -> Gather Merge  (rows=365262.0 loops=1 est_rows=356061 workers=6 buffers hit=677892 read=0)
+          -> Sort  (rows=52180.29 loops=7 est_rows=59344 buffers hit=677892 read=0)
+               Sort Key: ['store_sales_4.ss_list_price']
+            -> Seq Scan on store_sales store_sales_4  (rows=52180.29 loops=7 est_rows=59344 buffers hit=677664 read=0)
+                 Filter: ((ss_quantity >= 21) AND (ss_quantity <= 25) AND (((ss_list_price >= '122'::numeric) AND (ss_list_price <= '132'::numeric)) OR ((ss_coupon_amt >= '836'::numeric) AND (ss_coupon_amt <= '1836'::numeric)) OR ((ss_wholesale_cost >= '17'::numeric) AND (ss_wholesale_cost <= '37'::numeric))))
+                 Rows Removed by Filter: 4062247
+    -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=677892 read=0)
+      -> Gather Merge  (rows=302090.0 loops=1 est_rows=290267 workers=6 buffers hit=677892 read=0)
+        -> Sort  (rows=43155.71 loops=7 est_rows=48378 buffers hit=677892 read=0)
+             Sort Key: ['store_sales_5.ss_list_price']
+          -> Seq Scan on store_sales store_sales_5  (rows=43155.71 loops=7 est_rows=48378 buffers hit=677664 read=0)
+               Filter: ((ss_quantity >= 26) AND (ss_quantity <= 30) AND (((ss_list_price >= '154'::numeric) AND (ss_list_price <= '164'::numeric)) OR ((ss_coupon_amt >= '7326'::numeric) AND (ss_coupon_amt <= '8326'::numeric)) OR ((ss_wholesale_cost >= '7'::numeric) AND (ss_wholesale_cost <= '27'::numeric))))
+               Rows Removed by Filter: 4071272

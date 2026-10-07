@@ -1,0 +1,72 @@
+-- DuckDB 1.5.5, tpcds-q92, rewrite; latency 0.013226174 s, cpu 0.060206657999999996 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0)
+       CTE Name: eligible_dates
+       Table Index: 0
+       Estimated Cardinality: 1
+    -> TABLE_SCAN  (rows=91 time_s=0.0001)
+         Table: tpcds.main.date_dim
+         Type: Sequential Scan
+         Projections: d_date_sk
+         Filters: d_date>='2000-01-27'::DATE AND d_date<='2000-04-26'::DATE
+         Estimated Cardinality: 14609
+    -> CTE  (rows=0 time_s=0.0)
+         CTE Name: eligible_items
+         Table Index: 1
+         Estimated Cardinality: 1
+      -> TABLE_SCAN  (rows=100 time_s=0.0004)
+           Table: tpcds.main.item
+           Type: Sequential Scan
+           Projections: i_item_sk
+           Filters: i_manufact_id=350
+           Estimated Cardinality: 83
+      -> CTE  (rows=0 time_s=0.0)
+           CTE Name: scoped
+           Table Index: 2
+           Estimated Cardinality: 1
+        -> PROJECTION  (rows=163 time_s=0.0)
+             Projections: ['ws_item_sk', 'ws_ext_discount_amt']
+             Estimated Cardinality: 1238
+          -> HASH_JOIN  (rows=163 time_s=0.0009)
+               Join Type: INNER
+               Conditions: d_date_sk = ws_sold_date_sk
+               Estimated Cardinality: 1238
+            -> CTE_SCAN  (rows=91 time_s=0.0)
+                 CTE Index: 0
+                 Estimated Cardinality: 14609
+            -> HASH_JOIN  (rows=6642 time_s=0.0221)
+                 Join Type: INNER
+                 Conditions: ws_item_sk = i_item_sk
+                 Estimated Cardinality: 6192
+              -> TABLE_SCAN  (rows=7184497 time_s=0.036)
+                   Table: tpcds.main.web_sales
+                   Type: Sequential Scan
+                   Projections: ['ws_sold_date_sk', 'ws_item_sk', 'ws_ext_discount_amt']
+                   Estimated Cardinality: 7197566
+                   Dynamic Filters: optional: ws_item_sk>=10 AND optional: ws_item_sk<=99309
+              -> CTE_SCAN  (rows=100 time_s=0.0)
+                   CTE Index: 1
+                   Estimated Cardinality: 83
+        -> STREAMING_LIMIT  (rows=1 time_s=0.0)
+          -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+               Aggregates: sum(#0)
+            -> PROJECTION  (rows=52 time_s=0.0)
+                 Projections: ws_ext_discount_amt
+                 Estimated Cardinality: 86
+              -> HASH_JOIN  (rows=52 time_s=0.0002)
+                   Join Type: INNER
+                   Conditions: ['ws_item_sk = ws_item_sk', '(1.3 * avg_discount) < CAST(ws_ext_discount_amt AS DOUBLE)']
+                   Estimated Cardinality: 86
+                -> HASH_GROUP_BY  (rows=42 time_s=0.0003)
+                     Groups: #0
+                     Aggregates: avg(#1)
+                     Estimated Cardinality: 1230
+                  -> PROJECTION  (rows=163 time_s=0.0)
+                       Projections: ['ws_item_sk', 'ws_ext_discount_amt']
+                       Estimated Cardinality: 1238
+                    -> CTE_SCAN  (rows=163 time_s=0.0)
+                         CTE Index: 2
+                         Estimated Cardinality: 1238
+                -> CTE_SCAN  (rows=163 time_s=0.0)
+                     CTE Index: 2
+                     Estimated Cardinality: 1238

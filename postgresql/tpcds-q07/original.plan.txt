@@ -1,0 +1,30 @@
+-- PostgreSQL 18, tpcds-q07, original; execution 1539.225 ms, planning 0.95 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=732122 read=0)
+  -> Aggregate [Sorted]  (rows=100.0 loops=1 est_rows=1857 buffers hit=732122 read=0)
+       Group Key: ['item.i_item_id']
+    -> Nested Loop [Inner]  (rows=199.0 loops=1 est_rows=1857 buffers hit=732122 read=0)
+         Join Filter: (item.i_item_sk = store_sales.ss_item_sk)
+         Rows Removed by Join Filter: 25692106
+      -> Gather Merge  (rows=341.0 loops=1 est_rows=102000 workers=2 buffers hit=4582 read=0)
+        -> Sort  (rows=113.67 loops=3 est_rows=42500 buffers hit=4582 read=0)
+             Sort Key: ['item.i_item_id']
+          -> Seq Scan on item  (rows=34000.0 loops=3 est_rows=42500 buffers hit=4504 read=0)
+      -> Materialize  (rows=75344.0 loops=341 est_rows=1857 buffers hit=727540 read=0)
+        -> Nested Loop [Inner]  (rows=75483.0 loops=1 est_rows=1857 buffers hit=727540 read=0)
+          -> Gather  (rows=76758.0 loops=1 est_rows=1945 workers=3 buffers hit=500071 read=0)
+            -> Hash Join [Inner]  (rows=19189.5 loops=4 est_rows=627 buffers hit=500071 read=0)
+                 Hash Cond: (store_sales.ss_sold_date_sk = date_dim.d_date_sk)
+              -> Nested Loop [Inner]  (rows=98161.25 loops=4 est_rows=132207 buffers hit=498039 read=0)
+                -> Seq Scan on customer_demographics  (rows=6860.0 loops=4 est_rows=9244 buffers hit=23072 read=0)
+                     Filter: (((cd_gender)::text = 'M'::text) AND ((cd_marital_status)::text = 'S'::text) AND ((cd_education_status)::text = 'College'::text))
+                     Rows Removed by Filter: 473340
+                -> Index Scan on store_sales using scaleup_tpcds_56  (rows=14.31 loops=27440 est_rows=26 buffers hit=474967 read=0)
+                     Index Cond: (ss_cdemo_sk = customer_demographics.cd_demo_sk)
+              -> Hash  (rows=91.5 loops=4 est_rows=214 buffers hit=2032 read=0)
+                -> Seq Scan on date_dim  (rows=366.0 loops=1 est_rows=214 buffers hit=2032 read=0)
+                     Filter: (d_year = 2000)
+                     Rows Removed by Filter: 72683
+          -> Index Scan on promotion using scaleup_tpcds_41  (rows=0.98 loops=76758 est_rows=1 buffers hit=227469 read=0)
+               Index Cond: (p_promo_sk = store_sales.ss_promo_sk)
+               Filter: (((p_channel_email)::text = 'N'::text) OR ((p_channel_event)::text = 'N'::text))
+               Rows Removed by Filter: 0

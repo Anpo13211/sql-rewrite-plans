@@ -1,0 +1,117 @@
+-- DuckDB 1.5.5, tpch-q20, rewrite; latency 0.093977194 s, cpu 0.6490946590000001 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0001)
+       CTE Name: target_suppliers
+       Table Index: 0
+       Estimated Cardinality: 769
+    -> PROJECTION  (rows=4054 time_s=0.0)
+         Projections: ['s_suppkey', 's_name', 's_address']
+         Estimated Cardinality: 3846
+      -> HASH_JOIN  (rows=4054 time_s=0.0001)
+           Join Type: INNER
+           Conditions: s_nationkey = n_nationkey
+           Estimated Cardinality: 3846
+        -> TABLE_SCAN  (rows=4054 time_s=0.0013)
+             Table: tpch.main.supplier
+             Type: Sequential Scan
+             Projections: ['s_nationkey', 's_suppkey', 's_name', 's_address']
+             Estimated Cardinality: 100000
+             Dynamic Filters: s_nationkey=3
+        -> TABLE_SCAN  (rows=1 time_s=0.0)
+             Table: tpch.main.nation
+             Type: Sequential Scan
+             Projections: n_nationkey
+             Filters: n_name='CANADA'
+             Estimated Cardinality: 1
+    -> CTE  (rows=0 time_s=0.0003)
+         CTE Name: matching_parts
+         Table Index: 1
+         Estimated Cardinality: 769
+      -> TABLE_SCAN  (rows=21551 time_s=0.0785)
+           Table: tpch.main.part
+           Type: Sequential Scan
+           Projections: p_partkey
+           Filters: p_name>='forest' AND p_name<'foresu'
+           Estimated Cardinality: 400000
+      -> CTE  (rows=0 time_s=0.0)
+           CTE Name: candidate_partsupp
+           Table Index: 2
+           Estimated Cardinality: 769
+        -> PROJECTION  (rows=3517 time_s=0.0)
+             Projections: ['__internal_decompress_integral_bigint(#0, 1)', '__internal_decompress_integral_bigint(#1, 1)', '__internal_decompress_integral_bigint(#2, 1)']
+             Estimated Cardinality: 76329
+          -> HASH_GROUP_BY  (rows=3517 time_s=0.0017)
+               Groups: ['#0', '#1', '#2']
+               Estimated Cardinality: 76329
+            -> PROJECTION  (rows=3517 time_s=0.0)
+                 Projections: ['ps_suppkey', 'ps_partkey', 'ps_availqty']
+                 Estimated Cardinality: 76329
+              -> PROJECTION  (rows=3517 time_s=0.0)
+                   Projections: ['__internal_compress_integral_uinteger(#0, 1)', '__internal_compress_integral_uinteger(#1, 1)', '__internal_compress_integral_usmallint(#2, 1)']
+                   Estimated Cardinality: 76329
+                -> PROJECTION  (rows=3517 time_s=0.0)
+                     Projections: ['ps_suppkey', 'ps_partkey', 'ps_availqty']
+                     Estimated Cardinality: 76329
+                  -> HASH_JOIN  (rows=3517 time_s=0.0133)
+                       Join Type: INNER
+                       Conditions: ps_partkey = p_partkey
+                       Estimated Cardinality: 76329
+                    -> HASH_JOIN  (rows=324318 time_s=0.0228)
+                         Join Type: INNER
+                         Conditions: ps_suppkey = s_suppkey
+                         Estimated Cardinality: 378520
+                      -> TABLE_SCAN  (rows=7999845 time_s=0.0296)
+                           Table: tpch.main.partsupp
+                           Type: Sequential Scan
+                           Projections: ['ps_partkey', 'ps_suppkey', 'ps_availqty']
+                           Estimated Cardinality: 8000000
+                           Dynamic Filters: ['optional: ps_partkey>=5 AND optional: ps_partkey<=1999994', 'optional: ps_suppkey>=13 AND optional: ps_suppkey<=99985']
+                      -> CTE_SCAN  (rows=4054 time_s=0.0)
+                           CTE Index: 0
+                           Estimated Cardinality: 3846
+                    -> CTE_SCAN  (rows=21551 time_s=0.0)
+                         CTE Index: 1
+                         Estimated Cardinality: 400000
+        -> CTE  (rows=0 time_s=0.0)
+             CTE Name: eligible_suppliers
+             Table Index: 3
+             Estimated Cardinality: 769
+          -> PROJECTION  (rows=2377 time_s=0.0)
+               Projections: #0
+               Estimated Cardinality: 48828
+            -> FILTER  (rows=2377 time_s=0.0002)
+                 Expression: (CAST(ps_availqty AS DECIMAL(38,3)) > (0.5 * sum(l_quantity)))
+                 Estimated Cardinality: 48828
+              -> HASH_GROUP_BY  (rows=2384 time_s=0.002)
+                   Groups: ['#0', '#1', '#2']
+                   Aggregates: sum(#3)
+                   Estimated Cardinality: 244144
+                -> PROJECTION  (rows=4015 time_s=0.0)
+                     Projections: ['ps_suppkey', 'ps_partkey', 'ps_availqty', 'l_quantity']
+                     Estimated Cardinality: 244144
+                  -> HASH_JOIN  (rows=4015 time_s=0.1256)
+                       Join Type: INNER
+                       Conditions: ['l_partkey = ps_partkey', 'l_suppkey = ps_suppkey']
+                       Estimated Cardinality: 244144
+                    -> TABLE_SCAN  (rows=9099096 time_s=0.3729)
+                         Table: tpch.main.lineitem
+                         Type: Sequential Scan
+                         Projections: ['l_partkey', 'l_suppkey', 'l_quantity']
+                         Filters: l_shipdate>='1994-01-01'::DATE AND l_shipdate<'1995-01-01'::DATE
+                         Estimated Cardinality: 11997210
+                         Dynamic Filters: ['optional: l_partkey>=748 AND optional: l_partkey<=1999831', 'optional: l_suppkey>=20 AND optional: l_suppkey<=99985']
+                    -> CTE_SCAN  (rows=3517 time_s=0.0)
+                         CTE Index: 2
+                         Estimated Cardinality: 76329
+          -> ORDER_BY  (rows=1804 time_s=0.0002)
+               Order By: s.s_name ASC
+            -> HASH_JOIN  (rows=1804 time_s=0.0004)
+                 Join Type: RIGHT_SEMI
+                 Conditions: ps_suppkey = s_suppkey
+                 Estimated Cardinality: 769
+              -> CTE_SCAN  (rows=2377 time_s=0.0)
+                   CTE Index: 3
+                   Estimated Cardinality: 48828
+              -> CTE_SCAN  (rows=4054 time_s=0.0)
+                   CTE Index: 0
+                   Estimated Cardinality: 3846

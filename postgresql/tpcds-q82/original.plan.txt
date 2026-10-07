@@ -1,0 +1,25 @@
+-- PostgreSQL 18, tpcds-q82, original; execution 987.998 ms, planning 0.614 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=6.0 loops=1 est_rows=12 buffers hit=716462 read=0)
+  -> Group  (rows=6.0 loops=1 est_rows=12 buffers hit=716462 read=0)
+       Group Key: ['item.i_item_id', 'item.i_item_desc', 'item.i_current_price']
+    -> Gather Merge  (rows=6.0 loops=1 est_rows=72 workers=6 buffers hit=716462 read=0)
+      -> Group  (rows=0.86 loops=7 est_rows=12 buffers hit=716462 read=0)
+           Group Key: ['item.i_item_id', 'item.i_item_desc', 'item.i_current_price']
+        -> Sort  (rows=13828.43 loops=7 est_rows=334 buffers hit=716462 read=0)
+             Sort Key: ['item.i_item_id', 'item.i_item_desc', 'item.i_current_price']
+          -> Hash Join [Inner]  (rows=13828.43 loops=7 est_rows=334 buffers hit=716372 read=0)
+               Hash Cond: (store_sales.ss_item_sk = inventory.inv_item_sk)
+            -> Seq Scan on store_sales  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+            -> Hash  (rows=32.86 loops=7 est_rows=2 buffers hit=38708 read=0)
+              -> Nested Loop [Inner]  (rows=32.86 loops=7 est_rows=2 buffers hit=38708 read=0)
+                -> Seq Scan on item  (rows=2.14 loops=7 est_rows=5 buffers hit=4504 read=0)
+                     Filter: ((i_current_price >= '62'::numeric) AND (i_current_price <= '92'::numeric) AND (i_manufact_id = ANY ('{129,270,821,423}'::bigint[])))
+                     Rows Removed by Filter: 14569
+                -> Nested Loop [Inner]  (rows=15.33 loops=15 est_rows=180 buffers hit=34204 read=0)
+                  -> Seq Scan on date_dim  (rows=61.0 loops=15 est_rows=60 buffers hit=30480 read=0)
+                       Filter: ((d_date >= '2000-05-25'::date) AND (d_date <= '2000-07-24'::date))
+                       Rows Removed by Filter: 72988
+                  -> Index Scan on inventory using scaleup_tpcds_39  (rows=0.25 loops=915 est_rows=3 buffers hit=3724 read=0)
+                       Index Cond: ((inv_date_sk = date_dim.d_date_sk) AND (inv_item_sk = item.i_item_sk))
+                       Filter: ((inv_quantity_on_hand >= 100) AND (inv_quantity_on_hand <= 500))
+                       Rows Removed by Filter: 0

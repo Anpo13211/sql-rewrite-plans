@@ -1,0 +1,42 @@
+-- PostgreSQL 18, tpcds-q17, original; execution 2575.28 ms, planning 14.246 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=0.0 loops=1 est_rows=1 buffers hit=12673355 read=0)
+  -> Aggregate [Sorted]  (rows=0.0 loops=1 est_rows=1 buffers hit=12673355 read=0)
+       Group Key: ['item.i_item_id', 'item.i_item_desc', 'store.s_state']
+    -> Nested Loop [Inner]  (rows=0.0 loops=1 est_rows=1 buffers hit=12673355 read=0)
+      -> Gather Merge  (rows=17.0 loops=1 est_rows=1 workers=4 buffers hit=12673304 read=0)
+        -> Sort  (rows=3.4 loops=5 est_rows=1 buffers hit=12673304 read=0)
+             Sort Key: ['item.i_item_id NULLS FIRST', 'item.i_item_desc NULLS FIRST', 'store.s_state NULLS FIRST']
+          -> Nested Loop [Inner]  (rows=3.4 loops=5 est_rows=1 buffers hit=12673272 read=0)
+            -> Nested Loop [Inner]  (rows=3.4 loops=5 est_rows=1 buffers hit=12673217 read=0)
+              -> Nested Loop [Inner]  (rows=3.4 loops=5 est_rows=1 buffers hit=12673179 read=0)
+                   Join Filter: ((store_returns.sr_item_sk = store_sales.ss_item_sk) AND (store_sales.ss_customer_sk = store_returns.sr_customer_sk) AND (store_returns.sr_ticket_number = store_sales.ss_ticket_number))
+                   Rows Removed by Join Filter: 0
+                -> Nested Loop [Inner]  (rows=4.2 loops=5 est_rows=1 buffers hit=12671653 read=0)
+                  -> Nested Loop [Inner]  (rows=28.2 loops=5 est_rows=2 buffers hit=12671229 read=0)
+                    -> Hash Join [Inner]  (rows=80946.2 loops=5 est_rows=2909 buffers hit=64612 read=0)
+                         Hash Cond: (store_returns.sr_returned_date_sk = d2.d_date_sk)
+                      -> Seq Scan on store_returns  (rows=575506.4 loops=5 est_rows=719282 buffers hit=62568 read=0)
+                      -> Hash  (rows=54.8 loops=5 est_rows=180 buffers hit=2044 read=0)
+                        -> Seq Scan on date_dim d2  (rows=54.8 loops=5 est_rows=180 buffers hit=2044 read=0)
+                             Filter: ((d_quarter_name)::text = ANY ('{2001Q1,2001Q2,2001Q3}'::text[]))
+                             Rows Removed by Filter: 14555
+                    -> Index Scan on catalog_sales using scaleup_tpcds_20  (rows=0.0 loops=404731 est_rows=1 buffers hit=12606617 read=0)
+                         Index Cond: (cs_bill_customer_sk = store_returns.sr_customer_sk)
+                         Filter: (cs_item_sk = store_returns.sr_item_sk)
+                         Rows Removed by Filter: 28
+                  -> Index Scan on date_dim d3 using scaleup_tpcds_36  (rows=0.15 loops=141 est_rows=1 buffers hit=424 read=0)
+                       Index Cond: (d_date_sk = catalog_sales.cs_sold_date_sk)
+                       Filter: ((d_quarter_name)::text = ANY ('{2001Q1,2001Q2,2001Q3}'::text[]))
+                       Rows Removed by Filter: 1
+                -> Index Scan on store_sales using scaleup_tpcds_55  (rows=0.81 loops=21 est_rows=1 buffers hit=1526 read=0)
+                     Index Cond: (ss_customer_sk = catalog_sales.cs_bill_customer_sk)
+                     Filter: (catalog_sales.cs_item_sk = ss_item_sk)
+                     Rows Removed by Filter: 69
+              -> Index Scan on store using scaleup_tpcds_44  (rows=1.0 loops=17 est_rows=1 buffers hit=38 read=0)
+                   Index Cond: (s_store_sk = store_sales.ss_store_sk)
+            -> Index Scan on item using scaleup_tpcds_40  (rows=1.0 loops=17 est_rows=1 buffers hit=55 read=0)
+                 Index Cond: (i_item_sk = store_sales.ss_item_sk)
+      -> Index Scan on date_dim d1 using scaleup_tpcds_36  (rows=0.0 loops=17 est_rows=1 buffers hit=51 read=0)
+           Index Cond: (d_date_sk = store_sales.ss_sold_date_sk)
+           Filter: ((d_quarter_name)::text = '2001Q1'::text)
+           Rows Removed by Filter: 1

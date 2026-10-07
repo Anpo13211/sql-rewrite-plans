@@ -1,0 +1,29 @@
+-- PostgreSQL 18, tpcds-q26, rewrite; execution 594.761 ms, planning 0.546 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=448413 read=0)
+  -> Nested Loop [Inner] <CTE filtered_sales>  (rows=39744.0 loops=1 est_rows=1052 buffers hit=329181 read=0)
+    -> Gather  (rows=39971.0 loops=1 est_rows=1057 workers=3 buffers hit=327681 read=0)
+      -> Nested Loop [Inner]  (rows=9992.75 loops=4 est_rows=341 buffers hit=327681 read=0)
+        -> Nested Loop [Inner]  (rows=50882.5 loops=4 est_rows=68957 buffers hit=308925 read=0)
+          -> Seq Scan on customer_demographics cd  (rows=6860.0 loops=4 est_rows=9244 buffers hit=23072 read=0)
+               Filter: (((cd_gender)::text = 'M'::text) AND ((cd_marital_status)::text = 'S'::text) AND ((cd_education_status)::text = 'College'::text))
+               Rows Removed by Filter: 473340
+          -> Index Scan on catalog_sales cs using scaleup_tpcds_21  (rows=7.42 loops=27440 est_rows=18 buffers hit=285853 read=0)
+               Index Cond: (cs_bill_cdemo_sk = cd.cd_demo_sk)
+        -> Memoize  (rows=0.2 loops=203530 est_rows=1 buffers hit=18756 read=0)
+          -> Index Scan on date_dim d using scaleup_tpcds_36  (rows=0.2 loops=6255 est_rows=1 buffers hit=18756 read=0)
+               Index Cond: (d_date_sk = cs.cs_sold_date_sk)
+               Filter: (d_year = 2000)
+               Rows Removed by Filter: 1
+    -> Memoize  (rows=0.99 loops=39971 est_rows=1 buffers hit=1500 read=0)
+      -> Index Scan on promotion p using scaleup_tpcds_41  (rows=0.99 loops=501 est_rows=1 buffers hit=1500 read=0)
+           Index Cond: (p_promo_sk = cs.cs_promo_sk)
+           Filter: (((p_channel_email)::text = 'N'::text) OR ((p_channel_event)::text = 'N'::text))
+           Rows Removed by Filter: 0
+  -> Sort  (rows=100.0 loops=1 est_rows=1052 buffers hit=448413 read=0)
+       Sort Key: ['i.i_item_id']
+    -> Aggregate [Hashed]  (rows=27774.0 loops=1 est_rows=1052 buffers hit=448413 read=0)
+         Group Key: ['i.i_item_id']
+      -> Nested Loop [Inner]  (rows=39744.0 loops=1 est_rows=1052 buffers hit=448413 read=0)
+        -> CTE Scan (CTE filtered_sales)  (rows=39744.0 loops=1 est_rows=1052 buffers hit=329181 read=0)
+        -> Index Scan on item i using scaleup_tpcds_40  (rows=1.0 loops=39744 est_rows=1 buffers hit=119232 read=0)
+             Index Cond: (i_item_sk = fs.cs_item_sk)

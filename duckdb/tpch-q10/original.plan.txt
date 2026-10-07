@@ -1,0 +1,75 @@
+-- DuckDB 1.5.5, tpch-q10, original; latency 0.302652694 s, cpu 1.926638571 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=20 time_s=0.0027)
+       Top: 20
+       Order By: sum((tpch.main.lineitem.l_extendedprice * (1 - tpch.main.lineitem.l_discount))) DESC
+    -> PROJECTION  (rows=381105 time_s=0.0001)
+         Projections: ['c_custkey', 'c_name', 'revenue', 'c_acctbal', 'n_name', 'c_address', 'c_phone', 'c_comment']
+         Estimated Cardinality: 3907832
+      -> PROJECTION  (rows=381105 time_s=0.0079)
+           Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1', '#2', '__internal_decompress_string(#3)', '__internal_decompress_string(#4)', '#5', '#6', '#7']
+           Estimated Cardinality: 3907832
+        -> HASH_GROUP_BY  (rows=381105 time_s=0.314)
+             Groups: ['#0', '#1', '#2', '#3', '#4', '#5', '#6']
+             Aggregates: sum(#7)
+             Estimated Cardinality: 3907832
+          -> PROJECTION  (rows=1147084 time_s=0.0034)
+               Projections: ['c_custkey', 'c_name', 'c_acctbal', 'c_phone', 'n_name', 'c_address', 'c_comment', '(l_extendedprice * (1.00 - l_discount))']
+               Estimated Cardinality: 3907832
+            -> PROJECTION  (rows=1147084 time_s=0.0308)
+                 Projections: ['#0', '#1', '__internal_compress_integral_uinteger(#2, 1)', '#3', '#4', '__internal_compress_string_uhugeint(#5)', '#6', '#7', '__internal_compress_string_uhugeint(#8)']
+                 Estimated Cardinality: 3907832
+              -> PROJECTION  (rows=1147084 time_s=0.0255)
+                   Projections: ['#0', '#1', '__internal_decompress_integral_bigint(#2, 1)', '#3', '#4', '__internal_decompress_string(#5)', '#6', '#7', '__internal_decompress_string(#8)']
+                   Estimated Cardinality: 3907832
+                -> HASH_JOIN  (rows=1147084 time_s=0.5259)
+                     Join Type: INNER
+                     Conditions: l_orderkey = o_orderkey
+                     Estimated Cardinality: 3907832
+                  -> PROJECTION  (rows=14808183 time_s=0.0299)
+                       Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1', '#2']
+                       Estimated Cardinality: 19995351
+                    -> TABLE_SCAN  (rows=14808183 time_s=0.6128)
+                         Table: tpch.main.lineitem
+                         Type: Sequential Scan
+                         Projections: ['l_orderkey', 'l_extendedprice', 'l_discount']
+                         Filters: l_returnflag='R'
+                         Estimated Cardinality: 19995351
+                  -> PROJECTION  (rows=573157 time_s=0.0168)
+                       Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1', '#2', '__internal_compress_string_uhugeint(#3)', '#4', '#5', '__internal_compress_string_uhugeint(#6)', '__internal_compress_integral_uinteger(#7, 1)']
+                       Estimated Cardinality: 2907628
+                    -> PROJECTION  (rows=573157 time_s=0.0018)
+                         Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1', '#2', '#3', '#4', '#5', '#6', '__internal_decompress_integral_bigint(#7, 1)']
+                         Estimated Cardinality: 2907628
+                      -> HASH_JOIN  (rows=573157 time_s=0.0932)
+                           Join Type: INNER
+                           Conditions: c_custkey = o_custkey
+                           Estimated Cardinality: 2907628
+                        -> PROJECTION  (rows=1499999 time_s=0.0018)
+                             Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1', '#2', '#3', '#4', '#5', '#6']
+                             Estimated Cardinality: 1442307
+                          -> HASH_JOIN  (rows=1499999 time_s=0.0185)
+                               Join Type: INNER
+                               Conditions: c_nationkey = n_nationkey
+                               Estimated Cardinality: 1442307
+                            -> TABLE_SCAN  (rows=1499999 time_s=0.1573)
+                                 Table: tpch.main.customer
+                                 Type: Sequential Scan
+                                 Projections: ['c_custkey', 'c_nationkey', 'c_name', 'c_acctbal', 'c_phone', 'c_address', 'c_comment']
+                                 Filters: c_custkey<=1499999
+                                 Estimated Cardinality: 1500000
+                                 Dynamic Filters: optional: c_nationkey>=0 AND optional: c_nationkey<=24
+                            -> TABLE_SCAN  (rows=25 time_s=0.0)
+                                 Table: tpch.main.nation
+                                 Type: Sequential Scan
+                                 Projections: ['n_nationkey', 'n_name']
+                                 Estimated Cardinality: 25
+                        -> PROJECTION  (rows=573157 time_s=0.0072)
+                             Projections: ['__internal_compress_integral_uinteger(#0, 1)', '__internal_compress_integral_uinteger(#1, 1)']
+                             Estimated Cardinality: 3000000
+                          -> TABLE_SCAN  (rows=573157 time_s=0.0772)
+                               Table: tpch.main.orders
+                               Type: Sequential Scan
+                               Projections: ['o_custkey', 'o_orderkey']
+                               Filters: o_orderdate>='1993-10-01'::DATE AND o_orderdate<'1994-01-01'::DATE
+                               Estimated Cardinality: 3000000

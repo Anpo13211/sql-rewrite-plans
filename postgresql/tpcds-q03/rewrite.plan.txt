@@ -1,0 +1,24 @@
+-- PostgreSQL 18, tpcds-q03, rewrite; execution 913.292 ms, planning 0.299 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=682225 read=0)
+  -> Index Scan on date_dim using scaleup_tpcds_36 <CTE filtered_dates>  (rows=150.0 loops=1 est_rows=153 buffers hit=57 read=0)
+       Index Cond: ((d_date_sk >= 2450816) AND (d_date_sk <= 2452642))
+       Filter: (d_moy = 11)
+       Rows Removed by Filter: 1677
+  -> Incremental Sort  (rows=100.0 loops=1 est_rows=4687 buffers hit=682225 read=0)
+       Sort Key: ['d.d_year', '(sum(s.ss_ext_sales_price)) DESC', 'i.i_brand_id']
+    -> Aggregate [Sorted]  (rows=141.0 loops=1 est_rows=4687 buffers hit=682225 read=0)
+         Group Key: ['d.d_year', 'i.i_brand_id', 'i.i_brand']
+      -> Sort  (rows=3380.0 loops=1 est_rows=4687 buffers hit=682225 read=0)
+           Sort Key: ['d.d_year', 'i.i_brand_id', 'i.i_brand']
+        -> Hash Join [Inner]  (rows=7864.0 loops=1 est_rows=4687 buffers hit=682225 read=0)
+             Hash Cond: (s.ss_sold_date_sk = d.d_date_sk)
+          -> Gather  (rows=51799.0 loops=1 est_rows=58455 workers=6 buffers hit=682168 read=0)
+            -> Hash Join [Inner]  (rows=7399.86 loops=7 est_rows=9742 buffers hit=682168 read=0)
+                 Hash Cond: (s.ss_item_sk = i.i_item_sk)
+              -> Seq Scan on store_sales s  (rows=4114427.29 loops=7 est_rows=4800689 buffers hit=677664 read=0)
+              -> Hash  (rows=25.71 loops=7 est_rows=86 buffers hit=4504 read=0)
+                -> Seq Scan on item i  (rows=180.0 loops=1 est_rows=86 buffers hit=4504 read=0)
+                     Filter: (i_manufact_id = 128)
+                     Rows Removed by Filter: 101820
+          -> Hash  (rows=150.0 loops=1 est_rows=153 buffers hit=57 read=0)
+            -> CTE Scan (CTE filtered_dates)  (rows=150.0 loops=1 est_rows=153 buffers hit=57 read=0)

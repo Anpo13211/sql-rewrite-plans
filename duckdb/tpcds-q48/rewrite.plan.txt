@@ -1,0 +1,72 @@
+-- DuckDB 1.5.5, tpcds-q48, rewrite; latency 0.10247574 s, cpu 0.6535379550000004 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+       Aggregates: sum(#0)
+    -> PROJECTION  (rows=5507 time_s=0.0)
+         Projections: ss_quantity
+         Estimated Cardinality: 10482
+      -> PROJECTION  (rows=5507 time_s=0.0)
+           Projections: #2
+           Estimated Cardinality: 10482
+        -> FILTER  (rows=5507 time_s=0.0031)
+             Expression: ((((ss_net_profit >= 0.00) AND (ss_net_profit <= 2000.00)) AND ((ca_state = 'CO') OR (ca_state = 'OH') OR (ca_state = 'TX'))) OR (((ss_net_profit >= 150.00) AND (ss_net_profit <= 3000.00)) AND ((ca_state = 'OR') OR (ca_state = 'MN') OR (ca_state = 'KY'))) OR (((ca_state = 'VA') OR (ca_state = 'CA') OR (ca_state = 'MS')) AND ((ss_net_profit >= 50.00) AND constant_or_null(true, ss_net_profit, 25000.00))))
+             Estimated Cardinality: 10482
+          -> HASH_JOIN  (rows=42321 time_s=0.0055)
+               Join Type: INNER
+               Conditions: ca_address_sk = ss_addr_sk
+               Estimated Cardinality: 10482
+            -> TABLE_SCAN  (rows=18831 time_s=0.0093)
+                 Table: tpcds.main.customer_address
+                 Type: Sequential Scan
+                 Projections: ['ca_address_sk', 'ca_state']
+                 Filters: ca_country='United States'
+                 Estimated Cardinality: 50000
+                 Dynamic Filters: optional: ca_address_sk>=2 AND optional: ca_address_sk<=249999 AND optional: ca_address_sk IN BF(ss_addr_sk)
+            -> HASH_JOIN  (rows=43863 time_s=0.0012)
+                 Join Type: SEMI
+                 Conditions: ss_store_sk = #0
+                 Estimated Cardinality: 46081
+              -> HASH_JOIN  (rows=44111 time_s=0.0012)
+                   Join Type: SEMI
+                   Conditions: ss_sold_date_sk = #0
+                   Estimated Cardinality: 230407
+                -> PROJECTION  (rows=44111 time_s=0.0001)
+                     Projections: ['#0', '#1', '#2', '#4', '#5']
+                     Estimated Cardinality: 1152039
+                  -> FILTER  (rows=44111 time_s=0.0052)
+                       Expression: ((((ss_sales_price >= 100.00) AND (ss_sales_price <= 150.00)) AND (cd_marital_status = 'M') AND (cd_education_status = '4 yr Degree')) OR (((ss_sales_price >= 50.00) AND (ss_sales_price <= 100.00)) AND (cd_marital_status = 'D') AND (cd_education_status = '2 yr Degree')) OR ((cd_marital_status = 'S') AND (cd_education_status = 'College') AND ((ss_sales_price >= 150.00) AND constant_or_null(true, ss_sales_price, 200.00))))
+                       Estimated Cardinality: 1152039
+                    -> HASH_JOIN  (rows=133473 time_s=0.0938)
+                         Join Type: INNER
+                         Conditions: ss_cdemo_sk = cd_demo_sk
+                         Estimated Cardinality: 1152039
+                      -> TABLE_SCAN  (rows=148024 time_s=0.5031)
+                           Table: tpcds.main.store_sales
+                           Type: Sequential Scan
+                           Projections: ['ss_cdemo_sk', 'ss_addr_sk', 'ss_sold_date_sk', 'ss_store_sk', 'ss_sales_price', 'ss_net_profit', 'ss_quantity']
+                           Filters: (((ss_sales_price >= 100.00) AND (ss_sales_price <= 150.00)) OR ((ss_sales_price >= 50.00) AND (ss_sales_price <= 100.00)) OR ((ss_sales_price >= 150.00) AND constant_or_null(true, ss_sales_price, 200.00)))
+                           Estimated Cardinality: 5760198
+                           Dynamic Filters: ['optional: ss_cdemo_sk>=23 AND optional: ss_cdemo_sk<=1920772 AND optional: ss_cdemo_sk IN BF(cd_demo_sk)', 'optional: ss_sold_date_sk>=2451545 AND optional: ss_sold_date_sk<=2451910 AND optional: ss_sold_date_sk IN BF(#0)', 'optional: ss_store_sk>=1 AND optional: ss_store_sk<=100 AND optional: ss_store_sk IN BF(#0)']
+                      -> FILTER  (rows=164640 time_s=0.0268)
+                           Expression: (((cd_marital_status = 'M') AND (cd_education_status = '4 yr Degree')) OR ((cd_marital_status = 'D') AND (cd_education_status = '2 yr Degree')) OR ((cd_marital_status = 'S') AND (cd_education_status = 'College')))
+                           Estimated Cardinality: 384160
+                        -> TABLE_SCAN  (rows=1920800 time_s=0.0042)
+                             Table: tpcds.main.customer_demographics
+                             Type: Sequential Scan
+                             Projections: ['cd_demo_sk', 'cd_marital_status', 'cd_education_status']
+                             Estimated Cardinality: 1920800
+                -> FILTER  (rows=366 time_s=0.0)
+                     Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                     Estimated Cardinality: 585
+                  -> TABLE_SCAN  (rows=366 time_s=0.0)
+                       Table: tpcds.main.date_dim
+                       Type: Sequential Scan
+                       Projections: d_date_sk
+                       Filters: d_year=2000
+                       Estimated Cardinality: 585
+              -> TABLE_SCAN  (rows=100 time_s=0.0)
+                   Table: tpcds.main.store
+                   Type: Index Scan
+                   Projections: s_store_sk
+                   Filters: s_store_sk<=100
+                   Estimated Cardinality: 102

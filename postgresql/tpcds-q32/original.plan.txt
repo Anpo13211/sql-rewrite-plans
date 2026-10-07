@@ -1,0 +1,30 @@
+-- PostgreSQL 18, tpcds-q32, original; execution 129622.26 ms, planning 0.392 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=1.0 loops=1 est_rows=1 buffers hit=49139064 read=0)
+  -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=49139064 read=0)
+    -> Hash Join [Inner]  (rows=28.0 loops=1 est_rows=5 buffers hit=49139064 read=0)
+         Hash Cond: (catalog_sales.cs_item_sk = item.i_item_sk)
+         Join Filter: (catalog_sales.cs_ext_discount_amt > (SubPlan 1))
+         Rows Removed by Join Filter: 67
+      -> Gather  (rows=412202.0 loops=1 est_rows=17657 workers=6 buffers hit=513808 read=0)
+        -> Hash Join [Inner]  (rows=58886.0 loops=7 est_rows=2943 buffers hit=513808 read=0)
+             Hash Cond: (catalog_sales.cs_sold_date_sk = date_dim.d_date_sk)
+          -> Seq Scan on catalog_sales  (rows=2057323.0 loops=7 est_rows=2400266 buffers hit=511776 read=0)
+          -> Hash  (rows=13.0 loops=7 est_rows=53 buffers hit=2032 read=0)
+            -> Seq Scan on date_dim  (rows=91.0 loops=1 est_rows=53 buffers hit=2032 read=0)
+                 Filter: ((d_date >= '2000-01-27'::date) AND (d_date <= '2000-04-26'::date))
+                 Rows Removed by Filter: 72958
+      -> Hash  (rows=20.0 loops=1 est_rows=89 buffers hit=4504 read=0)
+        -> Seq Scan on item  (rows=20.0 loops=1 est_rows=89 buffers hit=4504 read=0)
+             Filter: (i_manufact_id = 977)
+             Rows Removed by Filter: 101980
+      -> Aggregate <SubPlan 1>  (rows=1.0 loops=95 est_rows=1 buffers hit=48620752 read=0)
+        -> Nested Loop [Inner]  (rows=9.23 loops=95 est_rows=1 buffers hit=48620752 read=0)
+             Join Filter: (catalog_sales_1.cs_sold_date_sk = date_dim_1.d_date_sk)
+             Rows Removed by Join Filter: 19912
+          -> Seq Scan on catalog_sales catalog_sales_1  (rows=223.38 loops=95 est_rows=544 buffers hit=48618720 read=0)
+               Filter: (cs_item_sk = item.i_item_sk)
+               Rows Removed by Filter: 14401038
+          -> Materialize  (rows=89.18 loops=21221 est_rows=90 buffers hit=2032 read=0)
+            -> Seq Scan on date_dim date_dim_1  (rows=91.0 loops=1 est_rows=90 buffers hit=2032 read=0)
+                 Filter: ((d_date >= '2000-01-27'::date) AND (d_date <= '2000-04-26'::date))
+                 Rows Removed by Filter: 72958

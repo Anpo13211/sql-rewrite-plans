@@ -1,0 +1,73 @@
+-- DuckDB 1.5.5, tpch-q19, rewrite; latency 0.174524764 s, cpu 1.2568920729999993 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+       Aggregates: sum(#0)
+    -> PROJECTION  (rows=1134 time_s=0.0)
+         Projections: (l_extendedprice * (1.00 - l_discount))
+         Estimated Cardinality: 599860
+      -> PROJECTION  (rows=1134 time_s=0.0)
+           Projections: ['#1', '#2']
+           Estimated Cardinality: 599860
+        -> FILTER  (rows=1134 time_s=0.0694)
+             Expression: ((SUBQUERY AND (l_quantity <= 11.00)) OR (SUBQUERY AND ((l_quantity >= 10.00) AND (l_quantity <= 20.00))) OR (SUBQUERY AND ((l_quantity >= 20.00) AND (l_quantity <= 30.00))))
+             Estimated Cardinality: 599860
+          -> HASH_JOIN  (rows=2141904 time_s=0.0559)
+               Join Type: MARK
+               Conditions: l_partkey = #0
+               Estimated Cardinality: 2999302
+            -> HASH_JOIN  (rows=2141904 time_s=0.051)
+                 Join Type: MARK
+                 Conditions: l_partkey = #0
+                 Estimated Cardinality: 2999302
+              -> HASH_JOIN  (rows=2141904 time_s=0.0494)
+                   Join Type: MARK
+                   Conditions: l_partkey = #0
+                   Estimated Cardinality: 2999302
+                -> PROJECTION  (rows=2141904 time_s=0.0067)
+                     Projections: ['#0', '#2', '#3', '#4']
+                     Estimated Cardinality: 2999302
+                  -> FILTER  (rows=2141904 time_s=0.2109)
+                       Expression: ((l_shipmode = 'AIR') OR (l_shipmode = 'AIR REG'))
+                       Estimated Cardinality: 2999302
+                    -> TABLE_SCAN  (rows=14994611 time_s=0.7641)
+                         Table: tpch.main.lineitem
+                         Type: Sequential Scan
+                         Projections: ['l_quantity', 'l_shipmode', 'l_partkey', 'l_extendedprice', 'l_discount']
+                         Filters: ["optional: l_shipmode IN ('AIR', 'AIR REG')", "l_shipinstruct='DELIVER IN PERSON'"]
+                         Estimated Cardinality: 14996513
+                -> PROJECTION  (rows=781 time_s=0.0)
+                     Projections: #1
+                     Estimated Cardinality: 13793
+                  -> FILTER  (rows=781 time_s=0.0029)
+                       Expression: ((p_container = 'SM CASE') OR (p_container = 'SM BOX') OR (p_container = 'SM PACK') OR (p_container = 'SM PKG'))
+                       Estimated Cardinality: 13793
+                    -> TABLE_SCAN  (rows=7907 time_s=0.0129)
+                         Table: tpch.main.part
+                         Type: Sequential Scan
+                         Projections: ['p_container', 'p_partkey']
+                         Filters: ["p_brand='Brand#12'", "optional: p_container IN ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG')", 'p_size>=1 AND p_size<=5']
+                         Estimated Cardinality: 68966
+              -> PROJECTION  (rows=1578 time_s=0.0)
+                   Projections: #1
+                   Estimated Cardinality: 13793
+                -> FILTER  (rows=1578 time_s=0.0034)
+                     Expression: ((p_container = 'MED BAG') OR (p_container = 'MED BOX') OR (p_container = 'MED PKG') OR (p_container = 'MED PACK'))
+                     Estimated Cardinality: 13793
+                  -> TABLE_SCAN  (rows=15932 time_s=0.0125)
+                       Table: tpch.main.part
+                       Type: Sequential Scan
+                       Projections: ['p_container', 'p_partkey']
+                       Filters: ["p_brand='Brand#23'", "optional: p_container IN ('MED BAG', 'MED BOX', 'MED PKG', 'MED PACK')", 'p_size>=1 AND p_size<=10']
+                       Estimated Cardinality: 68966
+            -> PROJECTION  (rows=2395 time_s=0.0)
+                 Projections: #1
+                 Estimated Cardinality: 13793
+              -> FILTER  (rows=2395 time_s=0.0039)
+                   Expression: ((p_container = 'LG CASE') OR (p_container = 'LG BOX') OR (p_container = 'LG PACK') OR (p_container = 'LG PKG'))
+                   Estimated Cardinality: 13793
+                -> TABLE_SCAN  (rows=24064 time_s=0.0137)
+                     Table: tpch.main.part
+                     Type: Sequential Scan
+                     Projections: ['p_container', 'p_partkey']
+                     Filters: ["p_brand='Brand#34'", "optional: p_container IN ('LG CASE', 'LG BOX', 'LG PACK', 'LG PKG')", 'p_size>=1 AND p_size<=15']
+                     Estimated Cardinality: 68966

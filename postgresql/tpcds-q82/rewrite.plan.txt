@@ -1,0 +1,20 @@
+-- PostgreSQL 18, tpcds-q82, rewrite; execution 22.22 ms, planning 0.26 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=6.0 loops=1 est_rows=12 buffers hit=10260 read=0)
+  -> Gather <CTE filtered_items>  (rows=15.0 loops=1 est_rows=12 workers=2 buffers hit=4504 read=0)
+    -> Seq Scan on item  (rows=5.0 loops=3 est_rows=5 buffers hit=4504 read=0)
+         Filter: ((i_current_price >= '62'::numeric) AND (i_current_price <= '92'::numeric) AND (i_manufact_id = ANY ('{129,270,821,423}'::bigint[])))
+         Rows Removed by Filter: 33995
+  -> Seq Scan on date_dim <CTE date_keys>  (rows=61.0 loops=1 est_rows=60 buffers hit=2032 read=0)
+       Filter: ((d_date >= '2000-05-25'::date) AND (d_date <= '2000-07-24'::date))
+       Rows Removed by Filter: 72988
+  -> Unique  (rows=6.0 loops=1 est_rows=12 buffers hit=10260 read=0)
+    -> Sort  (rows=230.0 loops=1 est_rows=1945 buffers hit=10260 read=0)
+         Sort Key: ['i.i_item_id', 'i.i_item_desc', 'i.i_current_price']
+      -> Nested Loop [Inner]  (rows=230.0 loops=1 est_rows=1945 buffers hit=10260 read=0)
+        -> CTE Scan (CTE filtered_items)  (rows=15.0 loops=1 est_rows=12 buffers hit=4504 read=0)
+        -> Nested Loop [Inner]  (rows=15.33 loops=15 est_rows=180 buffers hit=5756 read=0)
+          -> CTE Scan (CTE date_keys)  (rows=61.0 loops=15 est_rows=60 buffers hit=2032 read=0)
+          -> Index Scan on inventory inv using scaleup_tpcds_39  (rows=0.25 loops=915 est_rows=3 buffers hit=3724 read=0)
+               Index Cond: ((inv_date_sk = d.d_date_sk) AND (inv_item_sk = i.i_item_sk))
+               Filter: ((inv_quantity_on_hand >= 100) AND (inv_quantity_on_hand <= 500))
+               Rows Removed by Filter: 0

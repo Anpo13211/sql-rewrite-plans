@@ -1,0 +1,26 @@
+-- PostgreSQL 18, tpch-q10, original; execution 5483.448 ms, planning 0.946 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=20.0 loops=1 est_rows=20 buffers hit=26986433 read=0)
+  -> Sort  (rows=20.0 loops=1 est_rows=560994 buffers hit=26986433 read=0)
+       Sort Key: ["(sum((lineitem.l_extendedprice * ('1'::numeric - lineitem.l_discount)))) DESC"]
+    -> Aggregate [Sorted]  (rows=381105.0 loops=1 est_rows=560994 buffers hit=26986433 read=0)
+         Group Key: ['customer.c_custkey', 'nation.n_name']
+      -> Gather Merge  (rows=1147084.0 loops=1 est_rows=560994 workers=4 buffers hit=26986433 read=0)
+        -> Sort  (rows=229416.8 loops=5 est_rows=140248 buffers hit=26986433 read=0)
+             Sort Key: ['customer.c_custkey', 'nation.n_name']
+          -> Hash Join [Inner]  (rows=229416.8 loops=5 est_rows=140248 buffers hit=26986369 read=0)
+               Hash Cond: (customer.c_nationkey = nation.n_nationkey)
+            -> Hash Join [Inner]  (rows=229416.8 loops=5 est_rows=140248 buffers hit=26986364 read=0)
+                 Hash Cond: (customer.c_custkey = orders.o_custkey)
+              -> Seq Scan on customer  (rows=300000.0 loops=5 est_rows=375049 buffers hit=36560 read=0)
+              -> Hash  (rows=229416.8 loops=5 est_rows=80142 buffers hit=26949804 read=0)
+                -> Nested Loop [Inner]  (rows=229416.8 loops=5 est_rows=80142 buffers hit=26949804 read=0)
+                  -> Seq Scan on lineitem  (rows=2961636.6 loops=5 est_rows=2103583 buffers hit=1105296 read=0)
+                       Filter: ((l_returnflag)::text = 'R'::text)
+                       Rows Removed by Filter: 9035574
+                  -> Memoize  (rows=0.08 loops=14808183 est_rows=1 buffers hit=25844508 read=0)
+                    -> Index Scan on orders using scaleup_tpch_06  (rows=0.08 loops=6461126 est_rows=1 buffers hit=25844508 read=0)
+                         Index Cond: (o_orderkey = lineitem.l_orderkey)
+                         Filter: ((o_orderdate >= '1993-10-01'::date) AND (o_orderdate < '1994-01-01'::date))
+                         Rows Removed by Filter: 1
+            -> Hash  (rows=25.0 loops=5 est_rows=25 buffers hit=5 read=0)
+              -> Seq Scan on nation  (rows=25.0 loops=5 est_rows=25 buffers hit=5 read=0)

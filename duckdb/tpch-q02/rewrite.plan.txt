@@ -1,0 +1,132 @@
+-- DuckDB 1.5.5, tpch-q02, rewrite; latency 0.047985467 s, cpu 0.247126729 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0018)
+       CTE Name: target_parts
+       Table Index: 0
+       Estimated Cardinality: 100
+    -> TABLE_SCAN  (rows=7854 time_s=0.0216)
+         Table: tpch.main.part
+         Type: Sequential Scan
+         Projections: ['p_partkey', 'p_mfgr']
+         Filters: ['p_size=15', "suffix(p_type, 'BRASS')"]
+         Estimated Cardinality: 44445
+    -> CTE  (rows=0 time_s=0.0013)
+         CTE Name: eligible_supply
+         Table Index: 1
+         Estimated Cardinality: 100
+      -> PROJECTION  (rows=31416 time_s=0.0)
+           Projections: ['p_partkey', 'p_mfgr', 'ps_suppkey', 'ps_supplycost']
+           Estimated Cardinality: 179248
+        -> HASH_JOIN  (rows=31416 time_s=0.1285)
+             Join Type: INNER
+             Conditions: ps_partkey = p_partkey
+             Estimated Cardinality: 179248
+          -> TABLE_SCAN  (rows=7998024 time_s=0.044)
+               Table: tpch.main.partsupp
+               Type: Sequential Scan
+               Projections: ['ps_partkey', 'ps_suppkey', 'ps_supplycost']
+               Estimated Cardinality: 8000000
+               Dynamic Filters: optional: ps_partkey>=249 AND optional: ps_partkey<=1999754
+          -> CTE_SCAN  (rows=7854 time_s=0.0001)
+               CTE Index: 0
+               Estimated Cardinality: 44445
+      -> CTE  (rows=0 time_s=0.0071)
+           CTE Name: outer_suppliers
+           Table Index: 2
+           Estimated Cardinality: 100
+        -> HASH_JOIN  (rows=20033 time_s=0.0019)
+             Join Type: INNER
+             Conditions: s_nationkey = n_nationkey
+             Estimated Cardinality: 19230
+          -> TABLE_SCAN  (rows=82780 time_s=0.0285)
+               Table: tpch.main.supplier
+               Type: Sequential Scan
+               Projections: ['s_nationkey', 's_suppkey', 's_acctbal', 's_name', 's_address', 's_phone', 's_comment']
+               Estimated Cardinality: 100000
+               Dynamic Filters: optional: s_nationkey IN (6, 7, 19, 22, 23) AND optional: s_nationkey>=6 AND optional: s_nationkey<=23
+          -> HASH_JOIN  (rows=5 time_s=0.0001)
+               Join Type: INNER
+               Conditions: n_regionkey = r_regionkey
+               Estimated Cardinality: 5
+            -> TABLE_SCAN  (rows=5 time_s=0.0)
+                 Table: tpch.main.nation
+                 Type: Sequential Scan
+                 Projections: ['n_nationkey', 'n_regionkey', 'n_name']
+                 Estimated Cardinality: 25
+                 Dynamic Filters: n_regionkey=3
+            -> TABLE_SCAN  (rows=1 time_s=0.0)
+                 Table: tpch.main.region
+                 Type: Sequential Scan
+                 Projections: r_regionkey
+                 Filters: r_name='EUROPE'
+                 Estimated Cardinality: 1
+        -> CTE  (rows=0 time_s=0.0)
+             CTE Name: inner_suppliers
+             Table Index: 3
+             Estimated Cardinality: 100
+          -> PROJECTION  (rows=20033 time_s=0.0)
+               Projections: s_suppkey
+               Estimated Cardinality: 19230
+            -> HASH_JOIN  (rows=20033 time_s=0.0003)
+                 Join Type: INNER
+                 Conditions: s_nationkey = n_nationkey
+                 Estimated Cardinality: 19230
+              -> TABLE_SCAN  (rows=82780 time_s=0.0002)
+                   Table: tpch.main.supplier
+                   Type: Sequential Scan
+                   Projections: ['s_nationkey', 's_suppkey']
+                   Estimated Cardinality: 100000
+                   Dynamic Filters: optional: s_nationkey IN (6, 7, 19, 22, 23) AND optional: s_nationkey>=6 AND optional: s_nationkey<=23
+              -> HASH_JOIN  (rows=5 time_s=0.0)
+                   Join Type: INNER
+                   Conditions: n_regionkey = r_regionkey
+                   Estimated Cardinality: 5
+                -> TABLE_SCAN  (rows=5 time_s=0.0)
+                     Table: tpch.main.nation
+                     Type: Sequential Scan
+                     Projections: ['n_nationkey', 'n_regionkey']
+                     Estimated Cardinality: 25
+                     Dynamic Filters: n_regionkey=3
+                -> TABLE_SCAN  (rows=1 time_s=0.0)
+                     Table: tpch.main.region
+                     Type: Sequential Scan
+                     Projections: r_regionkey
+                     Filters: r_name='EUROPE'
+                     Estimated Cardinality: 1
+          -> TOP_N  (rows=100 time_s=0.0015)
+               Top: 100
+               Order By: ['o.s_acctbal DESC', 'o.n_name ASC', 'o.s_name ASC', 'es.p_partkey ASC']
+            -> PROJECTION  (rows=4667 time_s=0.0)
+                 Projections: ['s_acctbal', 's_name', 'n_name', 'p_partkey', 'p_mfgr', 's_address', 's_phone', 's_comment']
+                 Estimated Cardinality: 643
+              -> HASH_JOIN  (rows=4667 time_s=0.0032)
+                   Join Type: INNER
+                   Conditions: s_suppkey = ps_suppkey
+                   Estimated Cardinality: 643
+                -> CTE_SCAN  (rows=20033 time_s=0.0002)
+                     CTE Index: 2
+                     Estimated Cardinality: 19230
+                -> HASH_JOIN  (rows=4668 time_s=0.0018)
+                     Join Type: INNER
+                     Conditions: ['p_partkey = p_partkey', 'ps_supplycost = min_supplycost']
+                     Estimated Cardinality: 1607
+                  -> CTE_SCAN  (rows=31416 time_s=0.0001)
+                       CTE Index: 1
+                       Estimated Cardinality: 179248
+                  -> HASH_GROUP_BY  (rows=4667 time_s=0.0032)
+                       Groups: #0
+                       Aggregates: min(#1)
+                       Estimated Cardinality: 35573
+                    -> PROJECTION  (rows=6351 time_s=0.0)
+                         Projections: ['p_partkey', 'ps_supplycost']
+                         Estimated Cardinality: 35896
+                      -> HASH_JOIN  (rows=6351 time_s=0.0015)
+                           Join Type: INNER
+                           Conditions: ps_suppkey = s_suppkey
+                           Estimated Cardinality: 35896
+                        -> CTE_SCAN  (rows=31416 time_s=0.0001)
+                             CTE Index: 1
+                             Estimated Cardinality: 179248
+                        -> CTE_SCAN  (rows=20033 time_s=0.0)
+                             CTE Index: 3
+                             Estimated Cardinality: 19230

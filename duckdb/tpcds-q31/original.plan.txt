@@ -1,0 +1,176 @@
+-- DuckDB 1.5.5, tpcds-q31, original; latency 0.300832665 s, cpu 1.160741695 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0002)
+       CTE Name: ss
+       Table Index: 0
+       Estimated Cardinality: 18446744073709551615
+    -> PROJECTION  (rows=5541 time_s=0.0)
+         Projections: ['#0', '__internal_decompress_integral_bigint(#1, 1)', '__internal_decompress_integral_bigint(#2, 2000)', '#3']
+         Estimated Cardinality: 262326
+      -> HASH_GROUP_BY  (rows=5541 time_s=0.1475)
+           Groups: ['#0', '#1', '#2']
+           Aggregates: sum(#3)
+           Estimated Cardinality: 262326
+        -> PROJECTION  (rows=3022624 time_s=0.0005)
+             Projections: ['ca_county', 'd_qoy', 'd_year', 'ss_ext_sales_price']
+             Estimated Cardinality: 262326
+          -> PROJECTION  (rows=3022624 time_s=0.0027)
+               Projections: ['#0', '#1', '__internal_compress_integral_utinyint(#2, 1)', '__internal_compress_integral_utinyint(#3, 2000)']
+               Estimated Cardinality: 262326
+            -> HASH_JOIN  (rows=3022624 time_s=0.404)
+                 Join Type: INNER
+                 Conditions: ca_address_sk = ss_addr_sk
+                 Estimated Cardinality: 262326
+              -> TABLE_SCAN  (rows=250000 time_s=0.0066)
+                   Table: tpcds.main.customer_address
+                   Type: Sequential Scan
+                   Projections: ['ca_address_sk', 'ca_county']
+                   Estimated Cardinality: 250000
+                   Dynamic Filters: optional: ca_address_sk>=1 AND optional: ca_address_sk<=250000
+              -> HASH_JOIN  (rows=3095673 time_s=0.0373)
+                   Join Type: INNER
+                   Conditions: ss_sold_date_sk = d_date_sk
+                   Estimated Cardinality: 230647
+                -> TABLE_SCAN  (rows=3095673 time_s=0.307)
+                     Table: tpcds.main.store_sales
+                     Type: Sequential Scan
+                     Projections: ['ss_sold_date_sk', 'ss_addr_sk', 'ss_ext_sales_price']
+                     Estimated Cardinality: 28800991
+                     Dynamic Filters: optional: ss_sold_date_sk>=2451545 AND optional: ss_sold_date_sk<=2451818
+                -> FILTER  (rows=274 time_s=0.0)
+                     Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                     Estimated Cardinality: 585
+                  -> TABLE_SCAN  (rows=274 time_s=0.0004)
+                       Table: tpcds.main.date_dim
+                       Type: Sequential Scan
+                       Projections: ['d_date_sk', 'd_qoy', 'd_year']
+                       Filters: ['(((d_qoy = 1) OR (d_qoy = 2)) OR (d_qoy = 3)) AND (((d_qoy = 1) OR (d_qoy = 2)) OR (d_qoy = 3))', 'd_year=2000']
+                       Estimated Cardinality: 585
+    -> CTE  (rows=0 time_s=0.0001)
+         CTE Name: ws
+         Table Index: 1
+         Estimated Cardinality: 18446744073709551615
+      -> PROJECTION  (rows=5535 time_s=0.0)
+           Projections: ['#0', '__internal_decompress_integral_bigint(#1, 1)', '__internal_decompress_integral_bigint(#2, 2000)', '#3']
+           Estimated Cardinality: 65708
+        -> HASH_GROUP_BY  (rows=5535 time_s=0.0414)
+             Groups: ['#0', '#1', '#2']
+             Aggregates: sum(#3)
+             Estimated Cardinality: 65708
+          -> PROJECTION  (rows=811689 time_s=0.0001)
+               Projections: ['ca_county', 'd_qoy', 'd_year', 'ws_ext_sales_price']
+               Estimated Cardinality: 65708
+            -> PROJECTION  (rows=811689 time_s=0.0007)
+                 Projections: ['#0', '#1', '__internal_compress_integral_utinyint(#2, 1)', '__internal_compress_integral_utinyint(#3, 2000)']
+                 Estimated Cardinality: 65708
+              -> HASH_JOIN  (rows=811689 time_s=0.096)
+                   Join Type: INNER
+                   Conditions: ca_address_sk = ws_bill_addr_sk
+                   Estimated Cardinality: 65708
+                -> TABLE_SCAN  (rows=249991 time_s=0.0059)
+                     Table: tpcds.main.customer_address
+                     Type: Sequential Scan
+                     Projections: ['ca_address_sk', 'ca_county']
+                     Estimated Cardinality: 250000
+                     Dynamic Filters: optional: ca_address_sk>=5 AND optional: ca_address_sk<=249995
+                -> HASH_JOIN  (rows=811784 time_s=0.0143)
+                     Join Type: INNER
+                     Conditions: ws_sold_date_sk = d_date_sk
+                     Estimated Cardinality: 57640
+                  -> TABLE_SCAN  (rows=811784 time_s=0.0897)
+                       Table: tpcds.main.web_sales
+                       Type: Sequential Scan
+                       Projections: ['ws_sold_date_sk', 'ws_bill_addr_sk', 'ws_ext_sales_price']
+                       Estimated Cardinality: 7197566
+                       Dynamic Filters: optional: ws_sold_date_sk>=2451545 AND optional: ws_sold_date_sk<=2451818
+                  -> FILTER  (rows=274 time_s=0.0)
+                       Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                       Estimated Cardinality: 585
+                    -> TABLE_SCAN  (rows=274 time_s=0.0002)
+                         Table: tpcds.main.date_dim
+                         Type: Sequential Scan
+                         Projections: ['d_date_sk', 'd_qoy', 'd_year']
+                         Filters: ['(((d_qoy = 1) OR (d_qoy = 2)) OR (d_qoy = 3)) AND (((d_qoy = 1) OR (d_qoy = 2)) OR (d_qoy = 3))', 'd_year=2000']
+                         Estimated Cardinality: 585
+      -> ORDER_BY  (rows=307 time_s=0.0006)
+           Order By: ss1.ca_county ASC
+        -> PROJECTION  (rows=307 time_s=0.0002)
+             Projections: ['ca_county', 'd_year', 'web_q1_q2_increase', 'store_q1_q2_increase', 'web_q2_q3_increase', 'store_q2_q3_increase']
+             Estimated Cardinality: 18446744073709551615
+          -> FILTER  (rows=307 time_s=0.0011)
+               Expression: ((CASE  WHEN ((web_sales > 0.00)) THEN ((CAST((web_sales * 1.0000) AS DOUBLE) / CAST(web_sales AS DOUBLE))) ELSE NULL END > CASE  WHEN ((store_sales > 0.00)) THEN ((CAST((store_sales * 1.0000) AS DOUBLE) / CAST(store_sales AS DOUBLE))) ELSE NULL END) AND (CASE  WHEN ((web_sales > 0.00)) THEN ((CAST((web_sales * 1.0000) AS DOUBLE) / CAST(web_sales AS DOUBLE))) ELSE NULL END > CASE  WHEN ((store_sales > 0.00)) THEN ((CAST((store_sales * 1.0000) AS DOUBLE) / CAST(store_sales AS DOUBLE))) ELSE NULL END))
+               Estimated Cardinality: 18446744073709551615
+            -> HASH_JOIN  (rows=1840 time_s=0.0009)
+                 Join Type: INNER
+                 Conditions: ca_county = ca_county
+                 Estimated Cardinality: 18446744073709551615
+              -> HASH_JOIN  (rows=1842 time_s=0.0006)
+                   Join Type: INNER
+                   Conditions: ca_county = ca_county
+                   Estimated Cardinality: 570906219
+                -> HASH_JOIN  (rows=1842 time_s=0.0009)
+                     Join Type: INNER
+                     Conditions: ca_county = ca_county
+                     Estimated Cardinality: 8661767
+                  -> PROJECTION  (rows=1847 time_s=0.0)
+                       Projections: ['#0', '#3']
+                       Estimated Cardinality: 262326
+                    -> FILTER  (rows=1847 time_s=0.0001)
+                         Expression: ((d_qoy = 2) AND (d_year = 2000))
+                         Estimated Cardinality: 262326
+                      -> CTE_SCAN  (rows=5541 time_s=0.0001)
+                           CTE Index: 0
+                           Estimated Cardinality: 262326
+                  -> PROJECTION  (rows=1843 time_s=0.0)
+                       Projections: ['#0', '#3']
+                       Estimated Cardinality: 65708
+                    -> FILTER  (rows=1843 time_s=0.0)
+                         Expression: ((d_qoy = 1) AND (d_year = 2000))
+                         Estimated Cardinality: 65708
+                      -> CTE_SCAN  (rows=5535 time_s=0.0)
+                           CTE Index: 1
+                           Estimated Cardinality: 65708
+                -> PROJECTION  (rows=1847 time_s=0.0)
+                     Projections: ['#0', '#2', '#3']
+                     Estimated Cardinality: 262326
+                  -> FILTER  (rows=1847 time_s=0.0)
+                       Expression: ((d_qoy = 1) AND (d_year = 2000))
+                       Estimated Cardinality: 262326
+                    -> CTE_SCAN  (rows=5541 time_s=0.0)
+                         CTE Index: 0
+                         Estimated Cardinality: 262326
+              -> HASH_JOIN  (rows=1844 time_s=0.0005)
+                   Join Type: INNER
+                   Conditions: ca_county = ca_county
+                   Estimated Cardinality: 143001859
+                -> HASH_JOIN  (rows=1844 time_s=0.0007)
+                     Join Type: INNER
+                     Conditions: ca_county = ca_county
+                     Estimated Cardinality: 2169618
+                  -> PROJECTION  (rows=1845 time_s=0.0)
+                       Projections: ['#0', '#3']
+                       Estimated Cardinality: 65708
+                    -> FILTER  (rows=1845 time_s=0.0)
+                         Expression: ((d_qoy = 2) AND (d_year = 2000))
+                         Estimated Cardinality: 65708
+                      -> CTE_SCAN  (rows=5535 time_s=0.0)
+                           CTE Index: 1
+                           Estimated Cardinality: 65708
+                  -> PROJECTION  (rows=1847 time_s=0.0)
+                       Projections: ['#0', '#3']
+                       Estimated Cardinality: 65708
+                    -> FILTER  (rows=1847 time_s=0.0)
+                         Expression: ((d_qoy = 3) AND (d_year = 2000))
+                         Estimated Cardinality: 65708
+                      -> CTE_SCAN  (rows=5535 time_s=0.0)
+                           CTE Index: 1
+                           Estimated Cardinality: 65708
+                -> PROJECTION  (rows=1847 time_s=0.0)
+                     Projections: ['#0', '#3']
+                     Estimated Cardinality: 262326
+                  -> FILTER  (rows=1847 time_s=0.0)
+                       Expression: ((d_qoy = 3) AND (d_year = 2000))
+                       Estimated Cardinality: 262326
+                    -> CTE_SCAN  (rows=5541 time_s=0.0)
+                         CTE Index: 0
+                         Estimated Cardinality: 262326

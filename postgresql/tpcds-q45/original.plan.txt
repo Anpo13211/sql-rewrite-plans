@@ -1,0 +1,28 @@
+-- PostgreSQL 18, tpcds-q45, original; execution 7694.936 ms, planning 0.817 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=49.0 loops=1 est_rows=100 buffers hit=9350623 read=0)
+  -> Aggregate [Sorted]  (rows=49.0 loops=1 est_rows=4632 buffers hit=9350623 read=0)
+       Group Key: ['customer_address.ca_zip', 'customer_address.ca_city']
+    -> Nested Loop [Inner]  (rows=51.0 loops=1 est_rows=4632 buffers hit=9350623 read=0)
+         Join Filter: (("substring"((customer_address.ca_zip)::text, 1, 5) = ANY ('{85669,86197,88274,83405,86475,85392,85460,80348,81792}'::text[])) OR (ANY ((item.i_item_id)::text = ((hashed SubPlan 1).col1)::text)))
+         Rows Removed by Join Filter: 211016
+      -> Nested Loop [Inner]  (rows=211067.0 loops=1 est_rows=8865 buffers hit=8717418 read=0)
+        -> Nested Loop [Inner]  (rows=7195801.0 loops=1 est_rows=7196666 buffers hit=8711949 read=0)
+          -> Gather Merge  (rows=500000.0 loops=1 est_rows=500000 workers=3 buffers hit=16400 read=0)
+            -> Sort  (rows=125000.0 loops=4 est_rows=161290 buffers hit=16400 read=0)
+                 Sort Key: ['customer_address.ca_zip', 'customer_address.ca_city']
+              -> Hash Join [Inner]  (rows=125000.0 loops=4 est_rows=161290 buffers hit=16376 read=0)
+                   Hash Cond: (customer.c_current_addr_sk = customer_address.ca_address_sk)
+                -> Seq Scan on customer  (rows=125000.0 loops=4 est_rows=161290 buffers hit=11872 read=0)
+                -> Hash  (rows=62500.0 loops=4 est_rows=104167 buffers hit=4504 read=0)
+                  -> Seq Scan on customer_address  (rows=62500.0 loops=4 est_rows=104167 buffers hit=4504 read=0)
+          -> Index Scan on web_sales using scaleup_tpcds_79  (rows=14.39 loops=500000 est_rows=25 buffers hit=8695549 read=0)
+               Index Cond: (ws_bill_customer_sk = customer.c_customer_sk)
+        -> Memoize  (rows=0.03 loops=7195801 est_rows=1 buffers hit=5469 read=0)
+          -> Index Scan on date_dim using scaleup_tpcds_36  (rows=0.05 loops=1824 est_rows=1 buffers hit=5469 read=0)
+               Index Cond: (d_date_sk = web_sales.ws_sold_date_sk)
+               Filter: ((d_qoy = 2) AND (d_year = 2001))
+               Rows Removed by Filter: 1
+      -> Index Scan on item using scaleup_tpcds_40  (rows=1.0 loops=211067 est_rows=1 buffers hit=633201 read=0)
+           Index Cond: (i_item_sk = web_sales.ws_item_sk)
+      -> Index Scan on item item_1 using scaleup_tpcds_40 <SubPlan 1>  (rows=10.0 loops=1 est_rows=10 buffers hit=4 read=0)
+           Index Cond: (i_item_sk = ANY ('{2,3,5,7,11,13,17,19,23,29}'::bigint[]))

@@ -1,0 +1,27 @@
+-- PostgreSQL 18, tpcds-q40, original; execution 1917.887 ms, planning 2.805 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=1383352 read=0)
+  -> Aggregate [Sorted]  (rows=100.0 loops=1 est_rows=790 buffers hit=1383352 read=0)
+       Group Key: ['warehouse.w_state', 'item.i_item_id']
+    -> Gather Merge  (rows=168.0 loops=1 est_rows=790 workers=4 buffers hit=1383352 read=0)
+      -> Sort  (rows=471.4 loops=5 est_rows=198 buffers hit=1383352 read=0)
+           Sort Key: ['warehouse.w_state', 'item.i_item_id']
+        -> Hash Join [Right]  (rows=3521.2 loops=5 est_rows=198 buffers hit=1383320 read=0)
+             Hash Cond: ((catalog_returns.cr_order_number = catalog_sales.cs_order_number) AND (catalog_returns.cr_item_sk = catalog_sales.cs_item_sk))
+          -> Seq Scan on catalog_returns  (rows=288244.8 loops=5 est_rows=360241 buffers hit=41704 read=0)
+          -> Hash  (rows=3521.2 loops=5 est_rows=132 buffers hit=1341616 read=0)
+            -> Hash Join [Inner]  (rows=3521.2 loops=5 est_rows=132 buffers hit=1341616 read=0)
+                 Hash Cond: (catalog_sales.cs_warehouse_sk = warehouse.w_warehouse_sk)
+              -> Nested Loop [Inner]  (rows=3530.6 loops=5 est_rows=132 buffers hit=1341611 read=0)
+                -> Hash Join [Inner]  (rows=55186.6 loops=5 est_rows=1962 buffers hit=513808 read=0)
+                     Hash Cond: (catalog_sales.cs_sold_date_sk = date_dim.d_date_sk)
+                  -> Seq Scan on catalog_sales  (rows=2880252.2 loops=5 est_rows=2400266 buffers hit=511776 read=0)
+                  -> Hash  (rows=12.2 loops=5 est_rows=35 buffers hit=2032 read=0)
+                    -> Seq Scan on date_dim  (rows=61.0 loops=1 est_rows=35 buffers hit=2032 read=0)
+                         Filter: ((d_date >= '2000-02-10'::date) AND (d_date <= '2000-04-10'::date))
+                         Rows Removed by Filter: 72988
+                -> Index Scan on item using scaleup_tpcds_40  (rows=0.06 loops=275933 est_rows=1 buffers hit=827803 read=0)
+                     Index Cond: (i_item_sk = catalog_sales.cs_item_sk)
+                     Filter: ((i_current_price >= 0.99) AND (i_current_price <= 1.49))
+                     Rows Removed by Filter: 1
+              -> Hash  (rows=10.0 loops=5 est_rows=10 buffers hit=5 read=0)
+                -> Seq Scan on warehouse  (rows=10.0 loops=5 est_rows=10 buffers hit=5 read=0)

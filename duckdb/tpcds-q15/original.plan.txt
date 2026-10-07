@@ -1,0 +1,68 @@
+-- DuckDB 1.5.5, tpcds-q15, original; latency 0.091632145 s, cpu 0.15834360500000003 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0001)
+       Top: 100
+       Order By: tpcds.main.customer_address.ca_zip ASC
+    -> PROJECTION  (rows=524 time_s=0.0)
+         Projections: ['__internal_decompress_string(#0)', '#1']
+         Estimated Cardinality: 13441
+      -> HASH_GROUP_BY  (rows=524 time_s=0.005)
+           Groups: #0
+           Aggregates: sum(#1)
+           Estimated Cardinality: 13441
+        -> PROJECTION  (rows=32758 time_s=0.0001)
+             Projections: ['ca_zip', 'cs_sales_price']
+             Estimated Cardinality: 18943
+          -> PROJECTION  (rows=32758 time_s=0.0012)
+               Projections: ['#0', '__internal_compress_string_ubigint(#1)', '__internal_compress_integral_usmallint(#2, 2450815)']
+               Estimated Cardinality: 18943
+            -> HASH_JOIN  (rows=32758 time_s=0.0011)
+                 Join Type: INNER
+                 Conditions: cs_sold_date_sk = d_date_sk
+                 Estimated Cardinality: 18943
+              -> PROJECTION  (rows=34623 time_s=0.0001)
+                   Projections: ['#0', '#1', '#2']
+                   Estimated Cardinality: 2365492
+                -> FILTER  (rows=34623 time_s=0.0205)
+                     Expression: (IN (...) OR ((ca_state = 'CA') OR (ca_state = 'WA') OR (ca_state = 'GA')) OR constant_or_null(false, cs_sales_price, 500.00))
+                     Estimated Cardinality: 2365492
+                  -> HASH_JOIN  (rows=434687 time_s=0.0552)
+                       Join Type: MARK
+                       Conditions: "substring"(ca_zip, 1, 5) = #0
+                       Estimated Cardinality: 11827463
+                    -> HASH_JOIN  (rows=434687 time_s=0.0425)
+                         Join Type: INNER
+                         Conditions: cs_bill_customer_sk = c_customer_sk
+                         Estimated Cardinality: 11827463
+                      -> TABLE_SCAN  (rows=435705 time_s=0.0082)
+                           Table: tpcds.main.catalog_sales
+                           Type: Sequential Scan
+                           Projections: ['cs_bill_customer_sk', 'cs_sales_price', 'cs_sold_date_sk']
+                           Estimated Cardinality: 14401261
+                           Dynamic Filters: ['optional: cs_bill_customer_sk>=1 AND optional: cs_bill_customer_sk<=500000', 'optional: cs_sold_date_sk>=2452002 AND optional: cs_sold_date_sk<=2452092']
+                      -> HASH_JOIN  (rows=500000 time_s=0.0151)
+                           Join Type: INNER
+                           Conditions: c_current_addr_sk = ca_address_sk
+                           Estimated Cardinality: 410639
+                        -> TABLE_SCAN  (rows=500000 time_s=0.0022)
+                             Table: tpcds.main.customer
+                             Type: Sequential Scan
+                             Projections: ['c_customer_sk', 'c_current_addr_sk']
+                             Estimated Cardinality: 500000
+                             Dynamic Filters: optional: c_current_addr_sk>=1 AND optional: c_current_addr_sk<=250000
+                        -> TABLE_SCAN  (rows=250000 time_s=0.0067)
+                             Table: tpcds.main.customer_address
+                             Type: Sequential Scan
+                             Projections: ['ca_address_sk', 'ca_zip', 'ca_state']
+                             Estimated Cardinality: 250000
+                    -> COLUMN_DATA_SCAN  (rows=9 time_s=0.0)
+                         Estimated Cardinality: 0
+              -> FILTER  (rows=91 time_s=0.0)
+                   Expression: (d_date_sk BETWEEN 2450815 AND 2452653)
+                   Estimated Cardinality: 585
+                -> TABLE_SCAN  (rows=91 time_s=0.0003)
+                     Table: tpcds.main.date_dim
+                     Type: Sequential Scan
+                     Projections: d_date_sk
+                     Filters: ['d_qoy=2', 'd_year=2001']
+                     Estimated Cardinality: 585

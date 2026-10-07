@@ -1,0 +1,1092 @@
+{
+ "total_bytes_written": 0,
+ "total_bytes_read": 0,
+ "system_peak_temp_dir_size": 0,
+ "system_peak_buffer_memory": 3948445696,
+ "rows_returned": 0,
+ "wal_replay_entry_count": 0,
+ "result_set_size": 0,
+ "query_name": "EXPLAIN (ANALYZE, FORMAT JSON) SELECT count(*)\nFROM ((SELECT DISTINCT c_last_name,\n                         c_first_name,\n                         d_date\n         FROM store_sales,\n              date_dim,\n              customer\n         WHERE store_sales.ss_sold_date_sk = date_dim.d_date_sk\n           AND store_sales.ss_customer_sk = customer.c_customer_sk\n           AND d_month_seq BETWEEN 1200 AND 1200+11)\n      EXCEPT\n        (SELECT DISTINCT c_last_name,\n                         c_first_name,\n                         d_date\n         FROM catalog_sales,\n              date_dim,\n              customer\n         WHERE catalog_sales.cs_sold_date_sk = date_dim.d_date_sk\n           AND catalog_sales.cs_bill_customer_sk = customer.c_customer_sk\n           AND d_month_seq BETWEEN 1200 AND 1200+11)\n      EXCEPT\n        (SELECT DISTINCT c_last_name,\n                         c_first_name,\n                         d_date\n         FROM web_sales,\n              date_dim,\n              customer\n         WHERE web_sales.ws_sold_date_sk = date_dim.d_date_sk\n           AND web_sales.ws_bill_customer_sk = customer.c_customer_sk\n           AND d_month_seq BETWEEN 1200 AND 1200+11)) cool_cust ",
+ "waiting_to_attach_latency": 0.0,
+ "attach_load_storage_latency": 0.0,
+ "blocked_thread_time": 0.0,
+ "cpu_time": 1.693759419,
+ "extra_info": {},
+ "total_memory_allocated": 1009516544,
+ "cumulative_cardinality": 67446520,
+ "checkpoint_latency": 0.0,
+ "cumulative_rows_scanned": 40789704,
+ "write_to_wal_latency": 0.0,
+ "latency": 0.262452611,
+ "attach_replay_wal_latency": 0.0,
+ "commit_local_storage_latency": 0.0,
+ "children": [
+  {
+   "system_peak_temp_dir_size": 0,
+   "system_peak_buffer_memory": 0,
+   "result_set_size": 0,
+   "operator_timing": 3.32e-07,
+   "operator_type": "EXPLAIN_ANALYZE",
+   "cpu_time": 1.693759419,
+   "extra_info": {},
+   "cumulative_cardinality": 67446520,
+   "cumulative_rows_scanned": 40789704,
+   "operator_cardinality": 0,
+   "operator_name": "EXPLAIN_ANALYZE",
+   "operator_rows_scanned": 0,
+   "children": [
+    {
+     "system_peak_temp_dir_size": 0,
+     "system_peak_buffer_memory": 0,
+     "result_set_size": 8,
+     "operator_timing": 3.8412000000000004e-05,
+     "operator_type": "UNGROUPED_AGGREGATE",
+     "cpu_time": 1.693759087,
+     "extra_info": {
+      "Aggregates": "count_star()"
+     },
+     "cumulative_cardinality": 67446520,
+     "cumulative_rows_scanned": 40789704,
+     "operator_cardinality": 1,
+     "operator_name": "UNGROUPED_AGGREGATE",
+     "operator_rows_scanned": 0,
+     "children": [
+      {
+       "system_peak_temp_dir_size": 0,
+       "system_peak_buffer_memory": 0,
+       "result_set_size": 16693128,
+       "operator_timing": 0.010716658,
+       "operator_type": "PROJECTION",
+       "cpu_time": 1.693720675,
+       "extra_info": {
+        "Projections": [
+         "__internal_decompress_string(#0)",
+         "__internal_decompress_string(#1)",
+         "#2"
+        ],
+        "Estimated Cardinality": "5759882"
+       },
+       "cumulative_cardinality": 67446519,
+       "cumulative_rows_scanned": 40789704,
+       "operator_cardinality": 463698,
+       "operator_name": "PROJECTION",
+       "operator_rows_scanned": 0,
+       "children": [
+        {
+         "system_peak_temp_dir_size": 0,
+         "system_peak_buffer_memory": 0,
+         "result_set_size": 16693128,
+         "operator_timing": 0.05729013499999999,
+         "operator_type": "HASH_GROUP_BY",
+         "cpu_time": 1.683004017,
+         "extra_info": {
+          "Groups": [
+           "#0",
+           "#1",
+           "#2"
+          ],
+          "Aggregates": "",
+          "Estimated Cardinality": "5759882"
+         },
+         "cumulative_cardinality": 66982821,
+         "cumulative_rows_scanned": 40789704,
+         "operator_cardinality": 463698,
+         "operator_name": "HASH_GROUP_BY",
+         "operator_rows_scanned": 0,
+         "children": [
+          {
+           "system_peak_temp_dir_size": 0,
+           "system_peak_buffer_memory": 0,
+           "result_set_size": 16693128,
+           "operator_timing": 5.7756999999999996e-05,
+           "operator_type": "PROJECTION",
+           "cpu_time": 1.625713882,
+           "extra_info": {
+            "Projections": [
+             "c_last_name",
+             "c_first_name",
+             "d_date"
+            ],
+            "Estimated Cardinality": "5759882"
+           },
+           "cumulative_cardinality": 66519123,
+           "cumulative_rows_scanned": 40789704,
+           "operator_cardinality": 463698,
+           "operator_name": "PROJECTION",
+           "operator_rows_scanned": 0,
+           "children": [
+            {
+             "system_peak_temp_dir_size": 0,
+             "system_peak_buffer_memory": 0,
+             "result_set_size": 16693128,
+             "operator_timing": 0.009970042000000002,
+             "operator_type": "PROJECTION",
+             "cpu_time": 1.6256561250000001,
+             "extra_info": {
+              "Projections": [
+               "__internal_compress_string_uhugeint(#0)",
+               "__internal_compress_string_uhugeint(#1)",
+               "#2"
+              ],
+              "Estimated Cardinality": "5759882"
+             },
+             "cumulative_cardinality": 66055425,
+             "cumulative_rows_scanned": 40789704,
+             "operator_cardinality": 463698,
+             "operator_name": "PROJECTION",
+             "operator_rows_scanned": 0,
+             "children": [
+              {
+               "system_peak_temp_dir_size": 0,
+               "system_peak_buffer_memory": 0,
+               "result_set_size": 16693128,
+               "operator_timing": 0.078848569,
+               "operator_type": "HASH_GROUP_BY",
+               "cpu_time": 1.6156860830000002,
+               "extra_info": {
+                "Groups": [
+                 "#0",
+                 "#1",
+                 "#2"
+                ],
+                "Aggregates": "",
+                "Estimated Cardinality": "5759882"
+               },
+               "cumulative_cardinality": 65591727,
+               "cumulative_rows_scanned": 40789704,
+               "operator_cardinality": 463698,
+               "operator_name": "HASH_GROUP_BY",
+               "operator_rows_scanned": 0,
+               "children": [
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 16693128,
+                 "operator_timing": 0.035916034,
+                 "operator_type": "HASH_JOIN",
+                 "cpu_time": 1.5368375140000001,
+                 "extra_info": {
+                  "Join Type": "ANTI",
+                  "Conditions": [
+                   "#0 IS NOT DISTINCT FROM #0",
+                   "#1 IS NOT DISTINCT FROM #1",
+                   "#2 IS NOT DISTINCT FROM #2"
+                  ],
+                  "Estimated Cardinality": "5759882"
+                 },
+                 "cumulative_cardinality": 65128029,
+                 "cumulative_rows_scanned": 40789704,
+                 "operator_cardinality": 463698,
+                 "operator_name": "HASH_JOIN",
+                 "operator_rows_scanned": 0,
+                 "children": [
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 16751484,
+                   "operator_timing": 0.010833875,
+                   "operator_type": "PROJECTION",
+                   "cpu_time": 1.289378453,
+                   "extra_info": {
+                    "Projections": [
+                     "__internal_decompress_string(#0)",
+                     "__internal_decompress_string(#1)",
+                     "#2"
+                    ],
+                    "Estimated Cardinality": "5759882"
+                   },
+                   "cumulative_cardinality": 55247630,
+                   "cumulative_rows_scanned": 33019089,
+                   "operator_cardinality": 465319,
+                   "operator_name": "PROJECTION",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 16751484,
+                     "operator_timing": 0.05857452899999999,
+                     "operator_type": "HASH_GROUP_BY",
+                     "cpu_time": 1.278544578,
+                     "extra_info": {
+                      "Groups": [
+                       "#0",
+                       "#1",
+                       "#2"
+                      ],
+                      "Aggregates": "",
+                      "Estimated Cardinality": "5759882"
+                     },
+                     "cumulative_cardinality": 54782311,
+                     "cumulative_rows_scanned": 33019089,
+                     "operator_cardinality": 465319,
+                     "operator_name": "HASH_GROUP_BY",
+                     "operator_rows_scanned": 0,
+                     "children": [
+                      {
+                       "system_peak_temp_dir_size": 0,
+                       "system_peak_buffer_memory": 0,
+                       "result_set_size": 16751484,
+                       "operator_timing": 5.5721e-05,
+                       "operator_type": "PROJECTION",
+                       "cpu_time": 1.219970049,
+                       "extra_info": {
+                        "Projections": [
+                         "c_last_name",
+                         "c_first_name",
+                         "d_date"
+                        ],
+                        "Estimated Cardinality": "5759882"
+                       },
+                       "cumulative_cardinality": 54316992,
+                       "cumulative_rows_scanned": 33019089,
+                       "operator_cardinality": 465319,
+                       "operator_name": "PROJECTION",
+                       "operator_rows_scanned": 0,
+                       "children": [
+                        {
+                         "system_peak_temp_dir_size": 0,
+                         "system_peak_buffer_memory": 0,
+                         "result_set_size": 16751484,
+                         "operator_timing": 0.009928577000000001,
+                         "operator_type": "PROJECTION",
+                         "cpu_time": 1.219914328,
+                         "extra_info": {
+                          "Projections": [
+                           "__internal_compress_string_uhugeint(#0)",
+                           "__internal_compress_string_uhugeint(#1)",
+                           "#2"
+                          ],
+                          "Estimated Cardinality": "5759882"
+                         },
+                         "cumulative_cardinality": 53851673,
+                         "cumulative_rows_scanned": 33019089,
+                         "operator_cardinality": 465319,
+                         "operator_name": "PROJECTION",
+                         "operator_rows_scanned": 0,
+                         "children": [
+                          {
+                           "system_peak_temp_dir_size": 0,
+                           "system_peak_buffer_memory": 0,
+                           "result_set_size": 16751484,
+                           "operator_timing": 0.080594768,
+                           "operator_type": "HASH_GROUP_BY",
+                           "cpu_time": 1.209985751,
+                           "extra_info": {
+                            "Groups": [
+                             "#0",
+                             "#1",
+                             "#2"
+                            ],
+                            "Aggregates": "",
+                            "Estimated Cardinality": "5759882"
+                           },
+                           "cumulative_cardinality": 53386354,
+                           "cumulative_rows_scanned": 33019089,
+                           "operator_cardinality": 465319,
+                           "operator_name": "HASH_GROUP_BY",
+                           "operator_rows_scanned": 0,
+                           "children": [
+                            {
+                             "system_peak_temp_dir_size": 0,
+                             "system_peak_buffer_memory": 0,
+                             "result_set_size": 16751484,
+                             "operator_timing": 0.051177991000000006,
+                             "operator_type": "HASH_JOIN",
+                             "cpu_time": 1.129390983,
+                             "extra_info": {
+                              "Join Type": "ANTI",
+                              "Conditions": [
+                               "#0 IS NOT DISTINCT FROM #0",
+                               "#1 IS NOT DISTINCT FROM #1",
+                               "#2 IS NOT DISTINCT FROM #2"
+                              ],
+                              "Estimated Cardinality": "5759882"
+                             },
+                             "cumulative_cardinality": 52921035,
+                             "cumulative_rows_scanned": 33019089,
+                             "operator_cardinality": 465319,
+                             "operator_name": "HASH_JOIN",
+                             "operator_rows_scanned": 0,
+                             "children": [
+                              {
+                               "system_peak_temp_dir_size": 0,
+                               "system_peak_buffer_memory": 0,
+                               "result_set_size": 16918668,
+                               "operator_timing": 0.010986736,
+                               "operator_type": "PROJECTION",
+                               "cpu_time": 0.765968087,
+                               "extra_info": {
+                                "Projections": [
+                                 "__internal_decompress_string(#0)",
+                                 "__internal_decompress_string(#1)",
+                                 "#2"
+                                ],
+                                "Estimated Cardinality": "5759882"
+                               },
+                               "cumulative_cardinality": 34032442,
+                               "cumulative_rows_scanned": 29374040,
+                               "operator_cardinality": 469963,
+                               "operator_name": "PROJECTION",
+                               "operator_rows_scanned": 0,
+                               "children": [
+                                {
+                                 "system_peak_temp_dir_size": 0,
+                                 "system_peak_buffer_memory": 0,
+                                 "result_set_size": 16918668,
+                                 "operator_timing": 0.32489866,
+                                 "operator_type": "HASH_GROUP_BY",
+                                 "cpu_time": 0.754981351,
+                                 "extra_info": {
+                                  "Groups": [
+                                   "#0",
+                                   "#1",
+                                   "#2"
+                                  ],
+                                  "Aggregates": "",
+                                  "Estimated Cardinality": "5759882"
+                                 },
+                                 "cumulative_cardinality": 33562479,
+                                 "cumulative_rows_scanned": 29374040,
+                                 "operator_cardinality": 469963,
+                                 "operator_name": "HASH_GROUP_BY",
+                                 "operator_rows_scanned": 0,
+                                 "children": [
+                                  {
+                                   "system_peak_temp_dir_size": 0,
+                                   "system_peak_buffer_memory": 0,
+                                   "result_set_size": 194016960,
+                                   "operator_timing": 0.0030406809999999947,
+                                   "operator_type": "PROJECTION",
+                                   "cpu_time": 0.43008269099999996,
+                                   "extra_info": {
+                                    "Projections": [
+                                     "c_last_name",
+                                     "c_first_name",
+                                     "d_date"
+                                    ],
+                                    "Estimated Cardinality": "5759882"
+                                   },
+                                   "cumulative_cardinality": 33092516,
+                                   "cumulative_rows_scanned": 29374040,
+                                   "operator_cardinality": 5389360,
+                                   "operator_name": "PROJECTION",
+                                   "operator_rows_scanned": 0,
+                                   "children": [
+                                    {
+                                     "system_peak_temp_dir_size": 0,
+                                     "system_peak_buffer_memory": 0,
+                                     "result_set_size": 194016960,
+                                     "operator_timing": 0.130405046,
+                                     "operator_type": "PROJECTION",
+                                     "cpu_time": 0.42704200999999997,
+                                     "extra_info": {
+                                      "Projections": [
+                                       "__internal_compress_string_uhugeint(#0)",
+                                       "__internal_compress_string_uhugeint(#1)",
+                                       "#2"
+                                      ],
+                                      "Estimated Cardinality": "5759882"
+                                     },
+                                     "cumulative_cardinality": 27703156,
+                                     "cumulative_rows_scanned": 29374040,
+                                     "operator_cardinality": 5389360,
+                                     "operator_name": "PROJECTION",
+                                     "operator_rows_scanned": 0,
+                                     "children": [
+                                      {
+                                       "system_peak_temp_dir_size": 0,
+                                       "system_peak_buffer_memory": 0,
+                                       "result_set_size": 194016960,
+                                       "operator_timing": 0.0031393410000000004,
+                                       "operator_type": "PROJECTION",
+                                       "cpu_time": 0.29663696399999995,
+                                       "extra_info": {
+                                        "Projections": [
+                                         "c_last_name",
+                                         "c_first_name",
+                                         "d_date"
+                                        ],
+                                        "Estimated Cardinality": "5759882"
+                                       },
+                                       "cumulative_cardinality": 22313796,
+                                       "cumulative_rows_scanned": 29374040,
+                                       "operator_cardinality": 5389360,
+                                       "operator_name": "PROJECTION",
+                                       "operator_rows_scanned": 0,
+                                       "children": [
+                                        {
+                                         "system_peak_temp_dir_size": 0,
+                                         "system_peak_buffer_memory": 0,
+                                         "result_set_size": 194016960,
+                                         "operator_timing": 0.046759133,
+                                         "operator_type": "HASH_JOIN",
+                                         "cpu_time": 0.29349762299999993,
+                                         "extra_info": {
+                                          "Join Type": "INNER",
+                                          "Conditions": "ss_customer_sk = c_customer_sk",
+                                          "Estimated Cardinality": "5759882"
+                                         },
+                                         "cumulative_cardinality": 16924436,
+                                         "cumulative_rows_scanned": 29374040,
+                                         "operator_cardinality": 5389360,
+                                         "operator_name": "HASH_JOIN",
+                                         "operator_rows_scanned": 0,
+                                         "children": [
+                                          {
+                                           "system_peak_temp_dir_size": 0,
+                                           "system_peak_buffer_memory": 0,
+                                           "result_set_size": 66206064,
+                                           "operator_timing": 0.029445605999999985,
+                                           "operator_type": "HASH_JOIN",
+                                           "cpu_time": 0.23844291899999992,
+                                           "extra_info": {
+                                            "Join Type": "INNER",
+                                            "Conditions": "ss_sold_date_sk = d_date_sk",
+                                            "Estimated Cardinality": "5759882"
+                                           },
+                                           "cumulative_cardinality": 11035076,
+                                           "cumulative_rows_scanned": 28874040,
+                                           "operator_cardinality": 5517172,
+                                           "operator_name": "HASH_JOIN",
+                                           "operator_rows_scanned": 0,
+                                           "children": [
+                                            {
+                                             "system_peak_temp_dir_size": 0,
+                                             "system_peak_buffer_memory": 0,
+                                             "result_set_size": 88274752,
+                                             "operator_timing": 0.20871911599999993,
+                                             "operator_type": "TABLE_SCAN",
+                                             "cpu_time": 0.20871911599999993,
+                                             "extra_info": {
+                                              "Table": "tpcds.main.store_sales",
+                                              "Type": "Sequential Scan",
+                                              "Projections": [
+                                               "ss_sold_date_sk",
+                                               "ss_customer_sk"
+                                              ],
+                                              "Estimated Cardinality": "28800991",
+                                              "Dynamic Filters": [
+                                               "optional: ss_sold_date_sk>=2451545 AND optional: ss_sold_date_sk<=2451910",
+                                               "optional: ss_customer_sk>=1 AND optional: ss_customer_sk<=500000"
+                                              ]
+                                             },
+                                             "cumulative_cardinality": 5517172,
+                                             "cumulative_rows_scanned": 28800991,
+                                             "operator_cardinality": 5517172,
+                                             "operator_name": "SEQ_SCAN",
+                                             "operator_rows_scanned": 28800991,
+                                             "children": []
+                                            },
+                                            {
+                                             "system_peak_temp_dir_size": 0,
+                                             "system_peak_buffer_memory": 0,
+                                             "result_set_size": 4392,
+                                             "operator_timing": 1.5376e-05,
+                                             "operator_type": "FILTER",
+                                             "cpu_time": 0.000278197,
+                                             "extra_info": {
+                                              "Expression": "(d_date_sk BETWEEN 2450816 AND 2452642)",
+                                              "Estimated Cardinality": "14609"
+                                             },
+                                             "cumulative_cardinality": 732,
+                                             "cumulative_rows_scanned": 73049,
+                                             "operator_cardinality": 366,
+                                             "operator_name": "FILTER",
+                                             "operator_rows_scanned": 0,
+                                             "children": [
+                                              {
+                                               "system_peak_temp_dir_size": 0,
+                                               "system_peak_buffer_memory": 0,
+                                               "result_set_size": 4392,
+                                               "operator_timing": 0.000262821,
+                                               "operator_type": "TABLE_SCAN",
+                                               "cpu_time": 0.000262821,
+                                               "extra_info": {
+                                                "Table": "tpcds.main.date_dim",
+                                                "Type": "Sequential Scan",
+                                                "Projections": [
+                                                 "d_date_sk",
+                                                 "d_date"
+                                                ],
+                                                "Filters": "d_month_seq>=1200 AND d_month_seq<=1211",
+                                                "Estimated Cardinality": "14609"
+                                               },
+                                               "cumulative_cardinality": 366,
+                                               "cumulative_rows_scanned": 73049,
+                                               "operator_cardinality": 366,
+                                               "operator_name": "SEQ_SCAN",
+                                               "operator_rows_scanned": 73049,
+                                               "children": []
+                                              }
+                                             ]
+                                            }
+                                           ]
+                                          },
+                                          {
+                                           "system_peak_temp_dir_size": 0,
+                                           "system_peak_buffer_memory": 0,
+                                           "result_set_size": 20000000,
+                                           "operator_timing": 0.008295571,
+                                           "operator_type": "TABLE_SCAN",
+                                           "cpu_time": 0.008295571,
+                                           "extra_info": {
+                                            "Table": "tpcds.main.customer",
+                                            "Type": "Sequential Scan",
+                                            "Projections": [
+                                             "c_customer_sk",
+                                             "c_last_name",
+                                             "c_first_name"
+                                            ],
+                                            "Estimated Cardinality": "500000"
+                                           },
+                                           "cumulative_cardinality": 500000,
+                                           "cumulative_rows_scanned": 500000,
+                                           "operator_cardinality": 500000,
+                                           "operator_name": "SEQ_SCAN",
+                                           "operator_rows_scanned": 500000,
+                                           "children": []
+                                          }
+                                         ]
+                                        }
+                                       ]
+                                      }
+                                     ]
+                                    }
+                                   ]
+                                  }
+                                 ]
+                                }
+                               ]
+                              },
+                              {
+                               "system_peak_temp_dir_size": 0,
+                               "system_peak_buffer_memory": 0,
+                               "result_set_size": 11277324,
+                               "operator_timing": 0.007307348000000001,
+                               "operator_type": "PROJECTION",
+                               "cpu_time": 0.312244905,
+                               "extra_info": {
+                                "Projections": [
+                                 "__internal_decompress_string(#0)",
+                                 "__internal_decompress_string(#1)",
+                                 "#2"
+                                ],
+                                "Estimated Cardinality": "2880094"
+                               },
+                               "cumulative_cardinality": 18423274,
+                               "cumulative_rows_scanned": 3645049,
+                               "operator_cardinality": 313259,
+                               "operator_name": "PROJECTION",
+                               "operator_rows_scanned": 0,
+                               "children": [
+                                {
+                                 "system_peak_temp_dir_size": 0,
+                                 "system_peak_buffer_memory": 0,
+                                 "result_set_size": 11277324,
+                                 "operator_timing": 0.17595938000000008,
+                                 "operator_type": "HASH_GROUP_BY",
+                                 "cpu_time": 0.304937557,
+                                 "extra_info": {
+                                  "Groups": [
+                                   "#0",
+                                   "#1",
+                                   "#2"
+                                  ],
+                                  "Aggregates": "",
+                                  "Estimated Cardinality": "2880094"
+                                 },
+                                 "cumulative_cardinality": 18110015,
+                                 "cumulative_rows_scanned": 3645049,
+                                 "operator_cardinality": 313259,
+                                 "operator_name": "HASH_GROUP_BY",
+                                 "operator_rows_scanned": 0,
+                                 "children": [
+                                  {
+                                   "system_peak_temp_dir_size": 0,
+                                   "system_peak_buffer_memory": 0,
+                                   "result_set_size": 102966408,
+                                   "operator_timing": 0.00030247599999999993,
+                                   "operator_type": "PROJECTION",
+                                   "cpu_time": 0.12897817699999997,
+                                   "extra_info": {
+                                    "Projections": [
+                                     "c_last_name",
+                                     "c_first_name",
+                                     "d_date"
+                                    ],
+                                    "Estimated Cardinality": "2880094"
+                                   },
+                                   "cumulative_cardinality": 17796756,
+                                   "cumulative_rows_scanned": 3645049,
+                                   "operator_cardinality": 2860178,
+                                   "operator_name": "PROJECTION",
+                                   "operator_rows_scanned": 0,
+                                   "children": [
+                                    {
+                                     "system_peak_temp_dir_size": 0,
+                                     "system_peak_buffer_memory": 0,
+                                     "result_set_size": 102966408,
+                                     "operator_timing": 0.06709795099999999,
+                                     "operator_type": "PROJECTION",
+                                     "cpu_time": 0.12867570099999998,
+                                     "extra_info": {
+                                      "Projections": [
+                                       "__internal_compress_string_uhugeint(#0)",
+                                       "__internal_compress_string_uhugeint(#1)",
+                                       "#2"
+                                      ],
+                                      "Estimated Cardinality": "2880094"
+                                     },
+                                     "cumulative_cardinality": 14936578,
+                                     "cumulative_rows_scanned": 3645049,
+                                     "operator_cardinality": 2860178,
+                                     "operator_name": "PROJECTION",
+                                     "operator_rows_scanned": 0,
+                                     "children": [
+                                      {
+                                       "system_peak_temp_dir_size": 0,
+                                       "system_peak_buffer_memory": 0,
+                                       "result_set_size": 102966408,
+                                       "operator_timing": 0.00031375799999999986,
+                                       "operator_type": "PROJECTION",
+                                       "cpu_time": 0.061577749999999994,
+                                       "extra_info": {
+                                        "Projections": [
+                                         "c_last_name",
+                                         "c_first_name",
+                                         "d_date"
+                                        ],
+                                        "Estimated Cardinality": "2880094"
+                                       },
+                                       "cumulative_cardinality": 12076400,
+                                       "cumulative_rows_scanned": 3645049,
+                                       "operator_cardinality": 2860178,
+                                       "operator_name": "PROJECTION",
+                                       "operator_rows_scanned": 0,
+                                       "children": [
+                                        {
+                                         "system_peak_temp_dir_size": 0,
+                                         "system_peak_buffer_memory": 0,
+                                         "result_set_size": 102966408,
+                                         "operator_timing": 0.026930161999999997,
+                                         "operator_type": "HASH_JOIN",
+                                         "cpu_time": 0.061263991999999996,
+                                         "extra_info": {
+                                          "Join Type": "INNER",
+                                          "Conditions": "cs_bill_customer_sk = c_customer_sk",
+                                          "Estimated Cardinality": "2880094"
+                                         },
+                                         "cumulative_cardinality": 9216222,
+                                         "cumulative_rows_scanned": 3645049,
+                                         "operator_cardinality": 2860178,
+                                         "operator_name": "HASH_JOIN",
+                                         "operator_rows_scanned": 0,
+                                         "children": [
+                                          {
+                                           "system_peak_temp_dir_size": 0,
+                                           "system_peak_buffer_memory": 0,
+                                           "result_set_size": 34394172,
+                                           "operator_timing": 0.010150349,
+                                           "operator_type": "HASH_JOIN",
+                                           "cpu_time": 0.025200417,
+                                           "extra_info": {
+                                            "Join Type": "INNER",
+                                            "Conditions": "cs_sold_date_sk = d_date_sk",
+                                            "Estimated Cardinality": "2880094"
+                                           },
+                                           "cumulative_cardinality": 5856044,
+                                           "cumulative_rows_scanned": 3145049,
+                                           "operator_cardinality": 2866181,
+                                           "operator_name": "HASH_JOIN",
+                                           "operator_rows_scanned": 0,
+                                           "children": [
+                                            {
+                                             "system_peak_temp_dir_size": 0,
+                                             "system_peak_buffer_memory": 0,
+                                             "result_set_size": 47826096,
+                                             "operator_timing": 0.014904141000000001,
+                                             "operator_type": "TABLE_SCAN",
+                                             "cpu_time": 0.014904141000000001,
+                                             "extra_info": {
+                                              "Table": "tpcds.main.catalog_sales",
+                                              "Type": "Sequential Scan",
+                                              "Projections": [
+                                               "cs_sold_date_sk",
+                                               "cs_bill_customer_sk"
+                                              ],
+                                              "Estimated Cardinality": "14401261",
+                                              "Dynamic Filters": [
+                                               "optional: cs_sold_date_sk>=2451545 AND optional: cs_sold_date_sk<=2451910",
+                                               "optional: cs_bill_customer_sk>=1 AND optional: cs_bill_customer_sk<=500000"
+                                              ]
+                                             },
+                                             "cumulative_cardinality": 2989131,
+                                             "cumulative_rows_scanned": 3072000,
+                                             "operator_cardinality": 2989131,
+                                             "operator_name": "SEQ_SCAN",
+                                             "operator_rows_scanned": 3072000,
+                                             "children": []
+                                            },
+                                            {
+                                             "system_peak_temp_dir_size": 0,
+                                             "system_peak_buffer_memory": 0,
+                                             "result_set_size": 4392,
+                                             "operator_timing": 7.399e-06,
+                                             "operator_type": "FILTER",
+                                             "cpu_time": 0.00014592700000000001,
+                                             "extra_info": {
+                                              "Expression": "(d_date_sk BETWEEN 2450815 AND 2452653)",
+                                              "Estimated Cardinality": "14609"
+                                             },
+                                             "cumulative_cardinality": 732,
+                                             "cumulative_rows_scanned": 73049,
+                                             "operator_cardinality": 366,
+                                             "operator_name": "FILTER",
+                                             "operator_rows_scanned": 0,
+                                             "children": [
+                                              {
+                                               "system_peak_temp_dir_size": 0,
+                                               "system_peak_buffer_memory": 0,
+                                               "result_set_size": 4392,
+                                               "operator_timing": 0.000138528,
+                                               "operator_type": "TABLE_SCAN",
+                                               "cpu_time": 0.000138528,
+                                               "extra_info": {
+                                                "Table": "tpcds.main.date_dim",
+                                                "Type": "Sequential Scan",
+                                                "Projections": [
+                                                 "d_date_sk",
+                                                 "d_date"
+                                                ],
+                                                "Filters": "d_month_seq>=1200 AND d_month_seq<=1211",
+                                                "Estimated Cardinality": "14609"
+                                               },
+                                               "cumulative_cardinality": 366,
+                                               "cumulative_rows_scanned": 73049,
+                                               "operator_cardinality": 366,
+                                               "operator_name": "SEQ_SCAN",
+                                               "operator_rows_scanned": 73049,
+                                               "children": []
+                                              }
+                                             ]
+                                            }
+                                           ]
+                                          },
+                                          {
+                                           "system_peak_temp_dir_size": 0,
+                                           "system_peak_buffer_memory": 0,
+                                           "result_set_size": 20000000,
+                                           "operator_timing": 0.009133413,
+                                           "operator_type": "TABLE_SCAN",
+                                           "cpu_time": 0.009133413,
+                                           "extra_info": {
+                                            "Table": "tpcds.main.customer",
+                                            "Type": "Sequential Scan",
+                                            "Projections": [
+                                             "c_customer_sk",
+                                             "c_last_name",
+                                             "c_first_name"
+                                            ],
+                                            "Estimated Cardinality": "500000"
+                                           },
+                                           "cumulative_cardinality": 500000,
+                                           "cumulative_rows_scanned": 500000,
+                                           "operator_cardinality": 500000,
+                                           "operator_name": "SEQ_SCAN",
+                                           "operator_rows_scanned": 500000,
+                                           "children": []
+                                          }
+                                         ]
+                                        }
+                                       ]
+                                      }
+                                     ]
+                                    }
+                                   ]
+                                  }
+                                 ]
+                                }
+                               ]
+                              }
+                             ]
+                            }
+                           ]
+                          }
+                         ]
+                        }
+                       ]
+                      }
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 4273416,
+                   "operator_timing": 0.00293594,
+                   "operator_type": "PROJECTION",
+                   "cpu_time": 0.21154302699999997,
+                   "extra_info": {
+                    "Projections": [
+                     "__internal_decompress_string(#0)",
+                     "__internal_decompress_string(#1)",
+                     "#2"
+                    ],
+                    "Estimated Cardinality": "1439434"
+                   },
+                   "cumulative_cardinality": 9416701,
+                   "cumulative_rows_scanned": 7770615,
+                   "operator_cardinality": 118706,
+                   "operator_name": "PROJECTION",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 4273416,
+                     "operator_timing": 0.08782155499999997,
+                     "operator_type": "HASH_GROUP_BY",
+                     "cpu_time": 0.20860708699999997,
+                     "extra_info": {
+                      "Groups": [
+                       "#0",
+                       "#1",
+                       "#2"
+                      ],
+                      "Aggregates": "",
+                      "Estimated Cardinality": "1439434"
+                     },
+                     "cumulative_cardinality": 9297995,
+                     "cumulative_rows_scanned": 7770615,
+                     "operator_cardinality": 118706,
+                     "operator_name": "HASH_GROUP_BY",
+                     "operator_rows_scanned": 0,
+                     "children": [
+                      {
+                       "system_peak_temp_dir_size": 0,
+                       "system_peak_buffer_memory": 0,
+                       "result_set_size": 52069428,
+                       "operator_timing": 0.0007745060000000002,
+                       "operator_type": "PROJECTION",
+                       "cpu_time": 0.120785532,
+                       "extra_info": {
+                        "Projections": [
+                         "c_last_name",
+                         "c_first_name",
+                         "d_date"
+                        ],
+                        "Estimated Cardinality": "1439434"
+                       },
+                       "cumulative_cardinality": 9179289,
+                       "cumulative_rows_scanned": 7770615,
+                       "operator_cardinality": 1446373,
+                       "operator_name": "PROJECTION",
+                       "operator_rows_scanned": 0,
+                       "children": [
+                        {
+                         "system_peak_temp_dir_size": 0,
+                         "system_peak_buffer_memory": 0,
+                         "result_set_size": 52069428,
+                         "operator_timing": 0.035910594000000004,
+                         "operator_type": "PROJECTION",
+                         "cpu_time": 0.120011026,
+                         "extra_info": {
+                          "Projections": [
+                           "__internal_compress_string_uhugeint(#0)",
+                           "__internal_compress_string_uhugeint(#1)",
+                           "#2"
+                          ],
+                          "Estimated Cardinality": "1439434"
+                         },
+                         "cumulative_cardinality": 7732916,
+                         "cumulative_rows_scanned": 7770615,
+                         "operator_cardinality": 1446373,
+                         "operator_name": "PROJECTION",
+                         "operator_rows_scanned": 0,
+                         "children": [
+                          {
+                           "system_peak_temp_dir_size": 0,
+                           "system_peak_buffer_memory": 0,
+                           "result_set_size": 52069428,
+                           "operator_timing": 0.000777983,
+                           "operator_type": "PROJECTION",
+                           "cpu_time": 0.084100432,
+                           "extra_info": {
+                            "Projections": [
+                             "c_last_name",
+                             "c_first_name",
+                             "d_date"
+                            ],
+                            "Estimated Cardinality": "1439434"
+                           },
+                           "cumulative_cardinality": 6286543,
+                           "cumulative_rows_scanned": 7770615,
+                           "operator_cardinality": 1446373,
+                           "operator_name": "PROJECTION",
+                           "operator_rows_scanned": 0,
+                           "children": [
+                            {
+                             "system_peak_temp_dir_size": 0,
+                             "system_peak_buffer_memory": 0,
+                             "result_set_size": 52069428,
+                             "operator_timing": 0.021711499999999995,
+                             "operator_type": "HASH_JOIN",
+                             "cpu_time": 0.083322449,
+                             "extra_info": {
+                              "Join Type": "INNER",
+                              "Conditions": "ws_bill_customer_sk = c_customer_sk",
+                              "Estimated Cardinality": "1439434"
+                             },
+                             "cumulative_cardinality": 4840170,
+                             "cumulative_rows_scanned": 7770615,
+                             "operator_cardinality": 1446373,
+                             "operator_name": "HASH_JOIN",
+                             "operator_rows_scanned": 0,
+                             "children": [
+                              {
+                               "system_peak_temp_dir_size": 0,
+                               "system_peak_buffer_memory": 0,
+                               "result_set_size": 17358408,
+                               "operator_timing": 0.007804325999999998,
+                               "operator_type": "HASH_JOIN",
+                               "cpu_time": 0.052526222000000004,
+                               "extra_info": {
+                                "Join Type": "INNER",
+                                "Conditions": "ws_sold_date_sk = d_date_sk",
+                                "Estimated Cardinality": "1439434"
+                               },
+                               "cumulative_cardinality": 2893800,
+                               "cumulative_rows_scanned": 7270615,
+                               "operator_cardinality": 1446534,
+                               "operator_name": "HASH_JOIN",
+                               "operator_rows_scanned": 0,
+                               "children": [
+                                {
+                                 "system_peak_temp_dir_size": 0,
+                                 "system_peak_buffer_memory": 0,
+                                 "result_set_size": 23144544,
+                                 "operator_timing": 0.044436768,
+                                 "operator_type": "TABLE_SCAN",
+                                 "cpu_time": 0.044436768,
+                                 "extra_info": {
+                                  "Table": "tpcds.main.web_sales",
+                                  "Type": "Sequential Scan",
+                                  "Projections": [
+                                   "ws_sold_date_sk",
+                                   "ws_bill_customer_sk"
+                                  ],
+                                  "Estimated Cardinality": "7197566",
+                                  "Dynamic Filters": [
+                                   "optional: ws_sold_date_sk>=2451545 AND optional: ws_sold_date_sk<=2451910",
+                                   "optional: ws_bill_customer_sk>=2 AND optional: ws_bill_customer_sk<=499998"
+                                  ]
+                                 },
+                                 "cumulative_cardinality": 1446534,
+                                 "cumulative_rows_scanned": 7197566,
+                                 "operator_cardinality": 1446534,
+                                 "operator_name": "SEQ_SCAN",
+                                 "operator_rows_scanned": 7197566,
+                                 "children": []
+                                },
+                                {
+                                 "system_peak_temp_dir_size": 0,
+                                 "system_peak_buffer_memory": 0,
+                                 "result_set_size": 4392,
+                                 "operator_timing": 1.4601e-05,
+                                 "operator_type": "FILTER",
+                                 "cpu_time": 0.000285128,
+                                 "extra_info": {
+                                  "Expression": "(d_date_sk BETWEEN 2450816 AND 2452642)",
+                                  "Estimated Cardinality": "14609"
+                                 },
+                                 "cumulative_cardinality": 732,
+                                 "cumulative_rows_scanned": 73049,
+                                 "operator_cardinality": 366,
+                                 "operator_name": "FILTER",
+                                 "operator_rows_scanned": 0,
+                                 "children": [
+                                  {
+                                   "system_peak_temp_dir_size": 0,
+                                   "system_peak_buffer_memory": 0,
+                                   "result_set_size": 4392,
+                                   "operator_timing": 0.000270527,
+                                   "operator_type": "TABLE_SCAN",
+                                   "cpu_time": 0.000270527,
+                                   "extra_info": {
+                                    "Table": "tpcds.main.date_dim",
+                                    "Type": "Sequential Scan",
+                                    "Projections": [
+                                     "d_date_sk",
+                                     "d_date"
+                                    ],
+                                    "Filters": "d_month_seq>=1200 AND d_month_seq<=1211",
+                                    "Estimated Cardinality": "14609"
+                                   },
+                                   "cumulative_cardinality": 366,
+                                   "cumulative_rows_scanned": 73049,
+                                   "operator_cardinality": 366,
+                                   "operator_name": "SEQ_SCAN",
+                                   "operator_rows_scanned": 73049,
+                                   "children": []
+                                  }
+                                 ]
+                                }
+                               ]
+                              },
+                              {
+                               "system_peak_temp_dir_size": 0,
+                               "system_peak_buffer_memory": 0,
+                               "result_set_size": 19999880,
+                               "operator_timing": 0.009084727,
+                               "operator_type": "TABLE_SCAN",
+                               "cpu_time": 0.009084727,
+                               "extra_info": {
+                                "Table": "tpcds.main.customer",
+                                "Type": "Sequential Scan",
+                                "Projections": [
+                                 "c_customer_sk",
+                                 "c_last_name",
+                                 "c_first_name"
+                                ],
+                                "Filters": "c_customer_sk>=2 AND c_customer_sk<=499998",
+                                "Estimated Cardinality": "500000"
+                               },
+                               "cumulative_cardinality": 499997,
+                               "cumulative_rows_scanned": 500000,
+                               "operator_cardinality": 499997,
+                               "operator_name": "SEQ_SCAN",
+                               "operator_rows_scanned": 500000,
+                               "children": []
+                              }
+                             ]
+                            }
+                           ]
+                          }
+                         ]
+                        }
+                       ]
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

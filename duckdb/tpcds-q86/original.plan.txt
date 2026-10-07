@@ -1,0 +1,51 @@
+-- DuckDB 1.5.5, tpcds-q86, original; latency 0.063574661 s, cpu 0.3834886589999999 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> PROJECTION  (rows=100 time_s=0.0)
+       Projections: ['#0', '#1', '#2', '#3', '#4']
+       Estimated Cardinality: 100
+    -> TOP_N  (rows=100 time_s=0.0001)
+         Top: 100
+         Order By: ['(GROUPING(tpcds.main.item.i_category) + GROUPING(tpcds.main.item.i_class)) DESC', '#5 ASC', 'rank() OVER (PARTITION BY (GROUPING(tpcds.main.item.i_category) + GROUPING(tpcds.main.item.i_class)), CASE  WHEN ((GROUPING(tpcds.main.item.i_class) = 0)) THEN (tpcds.main.item.i_category) ELSE NULL END ORDER BY sum(tpcds.main.web_sales.ws_net_paid) DESC) ASC']
+      -> PROJECTION  (rows=168 time_s=0.0)
+           Projections: ['total_sum', 'i_category', 'i_class', 'lochierarchy', 'rank_within_parent', 'CASE  WHEN (((GROUPING(tpcds.main.item.i_category) + GROUPING(tpcds.main.item.i_class)) = 0)) THEN (i_category) ELSE NULL END']
+           Estimated Cardinality: 1521954
+        -> PROJECTION  (rows=168 time_s=0.0)
+             Projections: ['#0', '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10']
+             Estimated Cardinality: 1521954
+          -> WINDOW  (rows=168 time_s=0.014)
+               Projections: RANK() OVER (PARTITION BY (GROUPING(tpcds.main.item.i_category) + GROUPING(tpcds.main.item.i_class)), CASE  WHEN ((GROUPING(tpcds.main.item.i_class) = 0)) THEN (i_category) ELSE NULL END ORDER BY sum(ws_net_paid) DESC NULLS LAST)
+            -> HASH_GROUP_BY  (rows=168 time_s=0.2511)
+                 Groups: ['#0', '#1']
+                 Aggregates: sum(#2)
+                 Estimated Cardinality: 1521954
+              -> PROJECTION  (rows=1446551 time_s=0.0014)
+                   Projections: ['i_category', 'i_class', 'ws_net_paid']
+                   Estimated Cardinality: 1521979
+                -> HASH_JOIN  (rows=1446551 time_s=0.0116)
+                     Join Type: INNER
+                     Conditions: ws_item_sk = i_item_sk
+                     Estimated Cardinality: 1521979
+                  -> HASH_JOIN  (rows=1446551 time_s=0.0148)
+                       Join Type: INNER
+                       Conditions: ws_sold_date_sk = d_date_sk
+                       Estimated Cardinality: 1439434
+                    -> TABLE_SCAN  (rows=1446551 time_s=0.0888)
+                         Table: tpcds.main.web_sales
+                         Type: Sequential Scan
+                         Projections: ['ws_sold_date_sk', 'ws_item_sk', 'ws_net_paid']
+                         Estimated Cardinality: 7197566
+                         Dynamic Filters: ['optional: ws_sold_date_sk>=2451545 AND optional: ws_sold_date_sk<=2451910', 'optional: ws_item_sk>=1 AND optional: ws_item_sk<=102000']
+                    -> FILTER  (rows=366 time_s=0.0)
+                         Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                         Estimated Cardinality: 14609
+                      -> TABLE_SCAN  (rows=366 time_s=0.0005)
+                           Table: tpcds.main.date_dim
+                           Type: Sequential Scan
+                           Projections: d_date_sk
+                           Filters: d_month_seq>=1200 AND d_month_seq<=1211
+                           Estimated Cardinality: 14609
+                  -> TABLE_SCAN  (rows=102000 time_s=0.0011)
+                       Table: tpcds.main.item
+                       Type: Sequential Scan
+                       Projections: ['i_item_sk', 'i_category', 'i_class']
+                       Estimated Cardinality: 102000

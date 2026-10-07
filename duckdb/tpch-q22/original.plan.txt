@@ -1,0 +1,72 @@
+-- DuckDB 1.5.5, tpch-q22, original; latency 0.119520716 s, cpu 0.7306998399999998 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> ORDER_BY  (rows=7 time_s=0.0)
+       Order By: custsale.cntrycode ASC
+    -> HASH_GROUP_BY  (rows=7 time_s=0.0019)
+         Groups: #0
+         Aggregates: ['count_star()', 'sum(#1)']
+         Estimated Cardinality: 3
+      -> PROJECTION  (rows=63914 time_s=0.0)
+           Projections: ['cntrycode', 'c_acctbal']
+           Estimated Cardinality: 4
+        -> PROJECTION  (rows=63914 time_s=0.0014)
+             Projections: ['cntrycode', 'c_acctbal']
+             Estimated Cardinality: 4
+          -> RIGHT_DELIM_JOIN  (rows=0 time_s=0.0231)
+               Join Type: RIGHT_ANTI
+               Conditions: c_custkey IS NOT DISTINCT FROM c_custkey
+               Estimated Cardinality: 4
+               Delim Index: 1
+            -> NESTED_LOOP_JOIN  (rows=190691 time_s=0.0141)
+                 Join Type: INNER
+                 Conditions: CAST(c_acctbal AS DOUBLE) > SUBQUERY
+                 Estimated Cardinality: 23
+              -> TABLE_SCAN  (rows=419974 time_s=0.1266)
+                   Table: tpch.main.customer
+                   Type: Sequential Scan
+                   Projections: ['c_phone', 'c_acctbal', 'c_custkey']
+                   Filters: ("substring"(c_phone, 1, 2) IN ('13', '31', '23', '29', '30', '18', '17'))
+                   Estimated Cardinality: 300000
+              -> PROJECTION  (rows=1 time_s=0.0)
+                   Projections: ['CASE  WHEN ((#1 > 1)) THEN ("error"(\'More than one row returned by a subquery used as an expression - scalar subqueries can only return a single row.', 'Use "SET scalar_subquery_error_on_multiple_rows=false" to revert to previous behavior of returning a random row.\')) ELSE #0 END']
+                   Estimated Cardinality: 1
+                -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+                     Aggregates: ['"first"(#0)', 'count_star()']
+                  -> PROJECTION  (rows=1 time_s=0.0)
+                       Projections: #0
+                       Estimated Cardinality: 1
+                    -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0009)
+                         Aggregates: avg(#0)
+                      -> PROJECTION  (rows=381776 time_s=0.0001)
+                           Projections: c_acctbal
+                           Estimated Cardinality: 300000
+                        -> TABLE_SCAN  (rows=381776 time_s=0.1143)
+                             Table: tpch.main.customer
+                             Type: Sequential Scan
+                             Projections: c_acctbal
+                             Filters: ['c_acctbal>0.00', '("substring"(c_phone, 1, 2) IN (\'13\', \'31\', \'23\', \'29\', \'30\', \'18\', \'17\'))']
+                             Estimated Cardinality: 300000
+            -> HASH_JOIN  (rows=63914 time_s=0.0684)
+                 Join Type: RIGHT_ANTI
+                 Conditions: c_custkey IS NOT DISTINCT FROM c_custkey
+                 Estimated Cardinality: 4
+              -> PROJECTION  (rows=1902836 time_s=0.0012)
+                   Projections: c_custkey
+                   Estimated Cardinality: 337
+                -> HASH_JOIN  (rows=1902836 time_s=0.3445)
+                     Join Type: INNER
+                     Conditions: o_custkey = c_custkey
+                     Estimated Cardinality: 337
+                  -> TABLE_SCAN  (rows=14999994 time_s=0.0277)
+                       Table: tpch.main.orders
+                       Type: Sequential Scan
+                       Projections: o_custkey
+                       Estimated Cardinality: 15000000
+                       Dynamic Filters: optional: o_custkey>=6 AND optional: o_custkey<=1499997
+                  -> DELIM_SCAN  (rows=0 time_s=0)
+                       Delim Index: 1
+                       Estimated Cardinality: 22
+              -> DUMMY_SCAN  (rows=0 time_s=0)
+            -> HASH_GROUP_BY  (rows=190691 time_s=0.0064)
+                 Groups: #2
+                 Estimated Cardinality: 22

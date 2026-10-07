@@ -1,0 +1,98 @@
+-- PostgreSQL 18, tpcds-q49, original; execution 6233.735 ms, planning 1.716 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=46.0 loops=1 est_rows=3 buffers hit=1678464 read=0)
+  -> Sort  (rows=46.0 loops=1 est_rows=3 buffers hit=1678464 read=0)
+       Sort Key: ["('web'::text) NULLS FIRST", 'web.return_rank NULLS FIRST', 'web.currency_rank NULLS FIRST', 'web.item NULLS FIRST']
+    -> Unique  (rows=46.0 loops=1 est_rows=3 buffers hit=1678464 read=0)
+      -> Sort  (rows=46.0 loops=1 est_rows=3 buffers hit=1678464 read=0)
+           Sort Key: ["('web'::text)", 'web.item', 'web.return_ratio', 'web.return_rank', 'web.currency_rank']
+        -> Append  (rows=46.0 loops=1 est_rows=3 buffers hit=1678464 read=0)
+          -> Subquery Scan  (rows=13.0 loops=1 est_rows=1 buffers hit=258242 read=0)
+               Filter: ((web.return_rank <= 10) OR (web.currency_rank <= 10))
+               Rows Removed by Filter: 185
+            -> WindowAgg  (rows=198.0 loops=1 est_rows=1 buffers hit=258242 read=0)
+              -> Sort  (rows=198.0 loops=1 est_rows=1 buffers hit=258242 read=0)
+                   Sort Key: ['in_web.return_ratio']
+                -> WindowAgg  (rows=198.0 loops=1 est_rows=1 buffers hit=258242 read=0)
+                  -> Sort  (rows=198.0 loops=1 est_rows=1 buffers hit=258242 read=0)
+                       Sort Key: ['in_web.currency_ratio']
+                    -> Subquery Scan  (rows=198.0 loops=1 est_rows=1 buffers hit=258242 read=0)
+                      -> Aggregate [Sorted]  (rows=198.0 loops=1 est_rows=1 buffers hit=258242 read=0)
+                           Group Key: ['ws.ws_item_sk']
+                        -> Gather Merge  (rows=199.0 loops=1 est_rows=1 workers=3 buffers hit=258242 read=0)
+                          -> Sort  (rows=49.75 loops=4 est_rows=1 buffers hit=258242 read=0)
+                               Sort Key: ['ws.ws_item_sk']
+                            -> Hash Join [Inner]  (rows=49.75 loops=4 est_rows=1 buffers hit=258218 read=0)
+                                 Hash Cond: ((wr.wr_order_number = ws.ws_order_number) AND (wr.wr_item_sk = ws.ws_item_sk))
+                              -> Seq Scan on web_returns wr  (rows=1493.0 loops=4 est_rows=2120 buffers hit=18344 read=0)
+                                   Filter: (wr_return_amt > '10000'::numeric)
+                                   Rows Removed by Filter: 178312
+                              -> Hash  (rows=23669.5 loops=4 est_rows=698 buffers hit=239874 read=0)
+                                -> Nested Loop [Inner]  (rows=23669.5 loops=4 est_rows=698 buffers hit=239874 read=0)
+                                  -> Seq Scan on date_dim  (rows=7.75 loops=4 est_rows=18 buffers hit=2032 read=0)
+                                       Filter: ((d_year = 2001) AND (d_moy = 12))
+                                       Rows Removed by Filter: 18254
+                                  -> Bitmap Heap Scan on web_sales ws  (rows=3054.13 loops=31 est_rows=1534 buffers hit=237842 read=0)
+                                       Filter: ((ws_net_profit > '1'::numeric) AND (ws_net_paid > '0'::numeric) AND (ws_quantity > 0))
+                                       Rows Removed by Filter: 4805
+                                    -> Bitmap Index Scan using scaleup_tpcds_76  (rows=7858.9 loops=31 est_rows=3947 buffers hit=293 read=0)
+                                         Index Cond: (ws_sold_date_sk = date_dim.d_date_sk)
+          -> Subquery Scan  (rows=18.0 loops=1 est_rows=1 buffers hit=464059 read=0)
+               Filter: ((catalog.return_rank <= 10) OR (catalog.currency_rank <= 10))
+               Rows Removed by Filter: 388
+            -> WindowAgg  (rows=406.0 loops=1 est_rows=1 buffers hit=464059 read=0)
+              -> Sort  (rows=406.0 loops=1 est_rows=1 buffers hit=464059 read=0)
+                   Sort Key: ['in_cat.return_ratio']
+                -> WindowAgg  (rows=406.0 loops=1 est_rows=1 buffers hit=464059 read=0)
+                  -> Sort  (rows=406.0 loops=1 est_rows=1 buffers hit=464059 read=0)
+                       Sort Key: ['in_cat.currency_ratio']
+                    -> Subquery Scan  (rows=406.0 loops=1 est_rows=1 buffers hit=464059 read=0)
+                      -> Aggregate [Sorted]  (rows=406.0 loops=1 est_rows=1 buffers hit=464059 read=0)
+                           Group Key: ['cs.cs_item_sk']
+                        -> Gather Merge  (rows=408.0 loops=1 est_rows=1 workers=4 buffers hit=464059 read=0)
+                          -> Sort  (rows=81.6 loops=5 est_rows=1 buffers hit=464059 read=0)
+                               Sort Key: ['cs.cs_item_sk']
+                            -> Hash Join [Inner]  (rows=81.6 loops=5 est_rows=1 buffers hit=464027 read=0)
+                                 Hash Cond: ((cr.cr_order_number = cs.cs_order_number) AND (cr.cr_item_sk = cs.cs_item_sk))
+                              -> Seq Scan on catalog_returns cr  (rows=2497.0 loops=5 est_rows=3426 buffers hit=41704 read=0)
+                                   Filter: (cr_return_amount > '10000'::numeric)
+                                   Rows Removed by Filter: 285748
+                              -> Hash  (rows=37585.0 loops=5 est_rows=1364 buffers hit=422323 read=0)
+                                -> Nested Loop [Inner]  (rows=37585.0 loops=5 est_rows=1364 buffers hit=422323 read=0)
+                                  -> Seq Scan on date_dim date_dim_1  (rows=6.2 loops=5 est_rows=18 buffers hit=2032 read=0)
+                                       Filter: ((d_year = 2001) AND (d_moy = 12))
+                                       Rows Removed by Filter: 14604
+                                  -> Bitmap Heap Scan on catalog_sales cs  (rows=6062.1 loops=31 est_rows=2976 buffers hit=420291 read=0)
+                                       Filter: ((cs_net_profit > '1'::numeric) AND (cs_net_paid > '0'::numeric) AND (cs_quantity > 0))
+                                       Rows Removed by Filter: 9574
+                                    -> Bitmap Index Scan using scaleup_tpcds_17  (rows=15635.87 loops=31 est_rows=7810 buffers hit=498 read=0)
+                                         Index Cond: (cs_sold_date_sk = date_dim_1.d_date_sk)
+          -> Subquery Scan  (rows=15.0 loops=1 est_rows=1 buffers hit=956163 read=0)
+               Filter: ((store.return_rank <= 10) OR (store.currency_rank <= 10))
+               Rows Removed by Filter: 117
+            -> WindowAgg  (rows=132.0 loops=1 est_rows=1 buffers hit=956163 read=0)
+              -> Sort  (rows=132.0 loops=1 est_rows=1 buffers hit=956163 read=0)
+                   Sort Key: ['in_store.return_ratio']
+                -> WindowAgg  (rows=132.0 loops=1 est_rows=1 buffers hit=956163 read=0)
+                  -> Sort  (rows=132.0 loops=1 est_rows=1 buffers hit=956163 read=0)
+                       Sort Key: ['in_store.currency_ratio']
+                    -> Subquery Scan  (rows=132.0 loops=1 est_rows=1 buffers hit=956163 read=0)
+                      -> Aggregate [Sorted]  (rows=132.0 loops=1 est_rows=1 buffers hit=956163 read=0)
+                           Group Key: ['sts.ss_item_sk']
+                        -> Gather Merge  (rows=132.0 loops=1 est_rows=1 workers=4 buffers hit=956163 read=0)
+                          -> Sort  (rows=26.4 loops=5 est_rows=1 buffers hit=956163 read=0)
+                               Sort Key: ['sts.ss_item_sk']
+                            -> Hash Join [Inner]  (rows=26.4 loops=5 est_rows=1 buffers hit=956131 read=0)
+                                 Hash Cond: ((sr.sr_ticket_number = sts.ss_ticket_number) AND (sr.sr_item_sk = sts.ss_item_sk))
+                              -> Seq Scan on store_returns sr  (rows=962.6 loops=5 est_rows=4504 buffers hit=62568 read=0)
+                                   Filter: (sr_return_amt > '10000'::numeric)
+                                   Rows Removed by Filter: 574544
+                              -> Hash  (rows=45860.6 loops=5 est_rows=1539 buffers hit=893563 read=0)
+                                -> Nested Loop [Inner]  (rows=45860.6 loops=5 est_rows=1539 buffers hit=893563 read=0)
+                                  -> Seq Scan on date_dim date_dim_2  (rows=6.2 loops=5 est_rows=18 buffers hit=2032 read=0)
+                                       Filter: ((d_year = 2001) AND (d_moy = 12))
+                                       Rows Removed by Filter: 14604
+                                  -> Bitmap Heap Scan on store_sales sts  (rows=7396.87 loops=31 est_rows=3385 buffers hit=891531 read=0)
+                                       Filter: ((ss_net_profit > '1'::numeric) AND (ss_net_paid > '0'::numeric) AND (ss_quantity > 0))
+                                       Rows Removed by Filter: 22509
+                                    -> Bitmap Index Scan using scaleup_tpcds_53  (rows=29906.32 loops=31 est_rows=15095 buffers hit=872 read=0)
+                                         Index Cond: (ss_sold_date_sk = date_dim_2.d_date_sk)

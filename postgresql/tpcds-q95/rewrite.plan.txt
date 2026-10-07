@@ -1,0 +1,35 @@
+-- PostgreSQL 18, tpcds-q95, rewrite; execution 1399.124 ms, planning 1.51 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=1.0 loops=1 est_rows=1 buffers hit=1410232 read=0)
+  -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=1410232 read=0)
+    -> Sort  (rows=953.0 loops=1 est_rows=18 buffers hit=1410232 read=0)
+         Sort Key: ['ws.ws_order_number']
+      -> Nested Loop [Inner]  (rows=953.0 loops=1 est_rows=18 buffers hit=1410232 read=0)
+           Join Filter: (ws.ws_web_site_sk = site.web_site_sk)
+           Rows Removed by Join Filter: 43646
+        -> Gather  (rows=6915.0 loops=1 est_rows=107 workers=6 buffers hit=1410230 read=0)
+          -> Hash Join [Semi]  (rows=987.86 loops=7 est_rows=18 buffers hit=1410230 read=0)
+               Hash Cond: (wr.wr_order_number = ws2.ws_order_number)
+               Join Filter: (ws2.ws_warehouse_sk <> ws.ws_warehouse_sk)
+               Rows Removed by Join Filter: 208
+            -> Nested Loop [Inner]  (rows=987.86 loops=7 est_rows=18 buffers hit=1153238 read=0)
+              -> Hash Join [Semi]  (rows=31284.29 loops=7 est_rows=565 buffers hit=277368 read=0)
+                   Hash Cond: (ws.ws_order_number = wr.wr_order_number)
+                -> Hash Join [Inner]  (rows=43329.0 loops=7 est_rows=985 buffers hit=259024 read=0)
+                     Hash Cond: (ws.ws_ship_date_sk = d.d_date_sk)
+                  -> Seq Scan on web_sales ws  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+                  -> Hash  (rows=8.71 loops=7 est_rows=35 buffers hit=2032 read=0)
+                    -> Seq Scan on date_dim d  (rows=8.71 loops=7 est_rows=35 buffers hit=2032 read=0)
+                         Filter: ((d_date >= '1999-02-01'::date) AND (d_date <= '1999-04-02'::date))
+                         Rows Removed by Filter: 10427
+                -> Hash  (rows=102746.0 loops=7 est_rows=232007 buffers hit=18344 read=0)
+                  -> Seq Scan on web_returns wr  (rows=102746.0 loops=7 est_rows=232007 buffers hit=18344 read=0)
+              -> Index Scan on customer_address ca using scaleup_tpcds_34  (rows=0.03 loops=218990 est_rows=1 buffers hit=875870 read=0)
+                   Index Cond: (ca_address_sk = ws.ws_ship_addr_sk)
+                   Filter: ((ca_state)::text = 'IL'::text)
+                   Rows Removed by Filter: 1
+            -> Hash  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+              -> Seq Scan on web_sales ws2  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+        -> Materialize  (rows=6.45 loops=6915 est_rows=7 buffers hit=2 read=0)
+          -> Seq Scan on web_site site  (rows=7.0 loops=1 est_rows=7 buffers hit=2 read=0)
+               Filter: ((web_company_name)::text = 'pri'::text)
+               Rows Removed by Filter: 35

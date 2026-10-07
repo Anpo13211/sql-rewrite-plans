@@ -1,0 +1,50 @@
+-- PostgreSQL 18, tpcds-q95, original; execution 36741.118 ms, planning 1.233 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=1.0 loops=1 est_rows=1 buffers hit=2004428 read=0)
+  -> Hash Join [Inner] <CTE ws_wh>  (rows=74795990.0 loops=1 est_rows=78703774 buffers hit=513984 read=0)
+       Hash Cond: (ws1_1.ws_order_number = ws2.ws_order_number)
+       Join Filter: (ws1_1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
+       Rows Removed by Join Filter: 15547692
+    -> Seq Scan on web_sales ws1_1  (rows=7197566.0 loops=1 est_rows=7197626 buffers hit=256992 read=0)
+    -> Hash  (rows=7197566.0 loops=1 est_rows=7197626 buffers hit=256992 read=0)
+      -> Seq Scan on web_sales ws2  (rows=7197566.0 loops=1 est_rows=7197626 buffers hit=256992 read=0)
+  -> Sort  (rows=1.0 loops=1 est_rows=1 buffers hit=2004428 read=0)
+       Sort Key: ['(count(DISTINCT ws1.ws_order_number))']
+    -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=2004428 read=0)
+      -> Sort  (rows=953.0 loops=1 est_rows=18 buffers hit=2004428 read=0)
+           Sort Key: ['ws1.ws_order_number']
+        -> Hash Join [Inner]  (rows=953.0 loops=1 est_rows=18 buffers hit=2004428 read=0)
+             Hash Cond: (ws1.ws_order_number = ws_wh.ws_order_number)
+          -> Nested Loop [Inner]  (rows=953.0 loops=1 est_rows=18 buffers hit=1490444 read=0)
+               Join Filter: (ws1.ws_web_site_sk = web_site.web_site_sk)
+               Rows Removed by Join Filter: 43646
+            -> Hash Join [Inner]  (rows=6915.0 loops=1 est_rows=107 buffers hit=1490442 read=0)
+                 Hash Cond: (ws1.ws_order_number = web_returns.wr_order_number)
+              -> Gather  (rows=9415.0 loops=1 est_rows=187 workers=6 buffers hit=1472098 read=0)
+                -> Nested Loop [Inner]  (rows=1345.0 loops=7 est_rows=31 buffers hit=1472098 read=0)
+                  -> Hash Join [Inner]  (rows=43329.0 loops=7 est_rows=985 buffers hit=259024 read=0)
+                       Hash Cond: (ws1.ws_ship_date_sk = date_dim.d_date_sk)
+                    -> Seq Scan on web_sales ws1  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+                    -> Hash  (rows=8.71 loops=7 est_rows=35 buffers hit=2032 read=0)
+                      -> Seq Scan on date_dim  (rows=61.0 loops=1 est_rows=35 buffers hit=2032 read=0)
+                           Filter: ((d_date >= '1999-02-01'::date) AND (d_date <= '1999-04-02'::date))
+                           Rows Removed by Filter: 72988
+                  -> Index Scan on customer_address using scaleup_tpcds_34  (rows=0.03 loops=303303 est_rows=1 buffers hit=1213074 read=0)
+                       Index Cond: (ca_address_sk = ws1.ws_ship_addr_sk)
+                       Filter: ((ca_state)::text = 'IL'::text)
+                       Rows Removed by Filter: 1
+              -> Hash  (rows=423961.0 loops=1 est_rows=339588 buffers hit=18344 read=0)
+                -> Aggregate [Hashed]  (rows=423961.0 loops=1 est_rows=339588 buffers hit=18344 read=0)
+                     Group Key: ['web_returns.wr_order_number']
+                  -> Hash Join [Inner]  (rows=97991414.0 loops=1 est_rows=95549586 buffers hit=18344 read=0)
+                       Hash Cond: (ws_wh_1.ws_order_number = web_returns.wr_order_number)
+                    -> CTE Scan (CTE ws_wh)  (rows=74795990.0 loops=1 est_rows=78703774 buffers hit=0 read=0)
+                    -> Hash  (rows=719222.0 loops=1 est_rows=719222 buffers hit=18344 read=0)
+                      -> Seq Scan on web_returns  (rows=719222.0 loops=1 est_rows=719222 buffers hit=18344 read=0)
+            -> Materialize  (rows=6.45 loops=6915 est_rows=7 buffers hit=2 read=0)
+              -> Seq Scan on web_site  (rows=7.0 loops=1 est_rows=7 buffers hit=2 read=0)
+                   Filter: ((web_company_name)::text = 'pri'::text)
+                   Rows Removed by Filter: 35
+          -> Hash  (rows=600000.0 loops=1 est_rows=592420 buffers hit=513984 read=0)
+            -> Aggregate [Hashed]  (rows=600000.0 loops=1 est_rows=592420 buffers hit=513984 read=0)
+                 Group Key: ['ws_wh.ws_order_number']
+              -> CTE Scan (CTE ws_wh)  (rows=74795990.0 loops=1 est_rows=78703774 buffers hit=513984 read=0)

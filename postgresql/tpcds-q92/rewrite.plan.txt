@@ -1,0 +1,21 @@
+-- PostgreSQL 18, tpcds-q92, rewrite; execution 366.222 ms, planning 0.413 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=1.0 loops=1 est_rows=1 buffers hit=263531 read=0)
+  -> Seq Scan on item <CTE selected_items>  (rows=100.0 loops=1 est_rows=89 buffers hit=4504 read=0)
+       Filter: (i_manufact_id = 350)
+       Rows Removed by Filter: 101900
+  -> Aggregate  (rows=1.0 loops=1 est_rows=1 buffers hit=263531 read=0)
+    -> WindowAgg  (rows=163.0 loops=1 est_rows=27 buffers hit=263531 read=0)
+      -> Sort  (rows=163.0 loops=1 est_rows=27 buffers hit=263531 read=0)
+           Sort Key: ['ws.ws_item_sk']
+        -> Hash Join [Inner]  (rows=163.0 loops=1 est_rows=27 buffers hit=263528 read=0)
+             Hash Cond: (ws.ws_item_sk = i.i_item_sk)
+          -> Gather  (rows=205512.0 loops=1 est_rows=8866 workers=6 buffers hit=259024 read=0)
+            -> Hash Join [Inner]  (rows=29358.86 loops=7 est_rows=1478 buffers hit=259024 read=0)
+                 Hash Cond: (ws.ws_sold_date_sk = d.d_date_sk)
+              -> Seq Scan on web_sales ws  (rows=1028223.71 loops=7 est_rows=1199604 buffers hit=256992 read=0)
+              -> Hash  (rows=13.0 loops=7 est_rows=53 buffers hit=2032 read=0)
+                -> Seq Scan on date_dim d  (rows=91.0 loops=1 est_rows=53 buffers hit=2032 read=0)
+                     Filter: ((d_date >= '2000-01-27'::date) AND (d_date <= '2000-04-26'::date))
+                     Rows Removed by Filter: 72958
+          -> Hash  (rows=100.0 loops=1 est_rows=89 buffers hit=4504 read=0)
+            -> CTE Scan (CTE selected_items)  (rows=100.0 loops=1 est_rows=89 buffers hit=4504 read=0)

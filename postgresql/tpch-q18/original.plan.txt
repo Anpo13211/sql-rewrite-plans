@@ -1,0 +1,25 @@
+-- PostgreSQL 18, tpch-q18, original; execution 41444.893 ms, planning 0.623 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=8068842 read=0)
+  -> Sort  (rows=100.0 loops=1 est_rows=543706 buffers hit=8068842 read=0)
+       Sort Key: ['orders.o_totalprice DESC', 'orders.o_orderdate']
+    -> Aggregate [Sorted]  (rows=624.0 loops=1 est_rows=543706 buffers hit=8068842 read=0)
+         Group Key: ['customer.c_custkey', 'orders.o_orderkey']
+      -> Gather Merge  (rows=4368.0 loops=1 est_rows=543706 workers=6 buffers hit=8068842 read=0)
+        -> Sort  (rows=624.0 loops=7 est_rows=90618 buffers hit=8068842 read=0)
+             Sort Key: ['customer.c_custkey', 'orders.o_orderkey']
+          -> Nested Loop [Inner]  (rows=624.0 loops=7 est_rows=90618 buffers hit=8068812 read=0)
+            -> Nested Loop [Inner]  (rows=89.14 loops=7 est_rows=22658 buffers hit=8065604 read=0)
+              -> Merge Join [Inner]  (rows=89.14 loops=7 est_rows=22658 buffers hit=8063105 read=0)
+                   Merge Cond: (orders.o_orderkey = lineitem_1.l_orderkey)
+                -> Index Scan on orders using scaleup_tpch_06  (rows=2142642.57 loops=7 est_rows=2499898 buffers hit=325907 read=0)
+                -> Sort  (rows=446.29 loops=7 est_rows=135948 buffers hit=7737198 read=0)
+                     Sort Key: ['lineitem_1.l_orderkey']
+                  -> Aggregate [Hashed]  (rows=624.0 loops=7 est_rows=135948 buffers hit=7737198 read=0)
+                       Filter: (sum(lineitem_1.l_quantity) > '300'::numeric)
+                       Group Key: ['lineitem_1.l_orderkey']
+                       Rows Removed by Filter: 14999376
+                    -> Seq Scan on lineitem lineitem_1  (rows=59986052.0 loops=7 est_rows=59988096 buffers hit=7737198 read=0)
+              -> Index Scan on customer using scaleup_tpch_03  (rows=1.0 loops=624 est_rows=1 buffers hit=2499 read=0)
+                   Index Cond: (c_custkey = orders.o_custkey)
+            -> Index Scan on lineitem using scaleup_tpch_07  (rows=7.0 loops=624 est_rows=147 buffers hit=3208 read=0)
+                 Index Cond: (l_orderkey = orders.o_orderkey)

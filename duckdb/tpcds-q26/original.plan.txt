@@ -1,0 +1,71 @@
+-- DuckDB 1.5.5, tpcds-q26, original; latency 0.06916296 s, cpu 0.380892749 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=100 time_s=0.0008)
+       Top: 100
+       Order By: tpcds.main.item.i_item_id ASC
+    -> HASH_GROUP_BY  (rows=27774 time_s=0.0123)
+         Groups: #0
+         Aggregates: ['avg(#1)', 'avg(#2)', 'avg(#3)', 'avg(#4)']
+         Estimated Cardinality: 3302
+      -> PROJECTION  (rows=39744 time_s=0.0)
+           Projections: ['i_item_id', 'cs_quantity', 'cs_list_price', 'cs_coupon_amt', 'cs_sales_price']
+           Estimated Cardinality: 3361
+        -> HASH_JOIN  (rows=39744 time_s=0.0049)
+             Join Type: INNER
+             Conditions: i_item_sk = cs_item_sk
+             Estimated Cardinality: 3361
+          -> TABLE_SCAN  (rows=28046 time_s=0.001)
+               Table: tpcds.main.item
+               Type: Sequential Scan
+               Projections: ['i_item_sk', 'i_item_id']
+               Filters: optional: Dynamic Filter (i_item_id)
+               Estimated Cardinality: 102000
+               Dynamic Filters: optional: i_item_sk>=1 AND optional: i_item_sk<=101999 AND optional: i_item_sk IN BF(cs_item_sk)
+          -> HASH_JOIN  (rows=39744 time_s=0.0003)
+               Join Type: INNER
+               Conditions: cs_promo_sk = p_promo_sk
+               Estimated Cardinality: 3168
+            -> HASH_JOIN  (rows=39971 time_s=0.2699)
+                 Join Type: INNER
+                 Conditions: cd_demo_sk = cs_bill_cdemo_sk
+                 Estimated Cardinality: 16475
+              -> FILTER  (rows=27440 time_s=0.0011)
+                   Expression: (cd_demo_sk >= 2)
+                   Estimated Cardinality: 274400
+                -> TABLE_SCAN  (rows=27440 time_s=0.0183)
+                     Table: tpcds.main.customer_demographics
+                     Type: Sequential Scan
+                     Projections: cd_demo_sk
+                     Filters: ["cd_gender='M'", "cd_marital_status='S'", "cd_education_status='College'"]
+                     Estimated Cardinality: 274400
+                     Dynamic Filters: optional: cd_demo_sk>=2 AND optional: cd_demo_sk<=1920794
+              -> HASH_JOIN  (rows=2867350 time_s=0.0163)
+                   Join Type: INNER
+                   Conditions: cs_sold_date_sk = d_date_sk
+                   Estimated Cardinality: 115329
+                -> TABLE_SCAN  (rows=2987852 time_s=0.056)
+                     Table: tpcds.main.catalog_sales
+                     Type: Sequential Scan
+                     Projections: ['cs_sold_date_sk', 'cs_item_sk', 'cs_bill_cdemo_sk', 'cs_promo_sk', 'cs_quantity', 'cs_list_price', 'cs_coupon_amt', 'cs_sales_price']
+                     Estimated Cardinality: 14401261
+                     Dynamic Filters: optional: cs_sold_date_sk>=2451545 AND optional: cs_sold_date_sk<=2451910
+                -> FILTER  (rows=366 time_s=0.0)
+                     Expression: (d_date_sk BETWEEN 2450815 AND 2452653)
+                     Estimated Cardinality: 585
+                  -> TABLE_SCAN  (rows=366 time_s=0.0)
+                       Table: tpcds.main.date_dim
+                       Type: Sequential Scan
+                       Projections: d_date_sk
+                       Filters: d_year=2000
+                       Estimated Cardinality: 585
+            -> PROJECTION  (rows=498 time_s=0.0)
+                 Projections: #0
+                 Estimated Cardinality: 100
+              -> FILTER  (rows=498 time_s=0.0)
+                   Expression: ((p_channel_email = 'N') OR (p_channel_event = 'N'))
+                   Estimated Cardinality: 100
+                -> TABLE_SCAN  (rows=500 time_s=0.0)
+                     Table: tpcds.main.promotion
+                     Type: Sequential Scan
+                     Projections: ['p_promo_sk', 'p_channel_email', 'p_channel_event']
+                     Estimated Cardinality: 500

@@ -1,0 +1,20 @@
+-- PostgreSQL 18, tpcds-q22, rewrite; execution 4059.668 ms, planning 0.362 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=100 buffers hit=330944 read=0)
+  -> Index Scan on date_dim using scaleup_tpcds_36 <CTE date_keys>  (rows=366.0 loops=1 est_rows=9 buffers hit=57 read=0)
+       Index Cond: ((d_date_sk >= 2450815) AND (d_date_sk <= 2452635))
+       Filter: ((d_month_seq >= 1200) AND (d_month_seq <= 1211))
+       Rows Removed by Filter: 1455
+  -> Aggregate [Hashed] <CTE item_qoh>  (rows=51000.0 loops=1 est_rows=71886 buffers hit=326440 read=0)
+       Group Key: ['inv.inv_item_sk']
+    -> Nested Loop [Inner]  (rows=26520000.0 loops=1 est_rows=4589831 buffers hit=326440 read=0)
+      -> CTE Scan (CTE date_keys)  (rows=366.0 loops=1 est_rows=9 buffers hit=57 read=0)
+      -> Index Scan on inventory inv using scaleup_tpcds_39  (rows=72459.02 loops=366 est_rows=509981 buffers hit=326383 read=0)
+           Index Cond: (inv_date_sk = d.d_date_sk)
+  -> Sort  (rows=100.0 loops=1 est_rows=287545 buffers hit=330944 read=0)
+       Sort Key: ["((sum(q.quantity_sum) / NULLIF(sum(q.quantity_count), '0'::numeric))) NULLS FIRST", 'i.i_product_name NULLS FIRST', 'i.i_brand NULLS FIRST', 'i.i_class NULLS FIRST', 'i.i_category NULLS FIRST']
+    -> Aggregate [Mixed]  (rows=203751.0 loops=1 est_rows=287545 buffers hit=330944 read=0)
+      -> Hash Join [Inner]  (rows=51000.0 loops=1 est_rows=71886 buffers hit=330944 read=0)
+           Hash Cond: (q.inv_item_sk = i.i_item_sk)
+        -> CTE Scan (CTE item_qoh)  (rows=51000.0 loops=1 est_rows=71886 buffers hit=326440 read=0)
+        -> Hash  (rows=102000.0 loops=1 est_rows=102000 buffers hit=4504 read=0)
+          -> Seq Scan on item i  (rows=102000.0 loops=1 est_rows=102000 buffers hit=4504 read=0)

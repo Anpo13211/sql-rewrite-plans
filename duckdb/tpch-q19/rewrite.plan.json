@@ -1,0 +1,450 @@
+{
+ "total_bytes_written": 0,
+ "total_bytes_read": 0,
+ "system_peak_temp_dir_size": 0,
+ "system_peak_buffer_memory": 3427704832,
+ "rows_returned": 0,
+ "wal_replay_entry_count": 0,
+ "result_set_size": 0,
+ "query_name": "EXPLAIN (ANALYZE, FORMAT JSON) SELECT sum(l.l_extendedprice * (1 - l.l_discount)) AS revenue\nFROM lineitem AS l\nWHERE (l.l_quantity BETWEEN 1 AND 1+10\n       AND l.l_shipmode IN ('AIR', 'AIR REG')\n       AND l.l_shipinstruct = 'DELIVER IN PERSON'\n       AND l.l_partkey IN\n         (SELECT p_partkey\n          FROM part\n          WHERE p_brand = 'Brand#12'\n            AND p_container IN ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG')\n            AND p_size BETWEEN 1 AND 5))\n  OR (l.l_quantity BETWEEN 10 AND 10+10\n      AND l.l_shipmode IN ('AIR', 'AIR REG')\n      AND l.l_shipinstruct = 'DELIVER IN PERSON'\n      AND l.l_partkey IN\n        (SELECT p_partkey\n         FROM part\n         WHERE p_brand = 'Brand#23'\n           AND p_container IN ('MED BAG', 'MED BOX', 'MED PKG', 'MED PACK')\n           AND p_size BETWEEN 1 AND 10))\n  OR (l.l_quantity BETWEEN 20 AND 20+10\n      AND l.l_shipmode IN ('AIR', 'AIR REG')\n      AND l.l_shipinstruct = 'DELIVER IN PERSON'\n      AND l.l_partkey IN\n        (SELECT p_partkey\n         FROM part\n         WHERE p_brand = 'Brand#34'\n           AND p_container IN ('LG CASE', 'LG BOX', 'LG PACK', 'LG PKG')\n           AND p_size BETWEEN 1 AND 15))",
+ "waiting_to_attach_latency": 0.0,
+ "attach_load_storage_latency": 0.0,
+ "blocked_thread_time": 0.0,
+ "cpu_time": 1.2568920729999993,
+ "extra_info": {},
+ "total_memory_allocated": 100663296,
+ "cumulative_cardinality": 25764945,
+ "checkpoint_latency": 0.0,
+ "cumulative_rows_scanned": 65986052,
+ "write_to_wal_latency": 0.0,
+ "latency": 0.174524764,
+ "attach_replay_wal_latency": 0.0,
+ "commit_local_storage_latency": 0.0,
+ "children": [
+  {
+   "system_peak_temp_dir_size": 0,
+   "system_peak_buffer_memory": 0,
+   "result_set_size": 0,
+   "operator_timing": 1.56e-07,
+   "operator_type": "EXPLAIN_ANALYZE",
+   "cpu_time": 1.2568920729999993,
+   "extra_info": {},
+   "cumulative_cardinality": 25764945,
+   "cumulative_rows_scanned": 65986052,
+   "operator_cardinality": 0,
+   "operator_name": "EXPLAIN_ANALYZE",
+   "operator_rows_scanned": 0,
+   "children": [
+    {
+     "system_peak_temp_dir_size": 0,
+     "system_peak_buffer_memory": 0,
+     "result_set_size": 16,
+     "operator_timing": 1.5603e-05,
+     "operator_type": "UNGROUPED_AGGREGATE",
+     "cpu_time": 1.2568919169999992,
+     "extra_info": {
+      "Aggregates": "sum(#0)"
+     },
+     "cumulative_cardinality": 25764945,
+     "cumulative_rows_scanned": 65986052,
+     "operator_cardinality": 1,
+     "operator_name": "UNGROUPED_AGGREGATE",
+     "operator_rows_scanned": 0,
+     "children": [
+      {
+       "system_peak_temp_dir_size": 0,
+       "system_peak_buffer_memory": 0,
+       "result_set_size": 9072,
+       "operator_timing": 2.3619000000000002e-05,
+       "operator_type": "PROJECTION",
+       "cpu_time": 1.2568763139999992,
+       "extra_info": {
+        "Projections": "(l_extendedprice * (1.00 - l_discount))",
+        "Estimated Cardinality": "599860"
+       },
+       "cumulative_cardinality": 25764944,
+       "cumulative_rows_scanned": 65986052,
+       "operator_cardinality": 1134,
+       "operator_name": "PROJECTION",
+       "operator_rows_scanned": 0,
+       "children": [
+        {
+         "system_peak_temp_dir_size": 0,
+         "system_peak_buffer_memory": 0,
+         "result_set_size": 18144,
+         "operator_timing": 2.277e-06,
+         "operator_type": "PROJECTION",
+         "cpu_time": 1.2568526949999992,
+         "extra_info": {
+          "Projections": [
+           "#1",
+           "#2"
+          ],
+          "Estimated Cardinality": "599860"
+         },
+         "cumulative_cardinality": 25763810,
+         "cumulative_rows_scanned": 65986052,
+         "operator_cardinality": 1134,
+         "operator_name": "PROJECTION",
+         "operator_rows_scanned": 0,
+         "children": [
+          {
+           "system_peak_temp_dir_size": 0,
+           "system_peak_buffer_memory": 0,
+           "result_set_size": 30618,
+           "operator_timing": 0.06941813499999994,
+           "operator_type": "FILTER",
+           "cpu_time": 1.256850417999999,
+           "extra_info": {
+            "Expression": "((SUBQUERY AND (l_quantity <= 11.00)) OR (SUBQUERY AND ((l_quantity >= 10.00) AND (l_quantity <= 20.00))) OR (SUBQUERY AND ((l_quantity >= 20.00) AND (l_quantity <= 30.00))))",
+            "Estimated Cardinality": "599860"
+           },
+           "cumulative_cardinality": 25762676,
+           "cumulative_rows_scanned": 65986052,
+           "operator_cardinality": 1134,
+           "operator_name": "FILTER",
+           "operator_rows_scanned": 0,
+           "children": [
+            {
+             "system_peak_temp_dir_size": 0,
+             "system_peak_buffer_memory": 0,
+             "result_set_size": 57831408,
+             "operator_timing": 0.05586191399999994,
+             "operator_type": "HASH_JOIN",
+             "cpu_time": 1.1874322829999993,
+             "extra_info": {
+              "Join Type": "MARK",
+              "Conditions": "l_partkey = #0",
+              "Estimated Cardinality": "2999302"
+             },
+             "cumulative_cardinality": 25761542,
+             "cumulative_rows_scanned": 65986052,
+             "operator_cardinality": 2141904,
+             "operator_name": "HASH_JOIN",
+             "operator_rows_scanned": 0,
+             "children": [
+              {
+               "system_peak_temp_dir_size": 0,
+               "system_peak_buffer_memory": 0,
+               "result_set_size": 72824736,
+               "operator_timing": 0.051038589999999905,
+               "operator_type": "HASH_JOIN",
+               "cpu_time": 1.1139574279999993,
+               "extra_info": {
+                "Join Type": "MARK",
+                "Conditions": "l_partkey = #0",
+                "Estimated Cardinality": "2999302"
+               },
+               "cumulative_cardinality": 23590784,
+               "cumulative_rows_scanned": 63986052,
+               "operator_cardinality": 2141904,
+               "operator_name": "HASH_JOIN",
+               "operator_rows_scanned": 0,
+               "children": [
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 70682832,
+                 "operator_timing": 0.049427253999999816,
+                 "operator_type": "HASH_JOIN",
+                 "cpu_time": 1.0470309659999995,
+                 "extra_info": {
+                  "Join Type": "MARK",
+                  "Conditions": "l_partkey = #0",
+                  "Estimated Cardinality": "2999302"
+                 },
+                 "cumulative_cardinality": 21429792,
+                 "cumulative_rows_scanned": 61986052,
+                 "operator_cardinality": 2141904,
+                 "operator_name": "HASH_JOIN",
+                 "operator_rows_scanned": 0,
+                 "children": [
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 68540928,
+                   "operator_timing": 0.006729680999999977,
+                   "operator_type": "PROJECTION",
+                   "cpu_time": 0.9817720159999996,
+                   "extra_info": {
+                    "Projections": [
+                     "#0",
+                     "#2",
+                     "#3",
+                     "#4"
+                    ],
+                    "Estimated Cardinality": "2999302"
+                   },
+                   "cumulative_cardinality": 19278419,
+                   "cumulative_rows_scanned": 59986052,
+                   "operator_cardinality": 2141904,
+                   "operator_name": "PROJECTION",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 102811392,
+                     "operator_timing": 0.21089991299999986,
+                     "operator_type": "FILTER",
+                     "cpu_time": 0.9750423349999997,
+                     "extra_info": {
+                      "Expression": "((l_shipmode = 'AIR') OR (l_shipmode = 'AIR REG'))",
+                      "Estimated Cardinality": "2999302"
+                     },
+                     "cumulative_cardinality": 17136515,
+                     "cumulative_rows_scanned": 59986052,
+                     "operator_cardinality": 2141904,
+                     "operator_name": "FILTER",
+                     "operator_rows_scanned": 0,
+                     "children": [
+                      {
+                       "system_peak_temp_dir_size": 0,
+                       "system_peak_buffer_memory": 0,
+                       "result_set_size": 719741328,
+                       "operator_timing": 0.7641424219999998,
+                       "operator_type": "TABLE_SCAN",
+                       "cpu_time": 0.7641424219999998,
+                       "extra_info": {
+                        "Table": "tpch.main.lineitem",
+                        "Type": "Sequential Scan",
+                        "Projections": [
+                         "l_quantity",
+                         "l_shipmode",
+                         "l_partkey",
+                         "l_extendedprice",
+                         "l_discount"
+                        ],
+                        "Filters": [
+                         "optional: l_shipmode IN ('AIR', 'AIR REG')",
+                         "l_shipinstruct='DELIVER IN PERSON'"
+                        ],
+                        "Estimated Cardinality": "14996513"
+                       },
+                       "cumulative_cardinality": 14994611,
+                       "cumulative_rows_scanned": 59986052,
+                       "operator_cardinality": 14994611,
+                       "operator_name": "SEQ_SCAN",
+                       "operator_rows_scanned": 59986052,
+                       "children": []
+                      }
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 6248,
+                   "operator_timing": 2.406e-06,
+                   "operator_type": "PROJECTION",
+                   "cpu_time": 0.015831695999999996,
+                   "extra_info": {
+                    "Projections": "#1",
+                    "Estimated Cardinality": "13793"
+                   },
+                   "cumulative_cardinality": 9469,
+                   "cumulative_rows_scanned": 2000000,
+                   "operator_cardinality": 781,
+                   "operator_name": "PROJECTION",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 18744,
+                     "operator_timing": 0.0029473339999999994,
+                     "operator_type": "FILTER",
+                     "cpu_time": 0.015829289999999996,
+                     "extra_info": {
+                      "Expression": "((p_container = 'SM CASE') OR (p_container = 'SM BOX') OR (p_container = 'SM PACK') OR (p_container = 'SM PKG'))",
+                      "Estimated Cardinality": "13793"
+                     },
+                     "cumulative_cardinality": 8688,
+                     "cumulative_rows_scanned": 2000000,
+                     "operator_cardinality": 781,
+                     "operator_name": "FILTER",
+                     "operator_rows_scanned": 0,
+                     "children": [
+                      {
+                       "system_peak_temp_dir_size": 0,
+                       "system_peak_buffer_memory": 0,
+                       "result_set_size": 189768,
+                       "operator_timing": 0.012881955999999996,
+                       "operator_type": "TABLE_SCAN",
+                       "cpu_time": 0.012881955999999996,
+                       "extra_info": {
+                        "Table": "tpch.main.part",
+                        "Type": "Sequential Scan",
+                        "Projections": [
+                         "p_container",
+                         "p_partkey"
+                        ],
+                        "Filters": [
+                         "p_brand='Brand#12'",
+                         "optional: p_container IN ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG')",
+                         "p_size>=1 AND p_size<=5"
+                        ],
+                        "Estimated Cardinality": "68966"
+                       },
+                       "cumulative_cardinality": 7907,
+                       "cumulative_rows_scanned": 2000000,
+                       "operator_cardinality": 7907,
+                       "operator_name": "SEQ_SCAN",
+                       "operator_rows_scanned": 2000000,
+                       "children": []
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 ]
+                },
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 12624,
+                 "operator_timing": 3.326e-06,
+                 "operator_type": "PROJECTION",
+                 "cpu_time": 0.015887872000000004,
+                 "extra_info": {
+                  "Projections": "#1",
+                  "Estimated Cardinality": "13793"
+                 },
+                 "cumulative_cardinality": 19088,
+                 "cumulative_rows_scanned": 2000000,
+                 "operator_cardinality": 1578,
+                 "operator_name": "PROJECTION",
+                 "operator_rows_scanned": 0,
+                 "children": [
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 37872,
+                   "operator_timing": 0.0034052630000000004,
+                   "operator_type": "FILTER",
+                   "cpu_time": 0.015884546000000003,
+                   "extra_info": {
+                    "Expression": "((p_container = 'MED BAG') OR (p_container = 'MED BOX') OR (p_container = 'MED PKG') OR (p_container = 'MED PACK'))",
+                    "Estimated Cardinality": "13793"
+                   },
+                   "cumulative_cardinality": 17510,
+                   "cumulative_rows_scanned": 2000000,
+                   "operator_cardinality": 1578,
+                   "operator_name": "FILTER",
+                   "operator_rows_scanned": 0,
+                   "children": [
+                    {
+                     "system_peak_temp_dir_size": 0,
+                     "system_peak_buffer_memory": 0,
+                     "result_set_size": 382368,
+                     "operator_timing": 0.012479283000000002,
+                     "operator_type": "TABLE_SCAN",
+                     "cpu_time": 0.012479283000000002,
+                     "extra_info": {
+                      "Table": "tpch.main.part",
+                      "Type": "Sequential Scan",
+                      "Projections": [
+                       "p_container",
+                       "p_partkey"
+                      ],
+                      "Filters": [
+                       "p_brand='Brand#23'",
+                       "optional: p_container IN ('MED BAG', 'MED BOX', 'MED PKG', 'MED PACK')",
+                       "p_size>=1 AND p_size<=10"
+                      ],
+                      "Estimated Cardinality": "68966"
+                     },
+                     "cumulative_cardinality": 15932,
+                     "cumulative_rows_scanned": 2000000,
+                     "operator_cardinality": 15932,
+                     "operator_name": "SEQ_SCAN",
+                     "operator_rows_scanned": 2000000,
+                     "children": []
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              },
+              {
+               "system_peak_temp_dir_size": 0,
+               "system_peak_buffer_memory": 0,
+               "result_set_size": 19160,
+               "operator_timing": 3.808e-06,
+               "operator_type": "PROJECTION",
+               "cpu_time": 0.017612941,
+               "extra_info": {
+                "Projections": "#1",
+                "Estimated Cardinality": "13793"
+               },
+               "cumulative_cardinality": 28854,
+               "cumulative_rows_scanned": 2000000,
+               "operator_cardinality": 2395,
+               "operator_name": "PROJECTION",
+               "operator_rows_scanned": 0,
+               "children": [
+                {
+                 "system_peak_temp_dir_size": 0,
+                 "system_peak_buffer_memory": 0,
+                 "result_set_size": 57480,
+                 "operator_timing": 0.003879435,
+                 "operator_type": "FILTER",
+                 "cpu_time": 0.017609133,
+                 "extra_info": {
+                  "Expression": "((p_container = 'LG CASE') OR (p_container = 'LG BOX') OR (p_container = 'LG PACK') OR (p_container = 'LG PKG'))",
+                  "Estimated Cardinality": "13793"
+                 },
+                 "cumulative_cardinality": 26459,
+                 "cumulative_rows_scanned": 2000000,
+                 "operator_cardinality": 2395,
+                 "operator_name": "FILTER",
+                 "operator_rows_scanned": 0,
+                 "children": [
+                  {
+                   "system_peak_temp_dir_size": 0,
+                   "system_peak_buffer_memory": 0,
+                   "result_set_size": 577536,
+                   "operator_timing": 0.013729697999999999,
+                   "operator_type": "TABLE_SCAN",
+                   "cpu_time": 0.013729697999999999,
+                   "extra_info": {
+                    "Table": "tpch.main.part",
+                    "Type": "Sequential Scan",
+                    "Projections": [
+                     "p_container",
+                     "p_partkey"
+                    ],
+                    "Filters": [
+                     "p_brand='Brand#34'",
+                     "optional: p_container IN ('LG CASE', 'LG BOX', 'LG PACK', 'LG PKG')",
+                     "p_size>=1 AND p_size<=15"
+                    ],
+                    "Estimated Cardinality": "68966"
+                   },
+                   "cumulative_cardinality": 24064,
+                   "cumulative_rows_scanned": 2000000,
+                   "operator_cardinality": 24064,
+                   "operator_name": "SEQ_SCAN",
+                   "operator_rows_scanned": 2000000,
+                   "children": []
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

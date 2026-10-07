@@ -1,0 +1,69 @@
+-- DuckDB 1.5.5, tpch-q22, rewrite; latency 0.145053826 s, cpu 1.0517852289999996 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0033)
+       CTE Name: phone_customers
+       Table Index: 0
+       Estimated Cardinality: 0
+    -> PROJECTION  (rows=381776 time_s=0.0135)
+         Projections: ['c_custkey', 'cntrycode', 'c_acctbal']
+         Estimated Cardinality: 60000
+      -> FILTER  (rows=381776 time_s=0.0021)
+           Expression: (c_acctbal > 0.00)
+           Estimated Cardinality: 60000
+        -> TABLE_SCAN  (rows=419974 time_s=0.117)
+             Table: tpch.main.customer
+             Type: Sequential Scan
+             Projections: ['c_phone', 'c_custkey', 'c_acctbal']
+             Filters: ("substring"(c_phone, 1, 2) IN ('13', '31', '23', '29', '30', '18', '17'))
+             Estimated Cardinality: 300000
+    -> ORDER_BY  (rows=7 time_s=0.0001)
+         Order By: p.cntrycode ASC
+      -> HASH_GROUP_BY  (rows=7 time_s=0.0021)
+           Groups: #0
+           Aggregates: ['count_star()', 'sum(#1)']
+           Estimated Cardinality: 0
+        -> PROJECTION  (rows=63914 time_s=0.0)
+             Projections: ['cntrycode', 'c_acctbal']
+             Estimated Cardinality: 0
+          -> HASH_JOIN  (rows=63914 time_s=0.0389)
+               Join Type: RIGHT_ANTI
+               Conditions: o_custkey = c_custkey
+               Estimated Cardinality: 0
+            -> PROJECTION  (rows=999982 time_s=0.0006)
+                 Projections: __internal_decompress_integral_bigint(#0, 1)
+                 Estimated Cardinality: 976833
+              -> HASH_GROUP_BY  (rows=999982 time_s=0.839)
+                   Groups: #0
+                   Estimated Cardinality: 976833
+                -> PROJECTION  (rows=15000000 time_s=0.0008)
+                     Projections: o_custkey
+                     Estimated Cardinality: 15000000
+                  -> PROJECTION  (rows=15000000 time_s=0.0053)
+                       Projections: __internal_compress_integral_uinteger(#0, 1)
+                       Estimated Cardinality: 15000000
+                    -> TABLE_SCAN  (rows=15000000 time_s=0.0181)
+                         Table: tpch.main.orders
+                         Type: Sequential Scan
+                         Projections: o_custkey
+                         Estimated Cardinality: 15000000
+            -> NESTED_LOOP_JOIN  (rows=190691 time_s=0.009)
+                 Join Type: INNER
+                 Conditions: CAST(c_acctbal AS DOUBLE) > value
+                 Estimated Cardinality: 4
+              -> FILTER  (rows=381776 time_s=0.0005)
+                   Expression: (c_acctbal > 0.00)
+                   Estimated Cardinality: 60000
+                -> CTE_SCAN  (rows=381776 time_s=0.0003)
+                     CTE Index: 0
+                     Estimated Cardinality: 60000
+              -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0005)
+                   Aggregates: avg(#0)
+                -> PROJECTION  (rows=381776 time_s=0.0)
+                     Projections: c_acctbal
+                     Estimated Cardinality: 60000
+                  -> FILTER  (rows=381776 time_s=0.0006)
+                       Expression: (c_acctbal > 0.00)
+                       Estimated Cardinality: 60000
+                    -> CTE_SCAN  (rows=381776 time_s=0.0003)
+                         CTE Index: 0
+                         Estimated Cardinality: 60000

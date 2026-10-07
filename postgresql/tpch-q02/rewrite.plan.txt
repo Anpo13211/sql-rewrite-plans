@@ -1,0 +1,43 @@
+-- PostgreSQL 18, tpch-q02, rewrite; execution 165.72 ms, planning 1.066 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Limit  (rows=100.0 loops=1 est_rows=1 buffers hit=268234 read=0)
+  -> Sort  (rows=100.0 loops=1 est_rows=1 buffers hit=268234 read=0)
+       Sort Key: ['s.s_acctbal DESC', 'n.n_name', 's.s_name', 'part.p_partkey']
+    -> Nested Loop [Inner]  (rows=4667.0 loops=1 est_rows=1 buffers hit=268234 read=0)
+         Join Filter: (s.s_nationkey = n.n_nationkey)
+         Rows Removed by Join Filter: 18673
+      -> Nested Loop [Inner]  (rows=5.0 loops=1 est_rows=5 buffers hit=2 read=0)
+           Join Filter: (n.n_regionkey = r.r_regionkey)
+           Rows Removed by Join Filter: 20
+        -> Seq Scan on region r  (rows=1.0 loops=1 est_rows=1 buffers hit=1 read=0)
+             Filter: ((r_name)::text = 'EUROPE'::text)
+             Rows Removed by Filter: 4
+        -> Seq Scan on nation n  (rows=25.0 loops=1 est_rows=25 buffers hit=1 read=0)
+      -> Materialize  (rows=4668.0 loops=5 est_rows=1 buffers hit=268232 read=0)
+        -> Nested Loop [Inner]  (rows=4668.0 loops=1 est_rows=1 buffers hit=268232 read=0)
+          -> Nested Loop [Inner]  (rows=4668.0 loops=1 est_rows=1 buffers hit=254228 read=0)
+            -> Gather  (rows=7854.0 loops=1 est_rows=8303 workers=4 buffers hit=38232 read=0)
+              -> Seq Scan on part  (rows=1570.8 loops=5 est_rows=2076 buffers hit=38232 read=0)
+                   Filter: (((p_type)::text ~~ '%BRASS'::text) AND (p_size = 15))
+                   Rows Removed by Filter: 398429
+            -> Hash Join [Inner]  (rows=0.59 loops=7854 est_rows=1 buffers hit=215996 read=0)
+                 Hash Cond: (ps.ps_supplycost = (min(ps2.ps_supplycost)))
+              -> Index Scan on partsupp ps using scaleup_tpch_05  (rows=4.0 loops=4668 est_rows=18 buffers hit=19034 read=0)
+                   Index Cond: (ps_partkey = part.p_partkey)
+              -> Hash  (rows=0.59 loops=7854 est_rows=1 buffers hit=196962 read=0)
+                -> Aggregate  (rows=1.0 loops=7854 est_rows=1 buffers hit=196962 read=0)
+                  -> Nested Loop [Inner]  (rows=0.81 loops=7854 est_rows=4 buffers hit=196962 read=0)
+                       Join Filter: (n2.n_regionkey = r2.r_regionkey)
+                       Rows Removed by Join Filter: 3
+                    -> Seq Scan on region r2  (rows=1.0 loops=7854 est_rows=1 buffers hit=7854 read=0)
+                         Filter: ((r_name)::text = 'EUROPE'::text)
+                         Rows Removed by Filter: 4
+                    -> Nested Loop [Inner]  (rows=4.0 loops=7854 est_rows=18 buffers hit=189108 read=0)
+                      -> Nested Loop [Inner]  (rows=4.0 loops=7854 est_rows=18 buffers hit=126276 read=0)
+                        -> Index Scan on partsupp ps2 using scaleup_tpch_05  (rows=4.0 loops=7854 est_rows=18 buffers hit=32028 read=0)
+                             Index Cond: (ps_partkey = part.p_partkey)
+                        -> Index Scan on supplier s2 using scaleup_tpch_02  (rows=1.0 loops=31416 est_rows=1 buffers hit=94248 read=0)
+                             Index Cond: (s_suppkey = ps2.ps_suppkey)
+                      -> Index Scan on nation n2 using scaleup_tpch_01  (rows=1.0 loops=31416 est_rows=1 buffers hit=62832 read=0)
+                           Index Cond: (n_nationkey = s2.s_nationkey)
+          -> Index Scan on supplier s using scaleup_tpch_02  (rows=1.0 loops=4668 est_rows=1 buffers hit=14004 read=0)
+               Index Cond: (s_suppkey = ps.ps_suppkey)

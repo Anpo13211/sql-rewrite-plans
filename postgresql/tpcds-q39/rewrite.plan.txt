@@ -1,0 +1,38 @@
+-- PostgreSQL 18, tpcds-q39, rewrite; execution 2956.693 ms, planning 0.911 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Merge Join [Inner]  (rows=2433.0 loops=1 est_rows=71772 buffers hit=105947 read=20051)
+     Merge Cond: ((a.warehouse_sk = b.warehouse_sk) AND (a.item_sk = b.item_sk))
+  -> Seq Scan on date_dim <CTE dates1>  (rows=31.0 loops=1 est_rows=31 buffers hit=2032 read=0)
+       Filter: ((d_year = 2001) AND (d_moy = 1))
+       Rows Removed by Filter: 73018
+  -> Seq Scan on date_dim date_dim_1 <CTE dates2>  (rows=28.0 loops=1 est_rows=28 buffers hit=2032 read=0)
+       Filter: ((d_year = 2001) AND (d_moy = 2))
+       Rows Removed by Filter: 73021
+  -> Aggregate [Hashed] <CTE month1>  (rows=510000.0 loops=1 est_rows=718860 buffers hit=17125 read=10025)
+       Group Key: ['inv.inv_warehouse_sk', 'inv.inv_item_sk']
+    -> Nested Loop [Inner]  (rows=2040000.0 loops=1 est_rows=15809418 buffers hit=17125 read=10025)
+      -> CTE Scan (CTE dates1)  (rows=31.0 loops=1 est_rows=31 buffers hit=2032 read=0)
+      -> Index Scan on inventory inv using scaleup_tpcds_39  (rows=65806.45 loops=31 est_rows=509981 buffers hit=15093 read=10025)
+           Index Cond: (inv_date_sk = d.d_date_sk)
+  -> Aggregate [Hashed] <CTE month2>  (rows=510000.0 loops=1 est_rows=718860 buffers hit=17112 read=10026)
+       Group Key: ['inv_1.inv_warehouse_sk', 'inv_1.inv_item_sk']
+    -> Nested Loop [Inner]  (rows=2040000.0 loops=1 est_rows=14279474 buffers hit=17112 read=10026)
+      -> CTE Scan (CTE dates2)  (rows=28.0 loops=1 est_rows=28 buffers hit=2032 read=0)
+      -> Index Scan on inventory inv_1 using scaleup_tpcds_39  (rows=72857.14 loops=28 est_rows=509981 buffers hit=15080 read=10026)
+           Index Cond: (inv_date_sk = d_1.d_date_sk)
+  -> Sort  (rows=35851.0 loops=1 est_rows=11981 buffers hit=88835 read=10025)
+       Sort Key: ['a.warehouse_sk NULLS FIRST', 'a.item_sk NULLS FIRST']
+    -> Nested Loop [Inner]  (rows=35854.0 loops=1 est_rows=11981 buffers hit=88835 read=10025)
+      -> Hash Join [Inner]  (rows=35854.0 loops=1 est_rows=11981 buffers hit=17126 read=10025)
+           Hash Cond: (a.warehouse_sk = w.w_warehouse_sk)
+        -> CTE Scan (CTE month1)  (rows=35854.0 loops=1 est_rows=239620 buffers hit=17125 read=10025)
+             Filter: (CASE mean WHEN '0'::numeric THEN '0'::numeric ELSE (stdev / mean) END > '1'::numeric)
+             Rows Removed by Filter: 474146
+        -> Hash  (rows=10.0 loops=1 est_rows=10 buffers hit=1 read=0)
+          -> Seq Scan on warehouse w  (rows=10.0 loops=1 est_rows=10 buffers hit=1 read=0)
+      -> Index Only Scan on item i using scaleup_tpcds_40  (rows=1.0 loops=35854 est_rows=1 buffers hit=71709 read=0)
+           Index Cond: (i_item_sk = a.item_sk)
+  -> Sort  (rows=35463.0 loops=1 est_rows=239620 buffers hit=17112 read=10026)
+       Sort Key: ['b.warehouse_sk NULLS FIRST', 'b.item_sk NULLS FIRST']
+    -> CTE Scan (CTE month2)  (rows=35463.0 loops=1 est_rows=239620 buffers hit=17112 read=10026)
+         Filter: (CASE mean WHEN '0'::numeric THEN '0'::numeric ELSE (stdev / mean) END > '1'::numeric)
+         Rows Removed by Filter: 474537

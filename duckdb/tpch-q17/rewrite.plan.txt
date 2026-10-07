@@ -1,0 +1,57 @@
+-- DuckDB 1.5.5, tpch-q17, rewrite; latency 0.080110622 s, cpu 0.5707270570000023 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0002)
+       CTE Name: selected_parts
+       Table Index: 0
+       Estimated Cardinality: 1
+    -> TABLE_SCAN  (rows=2044 time_s=0.0124)
+         Table: tpch.main.part
+         Type: Sequential Scan
+         Projections: p_partkey
+         Filters: ["p_brand='Brand#23'", "p_container='MED BOX'"]
+         Estimated Cardinality: 54055
+    -> CTE  (rows=0 time_s=0.0003)
+         CTE Name: relevant_lineitem
+         Table Index: 1
+         Estimated Cardinality: 1
+      -> PROJECTION  (rows=61385 time_s=0.0)
+           Projections: ['l_partkey', 'l_quantity', 'l_extendedprice']
+           Estimated Cardinality: 1634664
+        -> HASH_JOIN  (rows=61385 time_s=0.3658)
+             Join Type: INNER
+             Conditions: l_partkey = p_partkey
+             Estimated Cardinality: 1634664
+          -> TABLE_SCAN  (rows=59985409 time_s=0.1854)
+               Table: tpch.main.lineitem
+               Type: Sequential Scan
+               Projections: ['l_partkey', 'l_quantity', 'l_extendedprice']
+               Estimated Cardinality: 59986052
+               Dynamic Filters: optional: l_partkey>=2409 AND optional: l_partkey<=1999712
+          -> CTE_SCAN  (rows=2044 time_s=0.0)
+               CTE Index: 0
+               Estimated Cardinality: 54055
+      -> PROJECTION  (rows=1 time_s=0.0)
+           Projections: avg_yearly
+           Estimated Cardinality: 1
+        -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0001)
+             Aggregates: sum(#0)
+          -> PROJECTION  (rows=5526 time_s=0.0)
+               Projections: l_extendedprice
+               Estimated Cardinality: 475469
+            -> HASH_JOIN  (rows=5526 time_s=0.002)
+                 Join Type: INNER
+                 Conditions: ['l_partkey = l_partkey', 'CAST(l_quantity AS DOUBLE) < (0.2 * avg_quantity)']
+                 Estimated Cardinality: 475469
+              -> CTE_SCAN  (rows=61385 time_s=0.0001)
+                   CTE Index: 1
+                   Estimated Cardinality: 1634664
+              -> HASH_GROUP_BY  (rows=2044 time_s=0.0042)
+                   Groups: #0
+                   Aggregates: avg(#1)
+                   Estimated Cardinality: 1090980
+                -> PROJECTION  (rows=61385 time_s=0.0)
+                     Projections: ['l_partkey', 'l_quantity']
+                     Estimated Cardinality: 1634664
+                  -> CTE_SCAN  (rows=61385 time_s=0.0001)
+                       CTE Index: 1
+                       Estimated Cardinality: 1634664

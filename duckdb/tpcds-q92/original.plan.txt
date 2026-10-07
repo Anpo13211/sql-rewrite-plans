@@ -1,0 +1,101 @@
+-- DuckDB 1.5.5, tpcds-q92, original; latency 0.023657527 s, cpu 0.11517811799999998 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> TOP_N  (rows=1 time_s=0.0)
+       Top: 100
+       Order By: sum(tpcds.main.web_sales.ws_ext_discount_amt) ASC
+    -> UNGROUPED_AGGREGATE  (rows=1 time_s=0.0)
+         Aggregates: sum(#0)
+      -> PROJECTION  (rows=52 time_s=0.0)
+           Projections: ws_ext_discount_amt
+           Estimated Cardinality: 1238
+        -> PROJECTION  (rows=52 time_s=0.0)
+             Projections: #1
+             Estimated Cardinality: 1238
+          -> FILTER  (rows=52 time_s=0.0)
+               Expression: (CAST(ws_ext_discount_amt AS DOUBLE) > SUBQUERY)
+               Estimated Cardinality: 1238
+            -> RIGHT_DELIM_JOIN  (rows=0 time_s=0.0001)
+                 Join Type: RIGHT
+                 Conditions: i_item_sk IS NOT DISTINCT FROM i_item_sk
+                 Estimated Cardinality: 0
+                 Delim Index: 1
+              -> HASH_JOIN  (rows=163 time_s=0.0009)
+                   Join Type: INNER
+                   Conditions: d_date_sk = ws_sold_date_sk
+                   Estimated Cardinality: 1238
+                -> FILTER  (rows=79 time_s=0.0)
+                     Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                     Estimated Cardinality: 14609
+                  -> TABLE_SCAN  (rows=79 time_s=0.0001)
+                       Table: tpcds.main.date_dim
+                       Type: Sequential Scan
+                       Projections: d_date_sk
+                       Filters: d_date>='2000-01-27'::DATE AND d_date<='2000-04-26'::DATE
+                       Estimated Cardinality: 14609
+                       Dynamic Filters: optional: d_date_sk>=2450816 AND optional: d_date_sk<=2452642 AND optional: d_date_sk IN BF(ws_sold_date_sk)
+                -> HASH_JOIN  (rows=6642 time_s=0.0184)
+                     Join Type: INNER
+                     Conditions: ws_item_sk = i_item_sk
+                     Estimated Cardinality: 6192
+                  -> TABLE_SCAN  (rows=7184497 time_s=0.0339)
+                       Table: tpcds.main.web_sales
+                       Type: Sequential Scan
+                       Projections: ['ws_item_sk', 'ws_sold_date_sk', 'ws_ext_discount_amt']
+                       Estimated Cardinality: 7197566
+                       Dynamic Filters: optional: ws_item_sk>=10 AND optional: ws_item_sk<=99309
+                  -> TABLE_SCAN  (rows=100 time_s=0.0002)
+                       Table: tpcds.main.item
+                       Type: Sequential Scan
+                       Projections: i_item_sk
+                       Filters: i_manufact_id=350
+                       Estimated Cardinality: 83
+              -> HASH_JOIN  (rows=163 time_s=0.0001)
+                   Join Type: RIGHT
+                   Conditions: i_item_sk IS NOT DISTINCT FROM i_item_sk
+                   Estimated Cardinality: 0
+                -> PROJECTION  (rows=42 time_s=0.0)
+                     Projections: ['(1.3 * avg(ws_ext_discount_amt))', 'i_item_sk']
+                     Estimated Cardinality: 6871
+                  -> PROJECTION  (rows=42 time_s=0.0)
+                       Projections: ['__internal_decompress_integral_bigint(#0, 1)', '#1']
+                       Estimated Cardinality: 6871
+                    -> HASH_GROUP_BY  (rows=42 time_s=0.0011)
+                         Groups: #0
+                         Aggregates: avg(#1)
+                         Estimated Cardinality: 6871
+                      -> PROJECTION  (rows=163 time_s=0.0)
+                           Projections: ['i_item_sk', 'ws_ext_discount_amt']
+                           Estimated Cardinality: 13742
+                        -> PROJECTION  (rows=163 time_s=0.0)
+                             Projections: ['__internal_compress_integral_uinteger(#0, 1)', '#1', '__internal_compress_integral_usmallint(#2, 2450816)']
+                             Estimated Cardinality: 13742
+                          -> HASH_JOIN  (rows=163 time_s=0.0001)
+                               Join Type: INNER
+                               Conditions: ws_sold_date_sk = d_date_sk
+                               Estimated Cardinality: 13742
+                            -> HASH_JOIN  (rows=163 time_s=0.0061)
+                                 Join Type: INNER
+                                 Conditions: ws_item_sk = i_item_sk
+                                 Estimated Cardinality: 68716
+                              -> TABLE_SCAN  (rows=204105 time_s=0.0536)
+                                   Table: tpcds.main.web_sales
+                                   Type: Sequential Scan
+                                   Projections: ['ws_item_sk', 'ws_sold_date_sk', 'ws_ext_discount_amt']
+                                   Estimated Cardinality: 7197566
+                                   Dynamic Filters: ['optional: ws_item_sk IN (1967, 3026, 4631, 8933, 10079, 13429, 14203, 15554, 16202, 16532, 17804, 18679, 19628, 19976, 20522, 21977, 22091, 22661, 22927, 23732, 24086, 27938, 32381, 33829, 38564, 43544, 44324, 51569, 52945, 57638, 66367, 74300, 77429, 77515, 78307, 85289, 85583, 86342, 86504, 92315, 92599, 93943) AND optional: ws_item_sk>=1967 AND optional: ws_item_sk<=93943', 'optional: ws_sold_date_sk>=2451571 AND optional: ws_sold_date_sk<=2451661']
+                              -> DELIM_SCAN  (rows=0 time_s=0)
+                                   Delim Index: 1
+                                   Estimated Cardinality: 921
+                            -> FILTER  (rows=91 time_s=0.0)
+                                 Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+                                 Estimated Cardinality: 14609
+                              -> TABLE_SCAN  (rows=91 time_s=0.0003)
+                                   Table: tpcds.main.date_dim
+                                   Type: Sequential Scan
+                                   Projections: d_date_sk
+                                   Filters: d_date>='2000-01-27'::DATE AND d_date<='2000-04-26'::DATE
+                                   Estimated Cardinality: 14609
+                -> DUMMY_SCAN  (rows=0 time_s=0)
+              -> HASH_GROUP_BY  (rows=42 time_s=0.0001)
+                   Groups: #1
+                   Estimated Cardinality: 921

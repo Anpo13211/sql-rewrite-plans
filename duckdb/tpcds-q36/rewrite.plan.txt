@@ -1,0 +1,74 @@
+-- DuckDB 1.5.5, tpcds-q36, rewrite; latency 0.118208237 s, cpu 0.8605904900000001 s (EXPLAIN ANALYZE with 8 threads; times are summed over threads and not comparable with the 32-thread speed-up)
+-> EXPLAIN_ANALYZE  (rows=0 time_s=0.0)
+  -> CTE  (rows=0 time_s=0.0214)
+       CTE Name: filtered_sales
+       Table Index: 0
+       Estimated Cardinality: 100
+    -> HASH_JOIN  (rows=1783740 time_s=0.0961)
+         Join Type: SEMI
+         Conditions: ss_store_sk = #0
+         Estimated Cardinality: 1152039
+      -> HASH_JOIN  (rows=5314259 time_s=0.112)
+           Join Type: SEMI
+           Conditions: ss_sold_date_sk = #0
+           Estimated Cardinality: 5760198
+        -> TABLE_SCAN  (rows=5314259 time_s=0.3341)
+             Table: tpcds.main.store_sales
+             Type: Sequential Scan
+             Projections: ['ss_sold_date_sk', 'ss_store_sk', 'ss_item_sk', 'ss_net_profit', 'ss_ext_sales_price']
+             Estimated Cardinality: 28800991
+             Dynamic Filters: ['optional: ss_sold_date_sk>=2451911 AND optional: ss_sold_date_sk<=2452275 AND optional: ss_sold_date_sk IN BF(#0)', 'optional: ss_store_sk IN (3, 4, 10, 11, 15, 17, 21, 31, 37, 39, 45, 46, 47, 49, 57, 58, 61, 67, 68, 75, 76, 77, 85, 86, 87, 91, 92, 93, 95, 97, 98) AND optional: ss_store_sk>=3 AND optional: ss_store_sk<=98 AND optional: ss_store_sk IN BF(#0)']
+        -> FILTER  (rows=365 time_s=0.0)
+             Expression: (d_date_sk BETWEEN 2450816 AND 2452642)
+             Estimated Cardinality: 585
+          -> TABLE_SCAN  (rows=365 time_s=0.0001)
+               Table: tpcds.main.date_dim
+               Type: Sequential Scan
+               Projections: d_date_sk
+               Filters: d_year=2001
+               Estimated Cardinality: 585
+      -> FILTER  (rows=31 time_s=0.0)
+           Expression: (s_store_sk <= 100)
+           Estimated Cardinality: 34
+        -> TABLE_SCAN  (rows=31 time_s=0.0)
+             Table: tpcds.main.store
+             Type: Sequential Scan
+             Projections: s_store_sk
+             Filters: s_state='TN'
+             Estimated Cardinality: 34
+    -> PROJECTION  (rows=100 time_s=0.0)
+         Projections: ['#0', '#1', '#2', '#3', '#4']
+         Estimated Cardinality: 100
+      -> TOP_N  (rows=100 time_s=0.0001)
+           Top: 100
+           Order By: ['"ROLLUP".lochierarchy DESC', '#5 ASC', 'rank() OVER (PARTITION BY "ROLLUP".lochierarchy, CASE  WHEN (("ROLLUP".t_class = 0)) THEN ("ROLLUP".i_category) ELSE NULL END ORDER BY "ROLLUP".gross_margin ASC) ASC']
+        -> PROJECTION  (rows=166 time_s=0.0)
+             Projections: ['gross_margin', 'i_category', 'i_class', 'lochierarchy', 'rank_within_parent', 'CASE  WHEN ((lochierarchy = 0)) THEN (i_category) ELSE NULL END']
+             Estimated Cardinality: 1223375
+          -> PROJECTION  (rows=166 time_s=0.0)
+               Projections: ['#0', '#1', '#2', '#3', '#4', '#5']
+               Estimated Cardinality: 1223375
+            -> WINDOW  (rows=166 time_s=0.0091)
+                 Projections: RANK() OVER (PARTITION BY lochierarchy, CASE  WHEN ((t_class = 0)) THEN (i_category) ELSE NULL END ORDER BY gross_margin ASC NULLS LAST)
+              -> PROJECTION  (rows=166 time_s=0.0001)
+                   Projections: ['gross_margin', 'i_category', 'i_class', 't_class', 'lochierarchy']
+                   Estimated Cardinality: 1223375
+                -> HASH_GROUP_BY  (rows=166 time_s=0.2335)
+                     Groups: ['#0', '#1']
+                     Aggregates: ['sum(#2)', 'sum(#3)']
+                     Estimated Cardinality: 1223375
+                  -> PROJECTION  (rows=1783740 time_s=0.0003)
+                       Projections: ['i_category', 'i_class', 'ss_net_profit', 'ss_ext_sales_price']
+                       Estimated Cardinality: 1223378
+                    -> HASH_JOIN  (rows=1783740 time_s=0.0511)
+                         Join Type: INNER
+                         Conditions: ss_item_sk = i_item_sk
+                         Estimated Cardinality: 1223378
+                      -> CTE_SCAN  (rows=1783740 time_s=0.0014)
+                           CTE Index: 0
+                           Estimated Cardinality: 1152039
+                      -> TABLE_SCAN  (rows=102000 time_s=0.0011)
+                           Table: tpcds.main.item
+                           Type: Sequential Scan
+                           Projections: ['i_item_sk', 'i_category', 'i_class']
+                           Estimated Cardinality: 102000

@@ -1,0 +1,37 @@
+-- PostgreSQL 18, tpch-q05, rewrite; execution 1762.84 ms, planning 5.899 ms (EXPLAIN ANALYZE, BUFFERS, TIMING OFF; in memory, no load)
+-> Sort  (rows=5.0 loops=1 est_rows=25 buffers hit=2619958 read=0)
+     Sort Key: ["(sum((l.l_extendedprice * ('1'::numeric - l.l_discount)))) DESC"]
+  -> Aggregate [Sorted] [Finalize]  (rows=5.0 loops=1 est_rows=25 buffers hit=2619958 read=0)
+       Group Key: ['n.n_nationkey']
+    -> Gather Merge  (rows=35.0 loops=1 est_rows=150 workers=6 buffers hit=2619958 read=0)
+      -> Aggregate [Sorted] [Partial]  (rows=5.0 loops=7 est_rows=25 buffers hit=2619958 read=0)
+           Group Key: ['n.n_nationkey']
+        -> Sort  (rows=10426.43 loops=7 est_rows=11766 buffers hit=2619958 read=0)
+             Sort Key: ['n.n_nationkey']
+          -> Hash Join [Inner]  (rows=10426.43 loops=7 est_rows=11766 buffers hit=2619934 read=0)
+               Hash Cond: ((n.n_nationkey = s.s_nationkey) AND (l.l_suppkey = s.s_suppkey))
+            -> Nested Loop [Inner]  (rows=260836.57 loops=7 est_rows=296712 buffers hit=2617734 read=0)
+              -> Merge Join [Inner]  (rows=65253.0 loops=7 est_rows=74190 buffers hit=303734 read=0)
+                   Merge Cond: (c.c_nationkey = n.n_nationkey)
+                -> Sort  (rows=286038.86 loops=7 est_rows=370949 buffers hit=303720 read=0)
+                     Sort Key: ['c.c_nationkey']
+                  -> Hash Join [Inner]  (rows=325131.29 loops=7 est_rows=370949 buffers hit=303720 read=0)
+                       Hash Cond: (o.o_custkey = c.c_custkey)
+                    -> Seq Scan on orders o  (rows=325131.29 loops=7 est_rows=370949 buffers hit=267160 read=0)
+                         Filter: ((o_orderdate >= '1994-01-01'::date) AND (o_orderdate < '1995-01-01'::date))
+                         Rows Removed by Filter: 1817726
+                    -> Hash  (rows=214285.71 loops=7 est_rows=375049 buffers hit=36560 read=0)
+                      -> Seq Scan on customer c  (rows=214285.71 loops=7 est_rows=375049 buffers hit=36560 read=0)
+                -> Sort  (rows=52212.14 loops=7 est_rows=5 buffers hit=14 read=0)
+                     Sort Key: ['n.n_nationkey']
+                  -> Hash Join [Inner]  (rows=5.0 loops=7 est_rows=5 buffers hit=14 read=0)
+                       Hash Cond: (n.n_regionkey = r.r_regionkey)
+                    -> Seq Scan on nation n  (rows=25.0 loops=7 est_rows=25 buffers hit=7 read=0)
+                    -> Hash  (rows=1.0 loops=7 est_rows=1 buffers hit=7 read=0)
+                      -> Seq Scan on region r  (rows=1.0 loops=7 est_rows=1 buffers hit=7 read=0)
+                           Filter: ((r_name)::text = 'ASIA'::text)
+                           Rows Removed by Filter: 4
+              -> Index Scan on lineitem l using scaleup_tpch_07  (rows=4.0 loops=456771 est_rows=147 buffers hit=2314000 read=0)
+                   Index Cond: (l_orderkey = o.o_orderkey)
+            -> Hash  (rows=14285.71 loops=7 est_rows=58824 buffers hit=2200 read=0)
+              -> Seq Scan on supplier s  (rows=14285.71 loops=7 est_rows=58824 buffers hit=2200 read=0)
